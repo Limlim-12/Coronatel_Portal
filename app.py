@@ -6,15 +6,18 @@ from flask import Flask, render_template, redirect, url_for, request, flash
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_migrate import Migrate
-from flask_login import LoginManager, login_user, login_required, logout_user, current_user
+from flask_login import login_user, login_required, logout_user, current_user # Removed LoginManager here
 from datetime import datetime, date
-from extensions import db, login_manager
+from extensions import db, login_manager # Keep this import
 import pytz
 import os
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key_here'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+basedir = os.path.abspath(os.path.dirname(__file__))
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL') or \
+    'sqlite:///' + os.path.join(basedir, 'instance', 'database.db')
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 app.config['SOA_FOLDER'] = 'static/soa'
@@ -23,14 +26,17 @@ app.config['ENV_MODE'] = os.getenv('FLASK_ENV', 'development')
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 os.makedirs(app.config['SOA_FOLDER'], exist_ok=True)
 
-# Initialize extensions
+# Initialize extensions (using the instances imported from extensions.py)
+# This MUST happen after app.config is set
 db.init_app(app)
-login_manager.init_app(app)
-migrate = Migrate(app, db)
+login_manager.init_app(app) # This is the correct instance imported from extensions.py
 
-login_manager = LoginManager()
+# Configure login_manager AFTER it has been initialized with the app
 login_manager.login_view = 'cx_login'  # <-- your login route function name
-login_manager.init_app(app)
+
+# Initialize Flask-Migrate (requires both app and db instances)
+migrate = Migrate(app, db) # This should come after db.init_app(app)
+
 
 # Import models after db is ready
 from models import Cx, PaymentProof, CxRequest
