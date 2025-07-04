@@ -1,0 +1,228 @@
+<div class="billing-section">
+    <div class="billing-tabs-container">
+        <button class="tab-btn active" onclick="showTab('upload', this)">📤 Payment Verification</button>
+        <button class="tab-btn" onclick="showTab('rebate', this)">💸 Rebate Request</button>
+        <button class="tab-btn" onclick="showTab('overcharge', this)">💸 Overcharge Request</button>
+        <button class="tab-btn" onclick="showTab('soa', this)">📥 Download SOA</button>
+    </div>
+
+    <div id="upload" class="tab-content active">
+        <h3>Upload Proof of Payment</h3>
+        <form id="uploadForm" action="{{ url_for('upload_proof') }}" method="POST" enctype="multipart/form-data">
+            <div class="form-group custom-file-upload-group">
+                <label for="proof_file" class="upload-label">
+                    <span class="upload-button">
+                        <i class="fas fa-cloud-upload-alt"></i> Upload Proof of Payment
+                    </span>
+                    <span id="file-name" class="file-name">No file chosen</span>
+                </label>
+                <input type="file" name="proof_file" id="proof_file" accept=".jpg,.jpeg,.png,.pdf" required class="hidden-file-input">
+            </div>
+
+            <div class="form-group">
+                <label for="bank_select">Select Bank</label>
+                <select id="bank_select" name="bank" required>
+                    <option value="" disabled selected>-- Choose a Bank --</option>
+                    <option value="gcash">GCash</option>
+                    <option value="seabank">SeaBank</option>
+                    <option value="ubp">UnionBank (UBP)</option>
+                    <option value="cimb">CIMB Bank</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="reference_number">Reference Number</label>
+                <input type="text" name="reference_number" id="reference_number" placeholder="Enter Reference Number" required>
+                <small id="ref_hint" class="form-hint-text"></small>
+            </div>
+
+            <div class="form-group">
+                <label for="amount_paid">Amount Paid</label>
+                <input type="number" name="amount" id="amount_paid" min="1" step="0.01" placeholder="₱0.00" required>
+            </div>
+
+            <div class="form-group">
+                <label for="payment_date">Transaction Date (from receipt)</label>
+                <input type="date" name="payment_date" id="payment_date" required>
+            </div>
+
+            <button type="submit" class="action-btn">📤 Submit Proof</button>
+        </form>
+
+       {% if previous_uploads %}
+    <h4 class="mt-4">Previous Uploads</h4>
+    <div class="proof-history">
+        {% for proof in previous_uploads %}
+        <div class="proof-card">
+            <div class="proof-card-header-line">
+                <div class="proof-main-info">
+                    <span class="proof-location">{{ current_user.location_region or 'N/A' }}</span>
+                    <span class="separator">|</span>
+                    <span class="proof-account-name">{{ current_user.name or 'N/A' }}</span>
+                    <span class="separator">|</span>
+                    <span class="proof-account-number">{{ current_user.account_number or 'N/A' }}</span>
+                </div>
+                <div class="proof-secondary-info">
+                    <span class="proof-status-display">
+                        <strong>Payment Status:</strong>
+                        <span class="proof-status status-{{ proof.status | lower }}">{{ proof.status }}</span>
+                    </span>
+                    <span class="proof-uploaded-display">
+                        <strong>Uploaded:</strong> {{ proof.uploaded_at.strftime('%b %d, %Y %I:%M %p') }}
+                    </span>
+                    <a href="{{ url_for('static', filename='uploads/' + proof.filename) }}" target="_blank" class="view-proof-link">View Proof</a>
+                </div>
+            </div>
+            <div class="proof-card-details">
+                <p><strong>Ref No:</strong> {{ proof.reference_number }}</p>
+                <p><strong>Amount:</strong> ₱{{ proof.amount }}</p>
+                <p><strong>Payment Date:</strong> {{ proof.payment_date.strftime('%b %d, %Y') }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% endif %}
+        
+    </div> <div id="rebate" class="tab-content">
+        <h3>Request a Rebate</h3>
+        <form action="{{ url_for('rebate_request') }}" method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="type" value="rebate">
+
+            <div class="form-group">
+                <label for="rebate_account_number">Account Number</label>
+                <input type="text" name="account_number" id="rebate_account_number" value="{{ current_user.account_number }}" readonly>
+            </div>
+
+            <div class="form-group">
+                <label>Billing Cycle</label>
+                <div class="form-date-range">
+                    <input type="date" name="billing_from" required>
+                    <span class="date-range-separator">to</span>
+                    <input type="date" name="billing_to" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="soa_file_rebate">Upload Latest SOA</label>
+                <input type="file" name="soa_file" id="soa_file_rebate" accept=".pdf,.jpg,.jpeg,.png" required>
+            </div>
+
+            <div class="form-group">
+                <label for="rebate_amount">Requested Rebate Amount (₱)</label>
+                <input type="number" name="rebate_amount" id="rebate_amount" step="0.01" min="0" placeholder="₱0.00" required>
+            </div>
+
+            <button type="submit" class="action-btn">📨 Submit Rebate Request</button>
+        </form>
+    </div> <div id="overcharge" class="tab-content">
+        <h3>Report Overcharge</h3>
+        <form action="{{ url_for('rebate_request') }}" method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="type" value="overcharge">
+
+            <div class="form-group">
+                <label for="overcharge_account_number">Account Number</label>
+                <input type="text" name="account_number" id="overcharge_account_number" value="{{ current_user.account_number }}" readonly>
+            </div>
+
+            <div class="form-group">
+                <label>Billing Cycle</label>
+                <div class="form-date-range">
+                    <input type="date" name="billing_from" required>
+                    <span class="date-range-separator">to</span>
+                    <input type="date" name="billing_to" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="soa_file_overcharge">Upload Latest SOA</label>
+                <input type="file" name="soa_file" id="soa_file_overcharge" accept=".pdf,.jpg,.jpeg,.png" required>
+            </div>
+
+            <div class="form-group">
+                <label for="overcharge_reason">Explanation of Overcharge</label>
+                <textarea name="overcharge_reason" id="overcharge_reason" rows="4" placeholder="Describe the overcharge issue..." required></textarea>
+            </div>
+
+            <button type="submit" class="action-btn">📨 Submit Overcharge Report</button>
+        </form>
+    </div> <div id="soa" class="tab-content">
+        <h3>Download or View Your Statement</h3>
+        <form action="{{ url_for('download_soa') }}" method="GET" class="mb-4">
+            <button type="submit" class="action-btn">⬇️ Download Latest SOA</button>
+        </form>
+        <div class="soa-viewer-container">
+            <iframe src="{{ url_for('serve_soa_pdf') }}" width="100%" height="500px" class="soa-iframe"></iframe>
+        </div>
+    </div> </div> <script>
+    // Function to handle tab switching
+    function showTab(tabId, clickedButton) {
+        // Remove 'active' class from all tab buttons
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        tabButtons.forEach(button => {
+            button.classList.remove('active');
+        });
+
+        // Hide all tab content
+        const tabContents = document.querySelectorAll('.tab-content');
+        tabContents.forEach(content => {
+            content.classList.remove('active');
+        });
+
+        // Add 'active' class to the clicked button
+        clickedButton.classList.add('active');
+
+        // Show the corresponding tab content
+        document.getElementById(tabId).classList.add('active');
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // --- Bank Select Hint Logic ---
+        const bankSelect = document.getElementById('bank_select');
+        const refHint = document.getElementById('ref_hint');
+        if (bankSelect && refHint) {
+            bankSelect.addEventListener('change', function() {
+                let hintText = '';
+                switch (this.value) {
+                    case 'gcash':
+                        hintText = 'Enter the 11-digit GCash Reference Number (starts with 2 or 3).';
+                        break;
+                    case 'seabank':
+                        hintText = 'Enter the SeaBank Transaction ID. It\'s usually 10-12 digits.';
+                        break;
+                    case 'ubp':
+                        hintText = 'Enter the UnionBank Transfer Reference Number. (e.g., 1234567890ABCDEF).';
+                        break;
+                    case 'cimb':
+                        hintText = 'Enter the CIMB Bank Transaction Ref. ID. Check your CIMB app for details.';
+                        break;
+                    default:
+                        hintText = 'Enter the complete reference number from your payment receipt or transaction confirmation.';
+                }
+                refHint.textContent = hintText;
+            });
+            // Trigger the change event once on page load to set initial hint
+            bankSelect.dispatchEvent(new Event('change'));
+        }
+
+        // --- Initial Tab Display Logic ---
+        // This ensures the first tab is visible on page load
+        const initialTabButton = document.querySelector('.billing-tabs-container .tab-btn.active');
+        if (initialTabButton) {
+            const initialTabId = initialTabButton.getAttribute('onclick').match(/'([^']+)'/)[1];
+            showTab(initialTabId, initialTabButton);
+        }
+
+        // --- File Upload Display Logic ---
+        const fileInput = document.getElementById('proof_file');
+        const fileNameSpan = document.getElementById('file-name');
+        if (fileInput && fileNameSpan) {
+            fileInput.addEventListener('change', function() {
+                if (this.files && this.files.length > 0) {
+                    fileNameSpan.textContent = this.files[0].name;
+                } else {
+                    fileNameSpan.textContent = 'No file chosen';
+                }
+            });
+        }
+    });
+</script>

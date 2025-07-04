@@ -1,0 +1,89 @@
+<!-- templates/test_sidebar.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sidebar Test</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Titillium Web', sans-serif;
+    }
+
+    .toggle-btn {
+      position: fixed;
+      top: 1rem;
+      left: 1rem;
+      z-index: 200;
+      padding: 0.6rem 1.2rem;
+      background-color: #FF325C;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 250px;
+      height: 100vh;
+      background-color: #FF325C;
+      color: white;
+      padding: 2rem 1rem;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+      z-index: 150;
+    }
+
+    .sidebar.active {
+      transform: translateX(0);
+    }
+
+    .main {
+      margin-left: 0;
+      padding: 2rem;
+    }
+
+    @media screen and (min-width: 769px) {
+      .main {
+        margin-left: 250px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<button class="toggle-btn" id="toggleBtn">☰</button>
+
+<div class="sidebar" id="sidebar">
+  <h2>Sidebar</h2>
+  <p>Click anywhere outside to close this.</p>
+</div>
+
+<div class="main" id="main">
+  <h1>Test Page</h1>
+  <p>This is just a test layout. Your app is safe.</p>
+</div>
+
+<script>
+  const toggleBtn = document.getElementById('toggleBtn');
+  const sidebar = document.getElementById('sidebar');
+
+  toggleBtn.addEventListener('click', (e) => {
+    e.stopPropagation(); // don't trigger body click
+    sidebar.classList.toggle('active');
+  });
+
+  document.body.addEventListener('click', (e) => {
+    if (!sidebar.contains(e.target) && e.target !== toggleBtn) {
+      sidebar.classList.remove('active');
+    }
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+{% block content %}
+
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<button id="sidebarToggle" class="toggle-btn">☰</button>
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+<div class="main" id="main">
+    <div class="sidebar collapsed" id="sidebar">
+
+        <div class="sidebar-header">
+            <img src="{{ url_for('static', filename='uploads/' + (current_user.avatar or 'logo.jpg')) }}" alt="User Avatar" class="sidebar-avatar">
+            <h3 class="sidebar-user-name">{{ current_user.name }}</h3>
+            <p class="sidebar-account-number">Account No: {{ current_user.account_number or 'N/A' }}</p>
+        </div>
+
+        <nav class="sidebar-nav">
+            <ul class="nav-links">
+                <li>
+                    <a href="{{ url_for('cx_dashboard') }}" class="sidebar-link {% if active_tab == 'dashboard' %}active{% endif %}">
+                        <i class="icon-dashboard"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('cx_dashboard', tab='profile') }}" class="sidebar-link {% if active_tab == 'profile' %}active{% endif %}">
+                        <i class="icon-profile"></i>
+                        <span>Profile</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('cx_dashboard', tab='billing') }}" class="sidebar-link {% if active_tab == 'billing' %}active{% endif %}">
+                        <i class="icon-billing"></i>
+                        <span>Billing & Payment</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('logout') }}" class="sidebar-link logout-link">
+                        <i class="icon-logout"></i>
+                        <span>Logout</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+   
+
+
+    <div class="tab-wrapper">
+        {% if active_tab == 'profile' %}
+            {% include 'cx/profile_tab.html' %}
+        {% elif active_tab == 'billing' %}
+            {% include 'cx/billing_tab.html' %}
+        {% else %}
+            <div class="profile-summary">
+                <div class="profile-header">
+                  <div class="user-info">
+                    <h2 class="greeting-text"><span id="time-greeting"></span>, {{ current_user.first_name }}!</h2>
+                    {# Removed original detail lines here as they were moved to Profile tab in previous iterations #}
+                  </div>
+                </div>
+            </div>
+
+            <div class="dashboard-widgets-grid">
+                <div class="dashboard-card notifications-card">
+                  <h2>Latest Notifications</h2>
+                  <p>No new notifications at this time.</p>
+                  {# You can add a loop here to display actual notifications if you have them #}
+                </div>
+
+                <div class="dashboard-card status-usage-card">
+                  <h2>Account Status</h2>
+                  <p><strong>Status:</strong> Active</p>
+                  <p><strong>Billing Cycle:</strong> 01/07/2025 - 31/07/2025</p>
+                  <p><strong>Due Date:</strong> 25/07/2025</p>
+
+                  <h2 class="mt-4">Internet Usage</h2>
+                  <p><strong>Data Used:</strong> 150 GB / 500 GB</p>
+                  <div class="progress-bar-container">
+                    <div class="progress-bar" style="width: 30%;"></div> {# Example: 30% usage. Adjust 'width' dynamically with Jinja if needed #}
+                  </div>
+                  <p><small>Next reset: in 15 days</small></p>
+                </div>
+            </div>
+
+            <div class="dashboard-card about-us-container">
+                <h2>ABOUT CORONA TELECOM</h2>
+                <p>Welcome to Corona Telecom! We are committed to providing reliable internet services and exceptional customer support to keep you connected. Our mission is to empower communities through seamless digital experiences.</p>
+                <p>Learn more about our services and values on our <a href="#">About Us page</a>.</p>
+            </div>
+        {% endif %} {# <-- THIS IS THE CRUCIAL {% endif %} THAT CLOSES THE 'if active_tab' BLOCK #}
+    </div> {# Closes .tab-wrapper #}
+</div> {# Closes .main-content #}
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const sidebar = document.getElementById('sidebar');
+  const main = document.getElementById('main'); // 'main' is now the id
+  const toggleBtn = document.getElementById('sidebarToggle');
+  const overlay = document.getElementById('sidebar-overlay');
+
+  // Ensure all necessary elements exist before adding event listeners
+  if (!sidebar || !main || !toggleBtn || !overlay) {
+      console.error("One or more essential sidebar elements not found in the DOM.");
+      return;
+  }
+
+  // Event listener for the toggle button
+  toggleBtn.addEventListener('click', function (e) {
+    e.stopPropagation(); // Prevents click from propagating to overlay/document
+    sidebar.classList.toggle('active');
+    sidebar.classList.toggle('collapsed'); // Correctly toggle 'collapsed' too
+    overlay.classList.toggle('active');
+    document.body.classList.toggle('sidebar-open'); // For body styling (e.g., preventing scroll)
+  });
+
+  // Event listeners for sidebar links (to close sidebar on mobile navigation)
+  document.querySelectorAll('.sidebar-link').forEach(link => {
+    link.addEventListener('click', function () {
+      if (window.innerWidth <= 768) { // Only close on smaller screens
+        sidebar.classList.remove('active');
+        sidebar.classList.add('collapsed'); // Ensure it goes back to collapsed state
+        overlay.classList.remove('active'); // Hide the overlay
+        document.body.classList.remove('sidebar-open');
+      }
+    });
+  });
+
+  // Event listener for clicking the overlay (to close sidebar)
+  overlay.addEventListener('click', function () {
+    sidebar.classList.remove('active');
+    sidebar.classList.add('collapsed'); // Ensure it goes back to collapsed state
+    overlay.classList.remove('active'); // Hide the overlay
+    document.body.classList.remove('sidebar-open');
+  });
+});
+</script>
+
+
+{% if request.args.get('uploaded') == 'true' %}
+<script>
+    Swal.fire({
+      title: 'Upload Successful!',
+      text: 'Your proof of payment was uploaded successfully.',
+      icon: 'success',
+      confirmButtonColor: '#FF325C'
+    });
+</script>
+{% endif %}
+
+<script>
+    function setGreeting() {
+        const greetingElement = document.getElementById('time-greeting');
+        if (!greetingElement) return;
+
+        const now = new Date();
+        const hour = now.getHours();
+        let greeting = '';
+
+        if (hour >= 5 && hour < 12) {
+            greeting = 'Good Morning';
+        } else if (hour >= 12 && hour < 18) {
+            greeting = 'Good Afternoon';
+        } else {
+            greeting = 'Good Evening';
+        }
+
+        greetingElement.textContent = greeting;
+    }
+
+    document.addEventListener('DOMContentLoaded', setGreeting);
+</script>
+
+{% endblock %} {# <-- THIS {% endblock %} IS CORRECTLY PLACED AT THE VERY END OF THE BLOCK CONTENT #}

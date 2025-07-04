@@ -1,0 +1,304 @@
+<div class="card profile-container">
+    {% if request.args.get('edit') != '1' %}
+    <div class="profile-summary">
+
+        <div class="profile-preview-header">
+            <span class="preview-heading">Profile Preview</span>
+            <a href="{{ url_for('cx_dashboard', tab='profile', edit='1') }}" class="edit-profile-btn">
+                ✏️
+            </a>
+        </div>
+
+        <div class="profile-hero-section">
+            <img src="{{ url_for('static', filename='uploads/' + (current_user.avatar or 'logo.jpg')) }}" alt="Avatar" class="avatar-display-large">
+            <h2 class="user-display-name">{{ current_user.name }}</h2>
+            <div class="user-main-info">
+                 <p class="detail-item"><strong>Username:</strong> <span>{{ current_user.email or 'N/A' }}</span></p>
+                 <p class="detail-item"><strong>Internet Plan::</strong> <span>{{ current_user.internet_plan or 'N/A' }}</span></p>
+				 <p class="detail-item"><strong>Account No.:</strong> <span>{{ current_user.account_number or 'N/A' }}</span></p>
+             </div>
+        </div>
+
+  
+  
+        <div class="profile-details-group">
+            <p class="detail-item"><strong>Full Name:</strong> <span>{{ current_user.first_name or '' }} {{ current_user.middle_name or '' }} {{ current_user.surname or '' }}</span></p>
+			<p class="detail-item"><strong>Contact:</strong> <span>{{ current_user.contact or 'N/A' }}</span></p>
+            <p class="detail-item"><strong>Birthdate:</strong> <span>{{ current_user.birthdate or 'N/A' }}</span></p>
+            <p class="detail-item"><strong>Gender:</strong> <span>{{ current_user.gender or 'N/A' }}</span></p>
+			<p class="detail-item"><strong>Age:</strong> <span>{{ age or 'N/A' }}</span></p>
+        </div>
+
+        <div class="profile-details-group">
+            <p class="detail-item"><strong>Country:</strong> <span>{{ current_user.location_country or 'N/A' }}</span></p>
+            <p class="detail-item"><strong>Region:</strong> <span>{{ current_user.location_region or 'N/A' }}</span></p>
+            <p class="detail-item"><strong>Province:</strong> <span>{{ current_user.location_province or 'N/A' }}</span></p>
+            <p class="detail-item"><strong>City:</strong> <span>{{ current_user.location_city or 'N/A' }}</span></p>
+            <p class="detail-item"><strong>Barangay:</strong> <span>{{ current_user.location_barangay or 'N/A' }}</span></p>
+            <p class="detail-item"><strong>ZIP:</strong> <span>{{ current_user.location_zip or 'N/A' }}</span></p>
+            <p class="detail-item"><strong>Street:</strong> <span>{{ current_user.location_street or 'N/A' }}</span></p>
+        </div>
+    </div>
+	
+	
+    {% else %}
+	
+	
+    <h2 class="form-title">Edit Profile Information</h2>
+
+    <form action="{{ url_for('update_profile') }}" method="post" enctype="multipart/form-data">
+        <div class="avatar-upload-section">
+            <img src="{{ url_for('static', filename='uploads/' + (current_user.avatar or 'logo.jpg')) }}?t={{ now.timestamp() }}" alt="Avatar" class="avatar-preview">
+            <div class="form-group">
+                <label for="avatar" class="file-label">Change Avatar</label>
+                <input type="file" name="avatar" id="avatar" accept="image/*">
+            </div>
+        </div>
+
+        <div class="form-section">
+            <div class="form-group">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" name="name" value="{{ current_user.name }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" value="{{ current_user.email }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="contact">Contact Number</label>
+                <input type="text" id="contact" name="contact" value="{{ current_user.contact or '' }}">
+            </div>
+
+            <div class="form-group">
+                <label for="account_number">Account Number</label>
+                <input type="text" id="account_number" name="account_number" value="{{ current_user.account_number or '' }}" disabled>
+            </div>
+
+            <div class="form-group">
+                <label for="internet_plan">Internet Plan</label>
+                <input type="text" id="internet_plan" name="internet_plan" value="{{ current_user.internet_plan or '' }}" disabled>
+            </div>
+        </div>
+
+        <hr>
+        <h3 class="form-section-heading">Demographics</h3>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="first_name">First Name</label>
+                <input type="text" id="first_name" name="first_name" value="{{ current_user.first_name or '' }}">
+            </div>
+            <div class="form-group">
+                <label for="middle_name">Middle Name</label>
+                <input type="text" id="middle_name" name="middle_name" value="{{ current_user.middle_name or '' }}">
+            </div>
+            <div class="form-group">
+                <label for="surname">Surname</label>
+                <input type="text" id="surname" name="surname" value="{{ current_user.surname or '' }}">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="birthdate">Birthdate</label>
+                <input type="date" name="birthdate" id="birthdate" value="{{ current_user.birthdate or '' }}" onchange="calculateAge()">
+            </div>
+            <div class="form-group">
+                <label for="age_display">Age</label>
+                <input type="text" id="age_display" placeholder="Age" disabled>
+            </div>
+            <div class="form-group">
+                <label for="gender">Gender</label>
+                <select name="gender" id="gender">
+                    <option value="">Select Gender</option>
+                    <option value="Male" {% if current_user.gender == 'Male' %}selected{% endif %}>Male</option>
+                    <option value="Female" {% if current_user.gender == 'Female' %}selected{% endif %}>Female</option>
+                    <option value="Non Binary" {% if current_user.gender == 'Non Binary' %}selected{% endif %}>Non Binary</option>
+                </select>
+            </div>
+        </div>
+
+        <hr>
+        <h3 class="form-section-heading">Location</h3>
+
+        <div class="form-section">
+            <div class="form-group">
+                <label for="location_country">Country</label>
+                <select name="location_country" id="location_country">
+                    <option value="Philippines" {% if current_user.location_country == 'Philippines' %}selected{% endif %}>🇵🇭 Philippines</option>
+                    <option value="N/A" {% if current_user.location_country == 'N/A' %}selected{% endif %}>Not Available</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="location_region">Region</label>
+                <select name="location_region" id="location_region">
+                    <option value="">Select Region</option>
+                    <option value="Central Visayas" {% if current_user.location_region == 'Central Visayas' %}selected{% endif %}>Central Visayas</option>
+                    <option value="Region VIII" {% if current_user.location_region == 'Region VIII' %}selected{% endif %}>Region VIII</option>
+                    <option value="N/A" {% if current_user.location_region == 'N/A' %}selected{% endif %}>Not Available</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="location_province">Province</label>
+                <select name="location_province" id="location_province">
+                    <option value="{{ current_user.location_province or '' }}">{{ current_user.location_province or 'Select Province' }}</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="location_city">City</label>
+                <select name="location_city" id="location_city">
+                    <option value="{{ current_user.location_city or '' }}">{{ current_user.location_city or 'Select City' }}</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="location_barangay">Barangay</label>
+                <select name="location_barangay" id="location_barangay">
+                    <option value="{{ current_user.location_barangay or '' }}">{{ current_user.location_barangay or 'Select Barangay' }}</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="location_zip">ZIP Code</label>
+                <input type="text" id="location_zip" name="location_zip" value="{{ current_user.location_zip or '' }}">
+            </div>
+
+            <div class="form-group">
+                <label for="location_street">Street Address</label>
+                <input type="text" id="location_street" name="location_street" value="{{ current_user.location_street or '' }}">
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn">💾 Save Changes</button>
+            <a href="{{ url_for('cx_dashboard', tab='profile') }}" class="btn btn-secondary">❌ Cancel</a>
+        </div>
+    </form>
+    {% endif %}
+</div>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const birthInput = document.getElementById('birthdate');
+    const ageOutput = document.getElementById('age_display');
+    const avatarInput = document.getElementById('avatar');
+    const regionSelect = document.getElementById('location_region');
+    const provinceSelect = document.getElementById('location_province');
+    const citySelect = document.getElementById('location_city');
+    const barangaySelect = document.getElementById('location_barangay');
+
+    // Auto-calculate age on load and change
+    if (birthInput && ageOutput) {
+        birthInput.addEventListener('change', calculateAge);
+        calculateAge(); // Initial load
+    }
+
+    // Avatar filename preview
+    if (avatarInput) {
+        avatarInput.addEventListener('change', function () {
+            const label = this.previousElementSibling;
+            if (label && this.files.length > 0) {
+                label.textContent = this.files[0].name;
+            } else if (label) {
+                label.textContent = 'Change Avatar';
+            }
+        });
+    }
+
+    // Cascading location dropdowns
+    if (regionSelect && provinceSelect && citySelect && barangaySelect) {
+        regionSelect.addEventListener('change', () => {
+            populateProvinces();
+        });
+
+        provinceSelect.addEventListener('change', () => {
+            populateCities();
+        });
+
+        citySelect.addEventListener('change', () => {
+            populateBarangays();
+        });
+
+        // Optional: Populate if already selected (e.g. in edit mode)
+        if (regionSelect.value) populateProvinces(regionSelect.value, true);
+    }
+
+    function calculateAge() {
+        if (!birthInput.value) return;
+        const birth = new Date(birthInput.value);
+        const today = new Date();
+        let age = today.getFullYear() - birth.getFullYear();
+        const m = today.getMonth() - birth.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
+        ageOutput.value = age > 0 ? `${age} yrs old` : '';
+    }
+
+    function populateProvinces(preset = regionSelect.value, preserve = false) {
+        const current = provinceSelect.value;
+        provinceSelect.innerHTML = '<option value="">Select Province</option>';
+        citySelect.innerHTML = '<option value="">Select City</option>';
+        barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
+        if (regions[preset]) {
+            Object.keys(regions[preset]).forEach(province => {
+                provinceSelect.add(new Option(province, province));
+            });
+            if (preserve && current) {
+                provinceSelect.value = current;
+                populateCities(preset, current, true);
+            }
+        }
+    }
+
+    function populateCities(regionVal = regionSelect.value, provinceVal = provinceSelect.value, preserve = false) {
+        const current = citySelect.value;
+        citySelect.innerHTML = '<option value="">Select City</option>';
+        barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
+        if (regions[regionVal] && regions[regionVal][provinceVal]) {
+            Object.keys(regions[regionVal][provinceVal]).forEach(city => {
+                citySelect.add(new Option(city, city));
+            });
+            if (preserve && current) {
+                citySelect.value = current;
+                populateBarangays(regionVal, provinceVal, current, true);
+            }
+        }
+    }
+
+    function populateBarangays(regionVal = regionSelect.value, provinceVal = provinceSelect.value, cityVal = citySelect.value, preserve = false) {
+        const current = barangaySelect.value;
+        barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
+        if (regions[regionVal] && regions[regionVal][provinceVal] && regions[regionVal][provinceVal][cityVal]) {
+            regions[regionVal][provinceVal][cityVal].forEach(brgy => {
+                barangaySelect.add(new Option(brgy, brgy));
+            });
+            if (preserve && current) barangaySelect.value = current;
+        }
+    }
+});
+
+const regions = {
+    'Central Visayas': {
+        'Cebu': {
+            'Cebu City': ['Lahug', 'Guadalupe'],
+            'Mandaue': ['Centro', 'Tipolo']
+        },
+        'Bohol': {
+            'Tagbilaran': ['Cogon', 'Dao']
+        }
+    },
+    'Region VIII': {
+        'Leyte': {
+            'Tacloban': ['Barangay 1', 'Barangay 2']
+        },
+        'Samar': {
+            'Calbayog': ['Barangay A', 'Barangay B']
+        }
+    }
+};
+</script>

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Corona Telecom</title>
+  <link href="https://fonts.googleapis.com/css2?family=Titillium+Web&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  {% if config['ENV_MODE'] == 'production' %}
+    <!-- Production: optimized CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/purged.css') }}">
+  {% else %}
+    <!-- Development: full CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  {% endif %}
+
+  <script>
+    console.log("Running in {{ config['ENV_MODE'] }} mode");
+  </script>
+</head>
+
+<body>
+
+
+ <header class="{% if dashboard_header %}dashboard-header{% else %}compact-header{% endif %}">
+      {% if dashboard_header %}
+        <h1 class="main-title">Welcome to Corona Telecom</h1>
+        <p class="subtitle">Empowering through connectivity.</p>
+      {% else %}
+        <img src="{{ url_for('static', filename='logo2.png') }}" alt="Corona Telecom" class="logo">
+        <h1 class="tagline">Empowering through connectivity.</h1>
+      {% endif %}
+    </header>
+
+
+
+
+ <main>
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-container" style="position: fixed; top: 1rem; right: 1rem; z-index: 1000;">
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }}" style="position: relative; min-width: 250px; padding: 1rem 1.5rem; margin-bottom: 1rem; background-color: #FFEBEE; color: #C62828; border-left: 5px solid #FF325C; border-radius: 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+            {{ message }}
+            <span onclick="this.parentElement.style.display='none';" style="position:absolute; top:5px; right:10px; cursor:pointer;">❌</span>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  {% block content %}{% endblock %}
+</main>
+
+ <footer class="main-footer">
+    <div class="footer-content">
+        <div class="footer-section contact-info">
+            <h3>Contact Corona Telecom</h3>
+            <p><i class="fab fa-facebook-square"></i> <a href="https://www.facebook.com/CoronaTelecom" target="_blank" rel="noopener noreferrer">Corona Telecom</a></p>
+            <p><i class="fas fa-mobile-alt"></i> <a href="tel:+639123456789">+63 917 841 8711</a></p>
+            <p><i class="fas fa-phone-alt"></i>  <a href="tel:+63821234567">(02) 3439 2767</a></p>
+        </div>
+
+        <div class="footer-section email-info">
+            <h3>Email Support</h3>
+            <p><i class="fas fa-envelope"></i> Support Team: <a href="mailto:support@coronatel.com">support@coronatel.com</a></p>
+            <p><i class="fas fa-envelope"></i> Billing Team: <a href="mailto:billing@coronatel.com">billing@coronatel.com</a></p>
+        </div>
+
+        <div class="footer-section footer-bottom">
+        <h3>Developers</h3>
+        <p>&copy; 2025 Corona Telecom. All rights reserved.</p>
+		<p>&trade; Web Creator: Engr. Lim</p>
+		<p>&trade; Web Designer: Arch. Zxak</p>
+    </div>
+
+    
+</footer> 
+  
+  
+  
+  
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const sidebar = document.getElementById('sidebar');
+  const main = document.getElementById('main');
+  const toggleBtn = document.getElementById('sidebarToggle');
+
+  if (!sidebar || !main || !toggleBtn) return;
+
+  // Toggle sidebar
+  toggleBtn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    sidebar.classList.toggle('collapsed');
+    main.classList.toggle('expanded');
+  });
+
+  // Auto-close sidebar when link is clicked (on mobile)
+  document.querySelectorAll('.sidebar-link').forEach(link => {
+    link.addEventListener('click', function () {
+      if (window.innerWidth <= 768) {
+        sidebar.classList.add('collapsed');
+        main.classList.add('expanded');
+      }
+    });
+  });
+  
+  
+  setTimeout(() => {
+    document.querySelectorAll('.alert').forEach(el => el.style.display = 'none');
+  }, 5000); // 5 seconds
+
+
+
+  // Auto-close sidebar on outside click (mobile only)
+  document.addEventListener('click', function (e) {
+    const isSidebarOpen = !sidebar.classList.contains('collapsed');
+    if (
+      window.innerWidth <= 768 &&
+      isSidebarOpen &&
+      !sidebar.contains(e.target) &&
+      !toggleBtn.contains(e.target)
+    ) {
+      sidebar.classList.add('collapsed');
+      main.classList.add('expanded');
+    }
+  });
+});
+</script>
+
+
+
+
+</body>
+</html>

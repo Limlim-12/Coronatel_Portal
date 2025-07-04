@@ -1,0 +1,1870 @@
+/* Base */
+*, *::before, *::after {
+  box-sizing: border-box; /* Universal sizing */
+}
+
+html, body {
+  height: 100%; /* Ensure body doesn't collapse */
+  margin: 0;
+  font-family: 'Titillium Web', sans-serif;
+  background-color: #ffffff;
+  color: #2e2e2e;
+  line-height: 1.6; /* General readability */
+}
+
+
+:root {
+    --primary-color: #FF325C;
+    --secondary-color: #1a1a1a;
+    --text-light: #ecf0f1;
+    --text-muted: #95a5a6;     /* Keep this for other muted text */
+    --border-light: rgba(255, 255, 255, 0.04);
+    --shadow-light: rgba(0, 0, 0, 0.25);
+    --shadow-strong: rgba(0, 0, 0, 0.5);
+    --hover-bg: rgba(255, 255, 255, 0.15); /* IMPROVED: Slightly more opaque hover background */
+    --active-shadow: rgba(255, 50, 92, 0.4);
+    --header-height: 70px;
+}
+
+
+
+body {
+    margin: 0;
+    font-family: 'Titillium Web', sans-serif;
+    background-color: #ffffff;
+    color: #2e2e2e;
+    line-height: 1.6; /* Added for general readability */
+}
+
+
+main {
+  padding-top: 0 !important; /* remove global padding */
+  margin-top: 70px; /* add space once below fixed header */
+}
+
+
+
+
+/* Header core */
+header {
+    background-color: #FF325C;
+    color: #ffffff;
+    text-align: center;
+    padding: 1rem 0.5rem;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 999; /* Ensure header is below toggle button but above content */
+    height: 70px; /* Explicit height for margin calculations */
+    display: flex;
+    flex-direction: column; /* FIXED: Stacks content vertically (perfect for your HTML) */
+    align-items: center; /* Centers horizontally in the column */
+    justify-content: center; /* Centers the stacked content vertically within the header height */
+}
+
+/* Slimmed compact version */
+.compact-header {
+    padding: 0.6rem 0.5rem;
+}
+
+/* Logo (compact) */
+.logo {
+    width: 48px;
+    height: auto;
+    margin: 0 auto 0.25rem;
+    display: block;
+	
+}
+
+/* Footer Styling */
+.main-footer {
+    background-color: #333; /* Dark background */
+    color: #f8f8f8; /* Light text color */
+    padding-top: 2.5rem; /* Vertical padding for the whole footer */
+    padding-bottom: 2.5rem; /* Vertical padding for the whole footer */
+    /* IMPORTANT: Remove padding-left and padding-right from here */
+    margin-top: 3rem; /* Space above the footer */
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.main-footer .footer-content {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    max-width: 1200px; /* This defines the main content column width */
+    margin: 0 auto; /* This centers the main content column */
+    padding: 0 1.5rem; /* Horizontal padding for spacing within the column */
+    padding-bottom: 1.5rem; /* Space below content before the line */
+}
+
+.main-footer .footer-section {
+    flex: 1; /* Allows sections to grow and shrink */
+    min-width: 250px; /* Minimum width before wrapping */
+    margin: 1rem; /* Space around each section */
+}
+
+.main-footer .footer-section h3 {
+    color: #FF325C; /* Highlight headings with your brand color */
+    font-size: 1.15rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Subtle separator */
+    padding-bottom: 0.5rem;
+}
+
+.main-footer .footer-section p {
+    margin-bottom: 0.5rem;
+    display: flex; /* For icon alignment */
+    align-items: center;
+}
+
+.main-footer .footer-section p i {
+    margin-right: 0.8rem; /* Space between icon and text */
+    font-size: 1.1rem;
+    color: #FF325C; /* Icon color */
+}
+
+.main-footer .footer-section a {
+    color: #f8f8f8; /* Link color */
+    text-decoration: none;
+    transition: color 0.2s ease-in-out;
+}
+
+.main-footer .footer-section a:hover {
+    color: #FF325C; /* Highlight on hover */
+    text-decoration: underline;
+}
+
+.main-footer .footer-bottom {
+    text-align: center; /* Centers the copyright text */
+    padding-top: 1.5rem; /* Space between the line and the copyright text */
+    padding-bottom: 0.5rem; /* Some padding at the very bottom */
+    border-top: 1px solid rgba(255, 255, 255, 0.1); /* The whitish line */
+    color: #cccccc;
+    font-size: 0.85rem;
+	max-width: 1200px; /* This makes the line span the same width as .footer-content */
+    margin-left: auto; /* Centers the section horizontally */
+    margin-right: auto; /* Centers the section horizontally */
+	
+}
+
+/* Responsive adjustments for very small screens */
+@media (max-width: 600px) {
+    .main-footer .footer-content {
+        flex-direction: column; /* Stack sections vertically */
+        align-items: center; /* Center sections */
+    }
+    .main-footer .footer-section {
+        width: 90%; /* Take more width */
+        text-align: center;
+    }
+    .main-footer .footer-section p {
+        justify-content: center; /* Center content within stacked sections */
+    }
+}
+
+
+/* Dashboard title - bold and elegant */
+.dashboard-header .main-title {
+    font-size: 1.6rem;
+    margin: 0;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+}
+
+/* Dashboard subtitle - light and fine */
+.dashboard-header .subtitle {
+    font-size: 1rem;
+    font-weight: 300;
+    margin: 0.2rem 0 0;
+    opacity: 0.85;
+}
+
+/* Compact tagline version (non-dashboard) */
+.tagline {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    opacity: 0.92;
+}
+
+/* Typography focus */
+h1, p {
+    line-height: 1.3;
+}
+
+/* Responsive refinement for smaller screens (less than 600px) */
+@media (max-width: 600px) {
+    .dashboard-header .main-title {
+        font-size: 1.35rem;
+    }
+
+    .dashboard-header .subtitle,
+    .tagline {
+        font-size: 0.95rem;
+    }
+
+    .logo {
+        width: 42px;
+    }
+}
+
+
+/* Dashboard Widgets Grid Layout */
+.dashboard-widgets-grid {
+    display: grid;
+    /* This creates two columns:
+       - On larger screens, minmax(0, 1fr) ensures columns are at least 0 and grow equally.
+       - gap creates space between grid items. */
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Adjusted for better responsiveness */
+    gap: 1.5rem; /* Space between the dashboard cards */
+    margin-top: 1.5rem; /* Space from the profile summary above */
+}
+
+/* Styling for all Dashboard Cards */
+.dashboard-card {
+    background-color: #ffffff; /* White background for the cards */
+    border-radius: 12px; /* Slightly rounded corners */
+    padding: 1.8rem; /* Inner spacing within the cards */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); /* Soft shadow for depth */
+    border: 1px solid #e0e0e0; /* Subtle border */
+    display: flex; /* Using flexbox for content alignment within cards */
+    flex-direction: column;
+    justify-content: space-between; /* Distributes space vertically */
+    transition: transform 0.2s ease-in-out; /* Smooth hover effect */
+}
+
+.dashboard-card:hover {
+    transform: translateY(-5px); /* Lift effect on hover */
+}
+
+.dashboard-card h2 {
+    color: #333;
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-size: 1.4rem; /* Slightly larger heading for cards */
+}
+
+.dashboard-card p {
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 0.8rem;
+}
+
+/* Specific styling for the 'About Us' card if needed to stretch */
+.dashboard-card.about-us-container {
+    grid-column: 1 / -1; /* Makes this card span across all columns in the grid */
+    margin-top: 1.5rem; /* Space between grid and about us */
+}
+
+/* Progress Bar for Internet Usage */
+.progress-bar-container {
+    width: 100%;
+    background-color: #e0e0e0;
+    border-radius: 8px;
+    height: 12px;
+    overflow: hidden; /* Ensures the progress bar stays within bounds */
+    margin-top: 0.8rem;
+    margin-bottom: 0.5rem;
+}
+
+.progress-bar {
+    height: 100%;
+    background-color: #FF325C; /* Your brand color for the progress */
+    border-radius: 8px;
+    text-align: center;
+    color: white;
+    transition: width 0.5s ease-in-out; /* Smooth animation for progress updates */
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 768px) {
+    .dashboard-widgets-grid {
+        grid-template-columns: 1fr; /* Stack cards vertically on smaller screens */
+        gap: 1.2rem;
+    }
+
+    .dashboard-card {
+        padding: 1.5rem;
+    }
+
+    .dashboard-card h2 {
+        font-size: 1.2rem;
+    }
+}
+
+
+
+/* --- Sidebar Styling --- */
+/* IMPORTANT: Ensure these are the ONLY .sidebar related rules in your entire CSS */
+.sidebar {
+    position: fixed; /* Fixed position relative to the viewport */
+    top: 0;
+    left: 0;
+    width: 280px; /* Default width of the sidebar for desktop */
+    height: 100vh; /* Full viewport height */
+    background-color: var(--secondary-color); /* Now correctly uses the minimalist black variable */
+    color: var(--text-light); /* Light text color for contrast */
+    padding: 2.5rem 1.8rem; /* More generous padding */
+    overflow-y: auto; /* Enable vertical scrolling if content exceeds height */
+    z-index: 1000; /* Stacks above most content */
+    box-shadow: 2px 0 20px var(--shadow-light); /* Initial shadow */
+    display: flex;
+    flex-direction: column; /* Stacks header, nav vertically */
+
+    /* Initial state for mobile: off-screen. Desktop will override this in media query. */
+    transform: translateX(-100%);
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s ease, padding 0.3s ease;
+}
+
+/* When 'active' class is added by JS, slide sidebar into view */
+.sidebar.active {
+    transform: translateX(0); /* Slides into view */
+    box-shadow: 2px 0 35px var(--shadow-strong); /* Stronger shadow when open */
+}
+
+/* Sidebar Overlay (dims background content when sidebar is open on mobile) */
+.sidebar-overlay {
+    display: none; /* Hidden by default, shown when 'active' */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw; /* Full viewport width */
+    height: 100vh; /* Full viewport height */
+    background-color: rgba(0, 0, 0, 0.7); /* Dims background */
+    z-index: 999; /* Below sidebar, above main content */
+    opacity: 0; /* Starts transparent, fades in */
+    transition: opacity 0.3s ease;
+}
+
+.sidebar-overlay.active {
+    display: block; /* Make visible */
+    opacity: 1; /* Fade in to full opacity */
+}
+
+
+/* Sidebar Header (User Avatar, Name, Account Number) */
+.sidebar-header {
+    text-align: center;
+    padding-bottom: 2.5rem;
+    margin-bottom: 2.5rem;
+    border-bottom: 1px solid var(--border-light); /* Subtle separator */
+}
+
+.sidebar-avatar {
+    width: 95px;
+    height: 95px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid var(--primary-color); /* Accent border */
+    margin-bottom: 1rem;
+    box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.08); /* Inner shadow for depth */
+}
+
+.sidebar-user-name {
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: var(--text-light);
+    margin-bottom: 0.3rem;
+    letter-spacing: 0.03em;
+}
+
+.sidebar-account-number {
+    font-size: 1rem;
+    color: var(--text-muted);
+    margin-top: 0.3rem;
+    margin-bottom: 0;
+    font-weight: 400;
+}
+
+
+/* Sidebar Navigation Links */
+.sidebar-nav {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.nav-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.nav-links li {
+    margin-bottom: 0.8rem;
+}
+
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    padding: 1rem 0.8rem; /* Adjusted horizontal padding */
+    color: var(--text-light);
+    text-decoration: none;
+    font-size: 1.1rem; /* Slightly increased font size for better readability */
+    font-weight: 500;
+    border-radius: 12px;
+    transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+    flex-wrap: wrap; /* Allows items to wrap to the next line */
+    flex-direction: row-reverse; /* Places the icon to the right of the text */
+}
+
+.sidebar-link i {
+    font-size: 1.4rem;
+    margin-right: 1rem; /* Reduced margin-right */
+    color: var(--text-light);
+    width: 30px;
+    text-align: center;
+    transition: color 0.3s ease;
+    flex-shrink: 0; /* Prevents the icon from shrinking */
+}
+
+.sidebar-link span {
+    display: block; /* Ensures the span behaves as a block element */
+    flex-grow: 1; /* Allows the text to take available space */
+    /* REMOVED: white-space: nowrap;, overflow: hidden;, text-overflow: ellipsis; */
+    /* This allows the "Billing & Payment" text to wrap onto multiple lines if needed */
+}
+
+/* Hover state for navigation links */
+.sidebar-link:hover {
+    background-color: var(--hover-bg); /* Will use the new, slightly more visible value */
+    color: var(--primary-color);
+    transform: translateX(10px);
+}
+.sidebar-link:hover i {
+    color: var(--primary-color);
+}
+
+/* Active state for the currently selected navigation link */
+.sidebar-link.active {
+    background-color: var(--primary-color);
+    color: #ffffff;
+    font-weight: 600;
+    box-shadow: 0 5px 18px var(--active-shadow);
+    transform: translateX(0);
+}
+.sidebar-link.active i {
+    color: #ffffff;
+}
+
+/* Logout link specific styling */
+.logout-link {
+    margin-top: auto;
+    border-top: 1px solid var(--border-light);
+    padding-top: 2.5rem;
+}
+.logout-link:hover {
+    background-color: rgba(255, 50, 92, 0.15); /* Remains consistent */
+}
+
+
+/* --- Responsive Adjustments for Sidebar (within media queries) --- */
+
+/* --- Sidebar Toggle Logic (Unified for All Devices) --- */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 280px;
+    height: 100vh;
+    background-color: var(--secondary-color);
+    color: var(--text-light);
+    padding: 2.5rem 1.8rem;
+    overflow-y: auto;
+    z-index: 1000;
+    box-shadow: 2px 0 20px var(--shadow-light);
+    transform: translateX(-100%);
+    transition: transform 0.35s ease, box-shadow 0.3s ease;
+}
+.sidebar.active {
+    transform: translateX(0);
+    box-shadow: 2px 0 35px var(--shadow-strong);
+}
+
+/* Overlay (for mobile view when sidebar is open) */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 999;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+.sidebar-overlay.active {
+    display: block;
+    opacity: 1;
+}
+
+
+/* --- Buttons --- */
+.btn, button, .toggle-btn {
+    background-color: #FF325C;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    font-size: 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin: 10px;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+    min-width: 160px; /* Ensures buttons have a consistent minimum width */
+}
+.btn:hover, button:hover, .toggle-btn:hover {
+    background-color: #e0254d;
+    transform: scale(1.03);
+    box-shadow: 0 4px 10px rgba(255, 50, 92, 0.4);
+}
+.btn-secondary {
+    background-color: #6c757d;
+}
+.btn-secondary:hover {
+    background-color: #5a6268;
+    box-shadow: 0 4px 10px rgba(108, 117, 125, 0.4);
+}
+
+/* --- Toggle Button Specific Styles (FIXED: Reinforcing positioning) --- */
+.toggle-btn {
+    background: transparent; /* Minimalist: no background */
+    border: none; /* Minimalist: no border */
+    color: white; /* Color of the '☰' icon - visible on red header */
+    padding: 0.5rem; /* Reduced padding for minimalist look */
+    font-size: 2.2rem; /* Larger icon size for visibility */
+    min-width: unset; /* Remove the inherited min-width from general buttons */
+    width: auto; /* Allow sizing to content */
+    height: auto;
+    line-height: 1; /* Better vertical centering for ☰ icon */
+    margin: 0; /* Remove default margin from general button style */
+    display: flex; /* Use flex to center content (the '☰' character) */
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    /* FIXED: Explicitly re-asserting position with !important to ensure it stays fixed */
+    position: fixed !important;
+    top: 1rem !important;
+    left: 1rem !important;
+    z-index: 1000 !important;
+}
+
+.toggle-btn:hover {
+    background-color: rgba(255, 255, 255, 0.2); /* Subtle hover effect */
+    color: white; /* Keep color consistent on hover */
+    transform: none; /* Remove scaling from general button hover */
+    box-shadow: none; /* Remove box-shadow from general button hover */
+}
+
+
+/* Flash messages */
+
+/* Tab wrapper */
+.tab-wrapper {
+    padding: 1rem;
+    max-width: 1200px;
+    margin: auto;
+    box-sizing: border-box; /* Crucial for responsive padding */
+}
+
+/* Profile Container - general styling for the card that holds the profile */
+.profile-container {
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 3rem;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    max-width: 800px;
+    margin: 2rem auto;
+    animation: fadeIn 0.5s ease;
+    width: 95%; /* Make it fluid up to max-width */
+    box-sizing: border-box; /* Include padding in width */
+}
+
+/* --- Login Page Specific Styles (Minimalist & Consistent Redesign) --- */
+
+/* Full page container for centering the login card */
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* Adjusted min-height for potential header. If you have a fixed header,
+       adjust '70px' to its actual height. Otherwise, remove '- 70px'. */
+    min-height: calc(100vh - 70px);
+    background-color: #f8f8f8; /* Light background for the page */
+    padding: 2rem 1rem; /* Padding for small screens, acts as margin on larger screens */
+    box-sizing: border-box; /* Include padding in height calculation */
+}
+
+/* The actual login card */
+.login-card {
+    background: #ffffff;
+    border-radius: 16px; /* Slightly more rounded for a softer look */
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08); /* Softer, deeper shadow */
+    padding: 2.5rem; /* Increased padding for more breathing room */
+    max-width: 420px; /* Slightly increased max-width for better balance */
+    width: 100%; /* Ensure it fills available width up to max-width */
+    text-align: center; /* Center align content inside the card */
+    animation: fadeIn 0.6s ease-out; /* Smooth fade-in animation */
+    border: 1px solid #eee; /* Subtle border for definition */
+}
+
+/* Login Logo */
+.login-logo {
+    width: 80px; /* Adjust size as needed */
+    height: auto;
+    margin: 0 auto 1.5rem; /* Center and add space below */
+    display: block; /* Ensure it behaves as a block element */
+}
+
+/* Login Title */
+.login-title {
+    font-size: 2.2rem; /* Larger, more welcoming title */
+    font-weight: 700;
+    color: #FF325C;
+    margin-bottom: 0.5rem; /* Reduced margin for tighter typography */
+}
+
+/* Login Subtitle - used for main subtitle and reset password form subtitle */
+.login-subtitle {
+    font-size: 1rem;
+    color: #666;
+    margin-bottom: 2rem; /* More space below subtitle */
+    line-height: 1.5;
+}
+
+/* Common form group styling */
+.login-card .form-group {
+    margin-bottom: 1.2rem; /* Space between form groups */
+    text-align: left; /* Align labels/inputs to the left within the group */
+}
+
+/* Input Fields - Unified style for all text/password inputs */
+.login-card input[type="email"],
+.login-card input[type="password"],
+.login-card input[type="text"] { /* In case you add text type inputs later */
+    width: 100%;
+    padding: 14px 18px; /* More generous padding for better feel */
+    font-size: 1.05rem; /* Slightly larger font */
+    border-radius: 10px; /* More rounded input fields */
+    border: 1px solid #ddd; /* Lighter border color */
+    background-color: #fdfdfd; /* Very subtle off-white background */
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    -webkit-appearance: none; /* For better consistency across browsers */
+    -moz-appearance: none;
+    appearance: none;
+}
+
+.login-card input[type="email"]:focus,
+.login-card input[type="password"]:focus,
+.login-card input[type="text"]:focus {
+    border-color: #FF325C; /* Highlight border on focus */
+    box-shadow: 0 0 0 3px rgba(255, 50, 92, 0.2); /* Soft focus ring */
+    outline: none; /* Remove default outline */
+}
+
+/* Login Button - Common style for all primary actions */
+.login-btn {
+    width: 100%;
+    padding: 15px; /* Larger padding for a more substantial button */
+    font-size: 1.1rem; /* Larger font size for prominence */
+    font-weight: 600;
+    border-radius: 10px; /* Consistent rounding */
+    background-color: #FF325C;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 1rem; /* Space above button */
+    letter-spacing: 0.5px;
+}
+
+.login-btn:hover {
+    background-color: #e0254d;
+    transform: translateY(-2px); /* Subtle lift on hover */
+    box-shadow: 0 6px 15px rgba(255, 50, 92, 0.3); /* Enhanced shadow on hover */
+}
+
+/* Specific button style for "Send Reset Link" to differentiate */
+.login-btn.secondary-btn { /* Adding a new class for this button */
+    background-color: #6c757d; /* A neutral gray */
+}
+
+.login-btn.secondary-btn:hover {
+    background-color: #5a6268;
+    box-shadow: 0 6px 15px rgba(108, 117, 125, 0.3);
+}
+
+/* Links (Forgot Password, Register, Back to Login) */
+.login-links {
+    margin-top: 1.8rem; /* Space above the links section */
+    font-size: 0.95rem;
+    color: #777;
+}
+
+.login-links p {
+    margin: 0.8rem 0 0; /* Adjust margin for paragraphs within links */
+}
+
+.login-card a { /* General link style within the card */
+    color: #FF325C;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s ease, text-decoration 0.2s ease;
+}
+
+.login-card a:hover {
+    color: #e0254d;
+    text-decoration: underline;
+}
+
+/* Styling for "Forgot Password?" and "Back to Login" links */
+.forgot-password-toggle, /* Updated class name */
+.toggle-form-link {
+    display: block; /* Make them block to take full width */
+    text-align: center;
+    margin-bottom: 0.5rem; /* Space between links if stacked */
+}
+
+/* Forgot Password Form specific styling */
+#forgot-form {
+    padding-top: 1rem; /* Add internal padding */
+    border-top: 1px solid #eee; /* Subtle separator */
+    margin-top: 1.5rem; /* Space above the form - MOVED FROM INLINE STYLE */
+    /* Initially hidden via JavaScript, but add a class for smooth transitions later if desired */
+    /* display: none; */ /* REMOVED: Will be handled by JS on DOMContentLoaded */
+}
+
+#forgot-form .login-subtitle { /* Override margin for this specific subtitle */
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
+}
+
+#forgot-form .forgot-form-text { /* Styling for the instruction text */
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 1.5rem;
+}
+
+.back-to-login-link { /* MOVED FROM INLINE STYLE */
+    margin-top: 1rem;
+}
+
+/* Accessibility: Visually hidden but available to screen readers */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* Utility class for forms that are hidden by JS - useful for transitions */
+.hidden-form {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+   
+}
+
+
+/* --- Responsive Adjustments for Login Page --- */
+@media (max-width: 768px) {
+    .login-container {
+        min-height: calc(100vh - 70px); /* Still account for header */
+        padding: 1.5rem; /* Less padding on very small screens */
+    }
+
+    .login-card {
+        padding: 1.8rem 1.5rem; /* Adjust card padding */
+        border-radius: 12px; /* Slightly less rounded on mobile */
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); /* Lighter shadow */
+    }
+
+    .login-logo {
+        width: 70px;
+        margin-bottom: 1.2rem;
+    }
+
+    .login-title {
+        font-size: 1.8rem; /* Smaller title on mobile */
+        margin-bottom: 0.4rem;
+    }
+
+    .login-subtitle {
+        font-size: 0.9rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .login-card input {
+        padding: 12px 15px; /* Adjust input padding */
+        font-size: 0.95rem;
+    }
+
+    .login-btn {
+        padding: 13px; /* Adjust button padding */
+        font-size: 1rem;
+    }
+
+    .login-links {
+        margin-top: 1.5rem;
+        font-size: 0.85rem;
+    }
+
+    .login-links p {
+        margin: 0.6rem 0 0;
+    }
+
+    #forgot-form .login-subtitle {
+        font-size: 1rem;
+        margin-bottom: 0.8rem;
+    }
+
+    #forgot-form .forgot-form-text {
+        font-size: 0.8rem;
+        margin-bottom: 1rem;
+    }
+}
+
+/* Animations (ensure these are in your CSS if not already) */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+
+/* --- Register Page Specific Styles (Minimalist & Consistent Redesign) --- */
+
+/* Full page container for centering the register card */
+.register-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 70px); /* Account for fixed header height (adjust 70px if different) */
+    background-color: #f8f8f8;
+    padding: 2rem 1rem;
+    box-sizing: border-box;
+}
+
+/* The actual register card */
+.register-card {
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    padding: 2.5rem; /* More generous padding */
+    max-width: 600px; /* Wider for more fields */
+    width: 100%;
+    text-align: center; /* Center align content */
+    animation: fadeIn 0.6s ease-out;
+    border: 1px solid #eee;
+}
+
+/* Register Logo */
+.register-logo {
+    width: 80px;
+    height: auto;
+    margin: 0 auto 1.5rem;
+    display: block;
+}
+
+/* Register Title */
+.register-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #FF325C;
+    margin-bottom: 0.5rem;
+}
+
+/* Register Subtitle */
+.register-subtitle {
+    font-size: 1rem;
+    color: #666;
+    margin-bottom: 2rem;
+    line-height: 1.5;
+}
+
+/* Form section heading (e.g., Account Information, Login Credentials) */
+.form-section-heading {
+    text-align: left;
+    margin-top: 2.5rem; /* Space above new section */
+    margin-bottom: 1.5rem; /* Space below heading */
+    color: #333;
+    font-size: 1.3rem; /* Slightly larger heading */
+    font-weight: 600;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #eee; /* Subtle line below heading */
+}
+/* No top margin for the very first section heading */
+.register-card form .form-section-heading:first-of-type {
+    margin-top: 0;
+}
+
+
+/* Form Row for multiple inputs on one line (e.g., Name parts) */
+.form-row {
+    display: flex;
+    gap: 1rem; /* Space between inputs in a row */
+    margin-bottom: 1.2rem; /* Space below the entire row */
+    flex-wrap: wrap; /* Allow items to wrap on smaller screens */
+}
+
+.form-row .form-group {
+    flex: 1; /* Allow each item to grow/shrink */
+    min-width: 120px; /* Minimum width before wrapping */
+    margin-bottom: 0; /* Remove default margin-bottom from form-group for items in a row */
+}
+
+/* Specific styling for Middle Initial input to make it smaller */
+.form-row .middle-initial-group {
+    flex-grow: 0; /* Don't allow it to grow as much */
+    flex-shrink: 0;
+    width: 70px; /* Fixed small width */
+    min-width: 70px;
+}
+.form-row .middle-initial-group input {
+    text-align: center; /* Center text in MI input */
+}
+
+
+/* Common form group styling */
+.register-card .form-group {
+    margin-bottom: 1.2rem; /* Space between form groups */
+    text-align: left;
+}
+
+/* Input fields and Select dropdown */
+.register-card input[type="text"],
+.register-card input[type="email"],
+.register-card input[type="password"],
+.register-card select {
+    width: 100%;
+    padding: 14px 18px;
+    font-size: 1.05rem;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    background-color: #fdfdfd;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    -webkit-appearance: none; /* For consistent select box appearance */
+    -moz-appearance: none;
+    appearance: none;
+}
+
+.register-card input:focus,
+.register-card select:focus {
+    border-color: #FF325C;
+    box-shadow: 0 0 0 3px rgba(255, 50, 92, 0.2);
+    outline: none;
+}
+
+/* Custom arrow for select dropdown for consistency */
+.register-card select {
+    background-image: url('data:image/svg+xml;utf8,<svg fill="#444" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    padding-right: 40px; /* Make space for the custom arrow */
+}
+
+
+/* Register Button */
+.register-btn {
+    width: 100%;
+    padding: 15px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 10px;
+    background-color: #FF325C;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 1.5rem; /* Space above button */
+    letter-spacing: 0.5px;
+}
+
+.register-btn:hover {
+    background-color: #e0254d;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(255, 50, 92, 0.3);
+}
+
+/* Login Link at the bottom */
+.register-login-link {
+    margin-top: 1.8rem;
+    font-size: 0.95rem;
+    color: #777;
+    text-align: center;
+}
+
+.register-login-link a {
+    color: #FF325C;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s ease;
+}
+
+.register-login-link a:hover {
+    color: #e0254d;
+    text-decoration: underline;
+}
+
+/* Form Hint Text (e.g., "Minimum 8 characters...") */
+.form-hint-text {
+    font-size: 0.85rem;
+    color: #888;
+    margin-top: 0.4rem; /* Space above hint text */
+    display: block; /* Ensure it takes its own line */
+    text-align: left; /* Align hint text to the left */
+    line-height: 1.4;
+}
+
+/* Accessibility: Visually hidden but available to screen readers */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* --- Responsive Adjustments for Register Page --- */
+@media (max-width: 768px) {
+    .register-container {
+        min-height: calc(100vh - 70px);
+        padding: 1.5rem;
+    }
+
+    .register-card {
+        padding: 1.8rem 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    }
+
+    .register-logo {
+        width: 70px;
+        margin-bottom: 1.2rem;
+    }
+
+    .register-title {
+        font-size: 1.8rem;
+        margin-bottom: 0.4rem;
+    }
+
+    .register-subtitle {
+        font-size: 0.9rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-section-heading {
+        font-size: 1.1rem;
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+    }
+
+    /* On small screens, stack the form-row elements */
+    .form-row {
+        flex-direction: column;
+        gap: 0.8rem; /* Reduce gap when stacked */
+    }
+    .form-row .form-group {
+        min-width: 100%; /* Take full width when stacked */
+    }
+    .form-row .middle-initial-group {
+        width: 100%; /* Full width when stacked */
+        min-width: 100%;
+    }
+
+
+    .register-card input,
+    .register-card select {
+        padding: 12px 15px;
+        font-size: 0.95rem;
+    }
+
+    .register-btn {
+        padding: 13px;
+        font-size: 1rem;
+    }
+
+    .register-login-link {
+        margin-top: 1.5rem;
+        font-size: 0.85rem;
+    }
+
+    .form-hint-text {
+        font-size: 0.75rem;
+    }
+}
+
+/* Animations (ensure these are in your CSS if not already) */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* --- PROFILE PREVIEW STYLES --- */
+
+.profile-summary {
+    position: relative;
+}
+
+/* --- PROFILE PREVIEW STYLES --- */
+
+.profile-summary {
+    position: relative;
+}
+
+/* Removed stray align-items and related properties that were outside a selector block */
+
+.profile-preview-header .preview-heading {
+    font-weight: 700;
+    font-size: 2.2rem;
+    margin-bottom: 0; /* Ensures it sits tightly with the button */
+    color: #FF325C;
+}
+
+.edit-profile-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background-color: white;
+    border: 1px solid #FF325C;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15); /* FIXED: Improved shadow for a softer, more defined look */
+    margin-left: 0.8rem; /* FIXED: Increased space to the left of the pencil icon */
+
+    text-decoration: none;
+    color: #FF325C; /* Color of the pencil icon itself */
+    font-size: 1.2rem;
+    transition: all 0.2s ease;
+    line-height: 1; /* Better vertical alignment for emoji */
+    padding: 0; /* Ensure no default padding interferes with width/height */
+}
+
+.edit-profile-btn:hover {
+    background-color: #FF325C;
+    color: white;
+    transform: scale(1.1);
+    box-shadow: 0 6px 15px rgba(255, 50, 92, 0.4); /* FIXED: Stronger, more vibrant shadow on hover */
+}
+
+/* Responsive adjustments for .edit-profile-btn */
+@media (max-width: 768px) {
+    .edit-profile-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 1rem;
+        margin-left: 0.5rem; /* Maintains increased relative space on smaller screens */
+    }
+}
+
+/* Primary User Info Section (Avatar, Name, Email, Plan) */
+.profile-hero-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.avatar-display-large {
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #FF325C;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1.5rem;
+}
+
+.user-display-name {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #222;
+    margin: 0 0 0.5rem 0;
+}
+
+.user-main-info {
+    font-size: 0.95rem;
+    color: #424242;
+    margin: 0.25rem 0;
+    line-height: 1.4;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+}
+
+.user-main-info strong {
+    font-weight: 600;
+    color: #444;
+}
+
+/* Grouping for other details (Contact, Personal Info, Address) */
+.profile-details-group {
+    margin-bottom: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #f8f8f8;
+    width: 100%;
+}
+
+.profile-details-group:first-of-type {
+    border-top: none;
+    padding-top: 0;
+    margin-top: -1rem;
+}
+
+.detail-item {
+    font-size: 0.95rem;
+    color: #555;
+    margin: 0.6rem 0;
+    line-height: 1.4;
+}
+
+.detail-item strong {
+    font-weight: 600;
+    color: #333;
+    margin-right: 0.3rem;
+}
+
+/* --- Edit Profile Form --- */
+.form-title {
+    color: #333;
+    font-weight: 600;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.profile-container form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.avatar-upload-section {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.avatar-preview {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Custom File Input Styling */
+.form-group input[type="file"] {
+    display: none;
+}
+
+.file-label {
+    display: inline-block;
+    background-color: #f0f0f0;
+    color: #424242;
+    padding: 10px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    border: 1px solid #ddd;
+    transition: background-color 0.2s, border-color 0.2s;
+    font-size: 0.95rem;
+    margin-top: 0.5rem;
+}
+
+.file-label:hover {
+    background-color: #e6e6e6;
+    border-color: #c4c4c4;
+}
+
+.form-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.form-section-heading {
+    text-align: left;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    color: #333;
+    font-size: 1.2rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #eee;
+}
+
+.form-group {
+    width: 100%;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.4rem;
+    font-weight: 600;
+    color: #444;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 10px 14px;
+    font-size: 15px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    /* box-sizing: border-box; already handled by universal selector */
+    background-color: #fff;
+    transition: all 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: #FF325C;
+    box-shadow: 0 0 3px rgba(255, 50, 92, 0.3);
+    outline: none;
+}
+
+.form-group input:disabled,
+.form-group select:disabled {
+    background-color: #f9f9f9;
+    color: #999;
+    cursor: not-allowed;
+    border-style: dashed;
+}
+
+/* Form Row for demographics */
+.form-row {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap; /* Allows items to wrap to the next line on smaller screens */
+    justify-content: space-between; /* Distributes items */
+}
+
+.form-row .form-group {
+    flex: 1; /* Allow items to grow/shrink */
+    min-width: 200px; /* Minimum width before wrapping */
+}
+
+/* Adjust form-row for smaller screens to stack items */
+@media (max-width: 768px) {
+    .form-row {
+        flex-direction: column; /* Stack items vertically on smaller screens */
+        gap: 1rem; /* Reduce gap when stacked */
+    }
+    .form-row .form-group {
+        min-width: 100%; /* Take full width when stacked */
+    }
+}
+
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 2rem;
+    flex-wrap: wrap; /* Allow buttons to wrap if screen is very small */
+}
+
+/* Adjust form-actions for mobile to center or stack buttons */
+@media (max-width: 480px) {
+    .form-actions {
+        justify-content: center; /* Center buttons on very small screens */
+        flex-direction: column; /* Stack buttons vertically */
+        gap: 0.5rem; /* Reduce gap */
+    }
+    .form-actions .btn, .form-actions button {
+        width: 100%; /* Make buttons full width when stacked */
+        margin: 0.25rem 0; /* Adjust margin */
+        /* box-sizing: border-box; already handled by universal selector */
+    }
+}
+
+
+/* Horizontal Rule styling */
+hr {
+    border: none;
+    border-top: 1px solid #eee;
+    margin: 2rem 0;
+}
+
+/* Main content layout for desktop */
+@media (min-width: 992px) {
+  .main-content {
+    margin-left: 280px; /* Account for visible sidebar on desktop */
+    padding-top: 5.625rem; /* 90px for fixed header spacing */
+    padding-left: 2rem;
+    padding-right: 2rem;
+    padding-bottom: 2rem;
+    width: auto;
+    transition: margin-left 0.3s ease;
+    box-sizing: border-box;
+  }
+}
+
+
+
+
+
+
+
+/* Main content layout for tablets/phones */
+@media (max-width: 991px) {
+  .main-content.expanded {
+    margin-left: 0;
+    padding-top: 5.625rem; /* Same spacing on mobile */
+  }
+}
+
+
+
+
+
+/* Cards (General card style) */
+.card {
+    background-color: #fff;
+    border: 1px solid #eee;
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    max-width: 800px;
+    margin: 2rem auto;
+    animation: fadeIn 0.5s ease;
+    width: 95%; /* Make it fluid up to max-width */
+    box-sizing: border-box; /* Include padding in width */
+}
+
+/* Animations (Existing styles, untouched) */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes clickFadeIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.97) translateY(10px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* Flash container */
+.flash-container {
+    margin-top: 1rem;
+}
+
+/* --- Mobile and Tablet Responsive Adjustments --- */
+
+.sidebar {
+  transform: translateX(-100%);
+  position: fixed;
+  z-index: 1000;
+  width: 200px;
+  transition: transform 0.3s ease;
+}
+
+.sidebar.active {
+  transform: translateX(0);
+}
+
+.main-content,
+.main-content.expanded {
+  margin-left: 0;
+  padding: 1rem;
+}
+
+
+    /* Profile container responsiveness */
+    .profile-container {
+        padding: 1.5rem; /* Adjust padding for smaller screens */
+        margin: 1.5rem auto; /* Adjust margin */
+        width: 95%; /* Ensure it's fluid */
+    }
+
+    /* Profile Preview Adjustments for Mobile/Tablet */
+        /* Removed flex-direction: column; to keep text and icon on same line */
+        /* Removed text-align: center; as justify-content handles it */
+        /* Removed padding-right from here */
+    .profile-preview-header .preview-heading {
+        font-size: 1.8rem; /* ADJUSTED: Smaller font for mobile */
+        margin-bottom: 1rem; /* Keep consistent */
+    }
+    .edit-profile-btn {
+        font-size: 1rem;
+        top: 50%; /* Adjusted for vertical centering */
+        right: 1.5rem; /* ADJUSTED: Positioned for mobile */
+        transform: translateY(-50%); /* Adjusted for vertical centering */
+    }
+
+    .profile-hero-section {
+        margin-bottom: 2rem;
+    }
+    .avatar-display-large {
+        width: 100px;
+        height: 100px;
+        margin-bottom: 1rem;
+    }
+    .user-display-name {
+        font-size: 1.8rem;
+    }
+    .user-main-info {
+        font-size: 0.9rem;
+    }
+
+    .profile-details-group {
+        margin-bottom: 1.5rem;
+        padding-top: 1rem;
+    }
+    .detail-item {
+        font-size: 0.85rem;
+        margin: 0.4rem 0;
+    }
+
+    /* Form specific mobile adjustments */
+    .profile-container form {
+        padding: 0; /* Remove extra padding within form on mobile */
+    }
+
+    .form-group {
+        max-width: 100%;
+    }
+
+    .form-group label {
+        text-align: left;
+    }
+
+    /* Adjust form rows to stack on smaller screens */
+    .form-row {
+        flex-direction: column; /* Stack items vertically */
+        gap: 0.8rem; /* Consistent smaller gap */
+    }
+
+
+/* For larger tablets and smaller laptops (e.g., 769px to 1024px) */
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+    .sidebar {
+        width: 220px; /* Slightly narrower sidebar than desktop */
+        padding: 1.5rem 0.8rem;
+    }
+
+    .main-content {
+        margin-left: 220px; /* Adjust main content margin to match sidebar */
+        padding: 1.5rem; /* Slightly reduced padding */
+    }
+
+    .profile-container {
+        padding: 2rem; /* Medium padding for tablets */
+        max-width: 700px; /* Slightly narrower max-width */
+    }
+
+    /* Removed padding-right from here */
+}
+.profile-preview-header .preview-heading {
+    font-size: 2.2rem; /* Consistent with desktop adjusted size */
+}
+.user-display-name {
+    font-size: 2rem; /* Slightly smaller for tablets */
+}
+.avatar-display-large {
+    width: 120px;
+    height: 120px;
+}
+.edit-profile-btn {
+    right: 3.5rem; /* Adjusted for tablets, maintaining consistent relative distance */
+}
+
+.form-row {
+    gap: 1rem; /* Adjust gap for medium screens */
+}
+.form-row .form-group {
+    flex: 1 1 45%; /* Allow two items per row, or wrap */
+    min-width: unset; /* Remove min-width to allow more flexible wrapping */
+}
+
+/* General adjustments for larger screens (laptops, desktops) */
+@media screen and (min-width: 1025px) {
+    .main-content {
+        margin-left: 250px; /* Standard sidebar width */
+        padding: 2rem; /* Standard padding */
+    }
+    .profile-container {
+        max-width: 800px; /* Standard max-width */
+        padding: 3rem; /* Standard padding */
+    }
+}
+
+/* --- START: New Styles for Billing Tab Integration (Refined) --- */
+
+/* Billing Section Container - Consistent padding for a cleaner look */
+.billing-section {
+    width: 100%; /* Ensures it takes full width on smaller screens */
+    max-width: 900px; /* Sets a maximum width for readability on larger screens */
+    margin: 0 auto; /* Centers the section horizontally when max-width is applied */
+
+    /* Order is important: Apply general padding first, then specific padding-top */
+    padding: 3rem; /* ENHANCED: Increased general padding for a more generous look (was 2.5rem) */
+    padding-top: calc(70px + 2rem); /* ENHANCED: Increased buffer for header clearance (was 70px + 1.5rem) */
+
+    background-color: var(--background-light, #ffffff); /* Light background for the content area */
+    border-radius: 12px; /* Softened corners for a modern look */
+    border: 1px solid var(--border-light, #f0f0f0); /* Subtle border for clearer definition and depth */
+    box-shadow: 0 6px 15px rgba(0,0,0,0.08); /* Deeper, softer shadow for a more modern, layered look */
+
+    animation: fadeIn 0.4s ease-in-out; /* Keeps your existing animation */
+    box-sizing: border-box; /* Ensures padding and border are included in the element's total width/height */
+    min-height: 250px; /* Ensures a minimum height for visual consistency even with sparse content */
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 767px) { /* Applies styles for screens up to 767px wide (common mobile breakpoint) */
+    .billing-section {
+        padding: 1.5rem; /* ENHANCED: Increased padding for a better fit on mobile (was 1.2rem) */
+        padding-top: calc(70px + 1.2rem); /* ENHANCED: Slightly more top buffer for mobile (was 70px + 1rem) */
+        border-radius: 0; /* Optional: Remove border-radius on very small screens for an edge-to-edge feel */
+        box-shadow: none; /* Optional: Remove shadow on very small screens for simplicity */
+        min-height: auto; /* Allow height to adjust dynamically on mobile */
+    }
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 767px) { /* Applies styles for screens up to 767px wide (common mobile breakpoint) */
+    .billing-section {
+        padding: 1.2rem; /* ENHANCED: Adjusted padding for a better fit on mobile */
+        padding-top: calc(70px + 1rem); /* Keeping a consistent top buffer with the header on mobile */
+        border-radius: 0; /* Optional: Remove border-radius on very small screens for an edge-to-edge feel */
+        box-shadow: none; /* Optional: Remove shadow on very small screens for simplicity */
+        min-height: auto; /* Allow height to adjust dynamically on mobile */
+    }
+}
+
+/* Billing Tabs Container */
+.billing-tabs-container {
+    display: flex;
+    justify-content: flex-start; /* Align tabs to the left */
+    gap: 1rem; /* ENHANCED: Slightly more space between tab buttons for better visual separation */
+    margin-bottom: 2.5rem; /* ENHANCED: More space below tabs before content starts, improving flow */
+    flex-wrap: wrap; /* Allows tabs to wrap onto multiple lines on smaller screens */
+    border-bottom: 2px solid var(--border-light, #eee); /* Using a CSS variable for consistent border color */
+    padding-bottom: 1.2rem; /* ENHANCED: More breathing room below tabs and above the border */
+}
+/* Styling for tab buttons - Enhanced for minimalism and usability */
+.tab-btn {
+    padding: 12px 20px; /* TWEAK: Slightly increased padding for better touch targets and visual presence */
+    border: none;
+    background-color: #f0f0f0;
+    color: #555;
+    cursor: pointer;
+    border-radius: 8px 8px 0 0; /* Rounded top corners */
+    transition: all 0.3s ease;
+    font-size: 1rem; /* TWEAK: Slightly larger font size for improved readability */
+    font-weight: 600;
+    /* Resetting/overriding inherited button styles */
+    min-width: unset; /* Allow natural width */
+    margin: 0; /* Remove default button margin */
+}
+
+.tab-btn:hover {
+    background-color: #e0e0e0;
+    color: #333;
+    transform: none; /* Prevent scaling from general button hover */
+    box-shadow: none; /* Prevent shadow from general button hover */
+}
+
+.tab-btn.active {
+    background-color: #FF325C;
+    color: white;
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.1); /* Lift effect for active tab */
+    border-color: #FF325C; /* Match border color */
+}
+
+/* Styling for form hint text (e.g., for <small> tags) */
+.form-hint-text {
+    color: #777;
+    font-size: 0.85rem;
+    margin-top: 0.2rem;
+    display: block; /* Ensures it takes its own line */
+}
+
+/* Styling for date range inputs within forms - Enhanced spacing and responsiveness */
+.form-date-range {
+    display: flex;
+    gap: 0.75rem; /* TWEAK: Consistent with tab gap, better visual separation */
+    align-items: center;
+    margin-bottom: 1rem; /* Space below the date range group */
+    flex-wrap: wrap; /* Allows inputs to wrap to the next line on smaller screens */
+}
+
+.form-date-range input {
+    flex: 1; /* Allows date inputs to share space equally within the flex container */
+    min-width: 140px; /* Ensure inputs don't get too small before wrapping */
+}
+
+.date-range-separator {
+    color: #555;
+    font-weight: 500;
+}
+
+/* Styling for the SOA viewer container */
+.soa-viewer-container {
+    overflow-x: auto; /* Ensures horizontal scrolling if content is too wide */
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 5px; /* Small padding inside the container for the iframe */
+    background-color: #f9f9f9;
+}
+
+/* Styling for the iframe itself within the SOA viewer - TWEAK: Added height for consistent layout */
+.soa-iframe {
+    border: none; /* Remove default iframe border */
+    border-radius: 6px; /* Slightly smaller border-radius than container for inner visual */
+    width: 100%; /* Ensure it fills container */
+    height: 70vh; /* Use viewport height for responsiveness */
+    min-height: 450px; /* Ensure a minimum height on small screens */
+    max-height: 800px; /* Prevent it from getting excessively tall on very large screens */
+}
+
+/* Specific styling for action buttons within forms - TWEAK: Added padding for prominence */
+form .action-btn {
+    padding: 14px 28px; /* TWEAK: Increased padding for prominence and better touch target */
+    margin-top: 1.5rem; /* Space above submit buttons in forms */
+    margin-left: 0; /* Override generic button margin */
+    margin-right: 0; /* Override generic button margin */
+    width: auto; /* Allow button to size to content plus padding */
+    min-width: 180px; /* Ensure a decent size */
+}
+
+/* Utility class for margin-bottom */
+.mb-4 {
+    margin-bottom: 1.5rem; /* TWEAK: Increased for better separation, matching other standard spacings */
+}
+
+/* Tab Content - Initially Hidden */
+.tab-content {
+    display: none;
+    animation: fadeIn 0.5s ease;
+    padding-top: 1rem; /* Add some top padding specific to tab content */
+}
+
+/* Show only the active tab content */
+.tab-content.active {
+    display: block;
+}
+
+/* Utility Class for margin-top */
+.mt-4 {
+    margin-top: 1.5rem; /* Adjust this value as desired for spacing */
+}
+
+/* Styles for Previous Uploads section */
+.proof-history {
+    margin-top: 1.5rem;
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.proof-card {
+    background-color: #fcfcfc;
+    border: 1px solid #e9e9e9;
+    border-radius: 10px;
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.proof-card strong {
+    color: #333;
+}
+
+.proof-card .proof-info {
+    flex-grow: 1;
+    margin-right: 1rem;
+}
+
+.proof-card .proof-meta {
+    text-align: right;
+    color: #777;
+}
+
+.proof-card .proof-meta a {
+    color: #FF325C;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.proof-card .proof-meta a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive adjustments for proof cards */
+@media (max-width: 600px) {
+    .proof-card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .proof-card .proof-info {
+        margin-right: 0;
+        margin-bottom: 0.5rem;
+    }
+    .proof-card .proof-meta {
+        text-align: left;
+    }
+}
+/* --- END: New Styles for Billing Tab Integration (Refined) --- */

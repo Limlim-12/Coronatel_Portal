@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="register-container">
+    <div class="register-card">
+        <img src="{{ url_for('static', filename='logo.jpg') }}" alt="Company Logo" class="register-logo">
+
+        <h2 class="register-title">Coronatel Account Registration</h2>
+        <p class="register-subtitle">Create your account to manage your services.</p>
+
+        <form method="POST" action="{{ url_for('cx_register') }}">
+            <div class="form-section-heading">Account Information</div>
+
+            <div class="form-row name-inputs"> {# Added name-inputs class for specific styling #}
+                <div class="form-group">
+                    <label for="surname" class="sr-only">Surname</label>
+                    <input type="text" id="surname" name="surname" placeholder="Surname" required autocomplete="family-name">
+                </div>
+                <div class="form-group">
+                    <label for="first_name" class="sr-only">First Name</label>
+                    <input type="text" id="first_name" name="first_name" placeholder="First Name" required autocomplete="given-name">
+                </div>
+                <div class="form-group middle-initial-group">
+                    <label for="middle_initial" class="sr-only">M.I.</label>
+                    <input type="text" id="middle_initial" name="middle_initial" placeholder="M.I." maxlength="1" autocomplete="additional-name">
+                </div>
+                <div class="form-group extension-name-group"> {# New group for extension name #}
+                    <label for="extension_name" class="sr-only">Ext.</label>
+                    <input type="text" id="extension_name" name="extension_name" placeholder="Ext." maxlength="5"> {# Maxlength adjusted #}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="account_number" class="sr-only">Account Number</label>
+                <input type="text" id="account_number" name="account_number" placeholder="Account Number" required>
+                <small class="form-hint-text">Your unique 10-digit Corona Telecom Account Number.</small>
+            </div>
+
+            <div class="form-group">
+                <label for="internet_plan" class="sr-only">Internet Plan</label>
+                <select id="internet_plan" name="internet_plan" required>
+                    <option value="">Select Your Internet Plan</option>
+                    <option value="basic_fiber_50mbps">Basic Fiber 50 Mbps</option>
+                    <option value="standard_fiber_100mbps">Standard Fiber 100 Mbps</option>
+                    <option value="premium_fiber_200mbps">Premium Fiber 200 Mbps</option>
+                    <option value="ultimate_fiber_500mbps">Ultimate Fiber 500 Mbps</option>
+                    </select>
+                <small class="form-hint-text">Choose the plan currently active on your account.</small>
+            </div>
+
+            <div class="form-section-heading">Login Credentials</div>
+
+            <div class="form-group">
+                <label for="email" class="sr-only">Email</label>
+                <input type="email" id="email" name="email" placeholder="Email Address" required autocomplete="email">
+                <small class="form-hint-text">This will be your username and for updates.</small>
+            </div>
+
+            <div class="form-group">
+                <label for="password" class="sr-only">Password</label>
+                <input type="password" id="password" name="password" placeholder="Password" required autocomplete="new-password">
+                <small class="form-hint-text">Minimum 8 characters, with letters and numbers.</small>
+            </div>
+
+            <div class="form-group">
+                <label for="confirm_password" class="sr-only">Confirm Password</label>
+                <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm Password" required autocomplete="new-password">
+            </div>
+
+            <button type="submit" class="register-btn">Register Account</button>
+        </form>
+
+        <p class="register-login-link">Already have an account? <a href="{{ url_for('cx_login') }}">Login Here</a></p>
+    </div>
+</div>
+{% endblock %}

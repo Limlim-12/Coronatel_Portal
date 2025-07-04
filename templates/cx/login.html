@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="login-container">
+    <div class="login-card">
+        <img src="{{ url_for('static', filename='logo.jpg') }}" alt="Company Logo" class="login-logo">
+
+        <div id="login-header">
+            <h2 class="login-title">Welcome Back!</h2>
+            <p class="login-subtitle">Please log in to your account.</p>
+        </div>
+
+        <form id="login-form" method="POST" action="{{ url_for('cx_login') }}">
+            <div class="form-group">
+                <label for="email" class="sr-only">Email</label>
+                <input type="email" id="email" name="email" placeholder="Email Address" required autocomplete="email">
+            </div>
+            <div class="form-group">
+                <label for="password" class="sr-only">Password</label>
+                <input type="password" id="password" name="password" placeholder="Password" required autocomplete="current-password">
+            </div>
+            <button type="submit" class="login-btn">Login</button>
+        </form>
+
+        <div class="login-links" id="login-links">
+            <a href="#" onclick="toggleForms(event)" class="forgot-password-toggle">Forgot Password?</a>
+            <p>Don't have an account? <a href="{{ url_for('cx_register') }}">Register Here</a></p>
+        </div>
+
+        <form id="forgot-form" method="POST" action="{{ url_for('cx_login') }}">
+            <h3 class="login-subtitle">Reset Your Password</h3>
+            <p class="forgot-form-text">Enter your registered email. We'll send you reset instructions.</p>
+            <div class="form-group">
+                <input type="email" name="reset_email" placeholder="Email Address" required>
+            </div>
+            <button type="submit" class="login-btn secondary-btn">Send Reset Link</button>
+            <p class="back-to-login-link"><a href="#" onclick="toggleForms(event)" class="toggle-form-link">← Back to Login</a></p>
+        </form>
+    </div>
+</div>
+
+<script>
+function toggleForms(e) {
+    e.preventDefault();
+    const loginForm = document.getElementById('login-form');
+    const forgotForm = document.getElementById('forgot-form');
+    const loginHeader = document.getElementById('login-header');
+    const loginLinks = document.getElementById('login-links');
+
+    const showingLogin = loginForm.style.display !== 'none';
+
+    // Toggle visibility using classes for animation/transitions if desired later
+    if (showingLogin) {
+        loginForm.classList.add('hidden-form');
+        loginHeader.classList.add('hidden-form');
+        loginLinks.classList.add('hidden-form');
+        forgotForm.classList.remove('hidden-form');
+    } else {
+        loginForm.classList.remove('hidden-form');
+        loginHeader.classList.remove('hidden-form');
+        loginLinks.classList.remove('hidden-form');
+        forgotForm.classList.add('hidden-form');
+    }
+
+    // Direct display property change for immediate toggle,
+    // this overrides any CSS display properties from hidden-form if not using opacity/transform
+    loginForm.style.display = showingLogin ? 'none' : 'block';
+    loginHeader.style.display = showingLogin ? 'none' : 'block';
+    loginLinks.style.display = showingLogin ? 'none' : 'block';
+    forgotForm.style.display = showingLogin ? 'block' : 'none';
+}
+
+// Initialize form states
+document.addEventListener('DOMContentLoaded', () => {
+    // Hide the forgot form by default on page load
+    document.getElementById('forgot-form').style.display = 'none';
+});
+</script>
+{% endblock %}
