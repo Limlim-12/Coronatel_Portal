@@ -614,6 +614,308 @@ h1, p {
     margin-bottom: 0.5rem; /* Reduced margin for tighter typography */
 }
 
+
+
+
+/* --- Landing Page Specific Styles --- */
+
+.landing-page-container {
+    max-width: 1200px; /* Limits content width for readability */
+    margin: 0 auto; /* Centers the container */
+    padding: 2rem 1.5rem; /* Padding on top/bottom and sides */
+}
+
+/* Hero Section */
+.hero-section {
+    display: flex;
+    flex-direction: row; /* Default: content and image side-by-side */
+    align-items: center;
+    justify-content: space-between;
+    padding: 4rem 0; /* More vertical padding */
+    gap: 2rem; /* Space between content and image */
+    text-align: left;
+}
+
+.hero-content {
+    flex: 1; /* Takes up available space */
+    max-width: 600px;
+}
+
+.hero-section h1 {
+    font-size: 3.5rem; /* Large, impactful headline */
+    color: var(--secondary-color); /* Darker text for prominence */
+    line-height: 1.1;
+    margin-bottom: 1rem;
+    font-weight: 700;
+}
+
+.hero-tagline {
+    font-size: 1.3rem; /* Prominent tagline */
+    color: #555;
+    margin-bottom: 2rem;
+    line-height: 1.5;
+}
+
+.hero-actions {
+    display: flex;
+    gap: 1rem; /* Space between buttons */
+}
+
+/* Specific button styles for hero section */
+.btn-primary-hero {
+    display: inline-block;
+    background-color: var(--primary-color);
+    color: var(--text-light);
+    padding: 0.9rem 1.8rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.btn-primary-hero:hover {
+    background-color: var(--primary-dark); /* Using a darker primary */
+    transform: translateY(-2px);
+}
+
+/* Optional: Secondary button style if you add "Register Now" */
+.btn-secondary-hero {
+    display: inline-block;
+    background-color: transparent;
+    color: var(--primary-color);
+    border: 2px solid var(--primary-color);
+    padding: 0.9rem 1.8rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+}
+
+.btn-secondary-hero:hover {
+    background-color: var(--primary-color);
+    color: var(--text-light);
+    transform: translateY(-2px);
+}
+
+
+.hero-image-placeholder {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 300px; /* Ensure image area has minimum size */
+}
+
+.hero-image-placeholder img {
+    max-width: 100%; /* Image should scale */
+    height: auto;
+    border-radius: 10px; /* Optional: subtle rounding */
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15); /* Soft shadow for depth */
+}
+
+/* Features Section */
+.features-section {
+    padding: 4rem 0;
+    text-align: center;
+    background-color: #f9f9f9; /* Light background for contrast */
+    border-radius: 10px; /* Match hero section rounding */
+    margin-bottom: 2rem;
+}
+
+.features-section h2 {
+    font-size: 2.5rem;
+    color: var(--secondary-color);
+    margin-bottom: 3rem;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Responsive grid */
+    gap: 2rem;
+    max-width: 1000px; /* Constrain grid width */
+    margin: 0 auto; /* Center the grid */
+}
+
+.feature-card {
+    background-color: #ffffff;
+    border-radius: 10px;
+    padding: 2rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px); /* Lift effect on hover */
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.icon-feature {
+    font-size: 3rem; /* Large icons */
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.feature-card h3 {
+    font-size: 1.5rem;
+    color: var(--secondary-color);
+    margin-bottom: 0.8rem;
+}
+
+.feature-card p {
+    font-size: 1rem;
+    color: #666;
+    line-height: 1.6;
+}
+
+/* Call to Action Section */
+.cta-section {
+    background-color: var(--primary-color);
+    color: var(--text-light);
+    padding: 4rem 1.5rem;
+    text-align: center;
+    border-radius: 10px;
+    margin-top: 2rem;
+}
+
+.cta-section h2 {
+    font-size: 2.8rem;
+    margin-bottom: 1rem;
+    color: var(--text-light);
+}
+
+.cta-section p {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+}
+
+/* Specific button style for CTA section */
+.btn-primary-large {
+    display: inline-block;
+    background-color: var(--text-light); /* White button on primary background */
+    color: var(--primary-color); /* Primary color text */
+    padding: 1.2rem 2.5rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 1.3rem;
+    transition: background-color 0.3s ease, transform 0.2s ease, color 0.3s ease;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+}
+
+.btn-primary-large:hover {
+    background-color: #f0f0f0; /* Slightly darker white on hover */
+    transform: translateY(-3px);
+    color: var(--primary-dark); /* Ensure text color changes correctly if primary-dark is defined */
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 992px) {
+    .hero-section {
+        flex-direction: column; /* Stack content and image vertically */
+        text-align: center;
+    }
+
+    .hero-content {
+        max-width: 100%;
+    }
+
+    .hero-section h1 {
+        font-size: 2.8rem;
+    }
+
+    .hero-tagline {
+        font-size: 1.1rem;
+    }
+
+    .hero-actions {
+        justify-content: center; /* Center buttons when stacked */
+    }
+
+    .hero-image-placeholder {
+        margin-top: 2rem; /* Add space when image is below content */
+    }
+
+    .features-section h2 {
+        font-size: 2rem;
+    }
+
+    .cta-section h2 {
+        font-size: 2.2rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .landing-page-container {
+        padding: 1.5rem 1rem;
+    }
+
+    .hero-section {
+        padding: 3rem 0;
+    }
+
+    .hero-section h1 {
+        font-size: 2.2rem;
+    }
+
+    .hero-tagline {
+        font-size: 1rem;
+    }
+
+    .btn-primary-hero, .btn-secondary-hero {
+        padding: 0.8rem 1.5rem;
+        font-size: 1rem;
+    }
+
+    .features-section {
+        padding: 3rem 0;
+    }
+
+    .features-section h2 {
+        font-size: 1.8rem;
+        margin-bottom: 2rem;
+    }
+
+    .feature-card {
+        padding: 1.5rem;
+    }
+
+    .icon-feature {
+        font-size: 2.5rem;
+    }
+
+    .feature-card h3 {
+        font-size: 1.3rem;
+    }
+
+    .cta-section {
+        padding: 3rem 1rem;
+    }
+
+    .cta-section h2 {
+        font-size: 1.8rem;
+    }
+
+    .cta-section p {
+        font-size: 1rem;
+    }
+
+    .btn-primary-large {
+        padding: 1rem 2rem;
+        font-size: 1.1rem;
+    }
+}
+
+
+
+
 /* Login Subtitle - used for main subtitle and reset password form subtitle */
 .login-subtitle {
     font-size: 1rem;

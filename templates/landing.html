@@ -1,6 +1,50 @@
 {% extends "base.html" %}
+
 {% block content %}
-  <h2>Welcome to Corona Telecom</h2>
-  <p>Your all-in-one customer billing experience.</p>
-  <a href="{{ url_for('cx_login') }}" class="btn">Login as Customer</a>
+<main class="landing-page-container">
+    <section class="hero-section">
+        <div class="hero-content">
+            <h1>Your Simplified Telecom Management</h1>
+            <p class="hero-tagline">Effortlessly manage your Coronatel account, bills, and services. Experience seamless connectivity.</p>
+            <div class="hero-actions">
+                <a href="{{ url_for('cx_login') }}" class="btn-primary-hero">Login to Your Account</a>
+                </div>
+        </div>
+        <div class="hero-image-placeholder">
+            <img src="{{ url_for('static', filename='images/coronatel.jpg') }}" alt="Telecom Management Illustration">
+        </div>
+    </section>
+
+    <section class="features-section">
+        <h2>What You Can Do with Coronatel Portal</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <i class="fas fa-credit-card icon-feature"></i>
+                <h3>Easy Bill Payments</h3>
+                <p>Securely pay your bills online using various convenient payment methods.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-chart-line icon-feature"></i>
+                <h3>Usage Monitoring</h3>
+                <p>Track your data and call usage in real-time to stay in control of your consumption.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-file-invoice-dollar icon-feature"></i>
+                <h3>Manage Requests</h3>
+                <p>Easily submit and track your rebate or overcharge requests with quick processing.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-download icon-feature"></i>
+                <h3>Download SOA</h3>
+                <p>Access and download your Statements of Account and payment history anytime, anywhere.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-section">
+        <h2>Ready to Simplify Your Billing?</h2>
+        <p>Join thousands of satisfied Coronatel customers today.</p>
+        <a href="{{ url_for('cx_login') }}" class="btn-primary-large">Get Started Now</a>
+    </section>
+</main>
 {% endblock %}
