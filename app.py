@@ -90,7 +90,8 @@ def cx_register():
             flash('Email already exists.', 'warning')
             return render_template('cx/register.html')
 
-        # Create full name
+        # Create full name for 'name' attribute
+        # Using middle_initial for middle_name in the display name as per user's previous preference
         full_name = f"{first_name} {middle_initial + '.' if middle_initial else ''} {surname} {extension_name}".strip()
 
         # Hash password
@@ -102,7 +103,14 @@ def cx_register():
             email=email,
             password=hashed_password,
             account_number=account_number,
-            internet_plan=internet_plan
+            internet_plan=internet_plan,
+            # Assigning individual name components to their respective columns
+            first_name=first_name,
+            # Map middle_initial from registration to middle_name for profile display
+            middle_name=middle_initial, # Saving middle_initial to middle_name
+            middle_initial=middle_initial, # Keeping middle_initial column populated too
+            surname=surname,
+            extension_name=extension_name # Saving extension_name
         )
 
         # Save to DB

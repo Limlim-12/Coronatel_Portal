@@ -20,7 +20,9 @@ class Cx(db.Model, UserMixin):
     # Personal information
     first_name = db.Column(db.String(50))
     middle_name = db.Column(db.String(50))
+    middle_initial = db.Column(db.String(50)) # Kept this for historical reasons or if you plan to use it differently
     surname = db.Column(db.String(50))
+    extension_name = db.Column(db.String(50)) # Added this column
     birthdate = db.Column(db.Date)
     gender = db.Column(db.String(20))
 

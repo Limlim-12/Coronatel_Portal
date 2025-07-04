@@ -53,12 +53,13 @@
         {% elif active_tab == 'billing' %}
             {% include 'cx/billing_tab.html' %}
         {% else %}
+
             <div class="profile-summary">
                 <div class="profile-header">
-                  <div class="user-info">
-                    <h2 class="greeting-text"><span id="time-greeting"></span>, {{ current_user.first_name }}!</h2>
-                    {# Removed original detail lines here as they were moved to Profile tab in previous iterations #}
-                  </div>
+                    <div class="user-info">
+                    <h2 class="greeting-text"><span id="time-greeting"></span>, {{ current_user.first_name or '' }}!</h2>
+                        {# Removed original detail lines here as they were moved to Profile tab in previous iterations #}
+                    </div>
                 </div>
             </div>
 
