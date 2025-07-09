@@ -3,6 +3,7 @@
 from extensions import db
 from flask_login import UserMixin
 from datetime import datetime
+from werkzeug.security import generate_password_hash, check_password_hash
 
 # Customer/User model
 class Cx(db.Model, UserMixin):
@@ -11,6 +12,8 @@ class Cx(db.Model, UserMixin):
     password = db.Column(db.String(200), nullable=False)  # Hashed password
     name = db.Column(db.String(120))
     avatar = db.Column(db.String(255), default='default.png')
+    role = db.Column(db.String(10), nullable=False, default='customer')
+
 
     # Account details
     contact = db.Column(db.String(50))
@@ -53,6 +56,10 @@ class PaymentProof(db.Model):
     payment_date = db.Column(db.Date)
     amount = db.Column(db.Float)
 
+    status = db.Column(db.String(20), default='PENDING')  # PENDING, VERIFIED, REJECTED
+
+    cx = db.relationship('Cx', backref='payment_proofs')
+
     def __repr__(self):
         return f"<PaymentProof {self.reference_number} | Cx_ID: {self.cx_id}>"
 
@@ -68,6 +75,43 @@ class CxRequest(db.Model):
     amount = db.Column(db.Float)
     soa_filename = db.Column(db.String(255))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    uploaded_at = db.Column(db.DateTime, default=datetime.utcnow)
+    status = db.Column(db.String(20), default='PENDING')
+    admin_note = db.Column(db.Text)  # Admin feedback
+    response_note = db.Column(db.Text)  # Customer reply
+ 
 
     def __repr__(self):
         return f"<CxRequest {self.type} | Cx_ID: {self.cx_id}>"
+    
+class SOA(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    cx_id = db.Column(db.Integer, db.ForeignKey('cx.id'), nullable=False)
+    filename = db.Column(db.String(255), nullable=False)
+    uploaded_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    cx = db.relationship('Cx', backref='soa_files')
+    
+class Notification(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    cx_id = db.Column(db.Integer, db.ForeignKey('cx.id'), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __repr__(self):
+        return f"<Notification for Cx {self.cx_id} - {self.message[:30]}...>"
+    
+
+class AdminUser(db.Model, UserMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(150), nullable=False)
+    name = db.Column(db.String(100))
+    password_hash = db.Column(db.String(255), nullable=False)
+    avatar = db.Column(db.String(255))
+
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+    
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
+

@@ -44,9 +44,6 @@
         </nav>
     </div>
 
-   
-
-
     <div class="tab-wrapper">
         {% if active_tab == 'profile' %}
             {% include 'cx/profile_tab.html' %}
@@ -58,30 +55,106 @@
                 <div class="profile-header">
                     <div class="user-info">
                     <h2 class="greeting-text"><span id="time-greeting"></span>, {{ current_user.first_name or '' }}!</h2>
-                        {# Removed original detail lines here as they were moved to Profile tab in previous iterations #}
                     </div>
                 </div>
             </div>
 
             <div class="dashboard-widgets-grid">
-                <div class="dashboard-card notifications-card">
-                  <h2>Latest Notifications</h2>
-                  <p>No new notifications at this time.</p>
-                  {# You can add a loop here to display actual notifications if you have them #}
+               <div class="dashboard-card notifications-card">
+    <h2>Latest Notifications</h2>
+    
+    {% if payment_notifications %}
+      <ul class="notif-list">
+        {% for note in payment_notifications[:5] %}
+        <li class="notif-box status-{{ note.status|lower }}">
+            <div class="notif-main-content">
+                <div class="notif-summary">
+                    <p class="notif-line">
+                        Invoice #: <span class="notif-value">{{ note.invoice_number or note.id }}</span>
+                    </p>
+                    <p class="notif-line">
+                        Date of Payment: <span class="notif-value">{{ note.date if note.date else 'N/A' }}</span>
+                    </p>
+                    <p class="notif-line">
+                        Payment Status: <span class="notif-value">{{ note.status or 'N/A' }}</span>
+                    </p>
+                    <button type="button" class="expand-toggle" onclick="toggleNotifDetail(this)">
+                        (click to expand)
+                    </button>
                 </div>
+                <div class="notif-detail hidden">
+                    <p class="detail-message">
+                        {% if note.message %}
+                            {{ note.message | safe }}
+                        {% else %}
+                            Payment of ₱{{ note.amount or 'N/A' }} paid on {{ note.date.strftime('%B %d, %Y') if note.date else 'N/A' }} has been **{{ note.status or 'N/A' }}**.
+                            {% if note.reason %}<br>Reason: {{ note.reason }}{% endif %}
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+            <form method="POST" action="{{ url_for('delete_notification', note_id=note.id) }}" class="delete-form">
+                <button type="submit" class="delete-btn" title="Delete Notification">🗑️</button>
+            </form>
+        </li>
+        {% endfor %}
+      </ul>
+
+      {% if payment_notifications|length > 5 %}
+      <button id="expandNotifBtn" onclick="toggleNotifications()">🔽 Show All</button>
+      <ul class="notif-list hidden notifications-dropdown" id="allNotifications"> {# Added notifications-dropdown class here #}
+        {% for note in payment_notifications[5:] %}
+        <li class="notif-box status-{{ note.status|lower }}">
+            <div class="notif-main-content">
+                <div class="notif-summary">
+                    <p class="notif-line">
+                        Invoice #: <span class="notif-value">{{ note.invoice_number or note.id }}</span>
+                    </p>
+                    <p class="notif-line">
+                        Date of Payment: <span class="notif-value">{{ note.timestamp.strftime('%B %d, %Y') if note.timestamp else 'N/A' }}</span>                    </p>
+                    <p class="notif-line">
+                        Payment Status: <span class="notif-value">{{ note.status or 'N/A' }}</span>
+                    </p>
+                    <button type="button" class="expand-toggle" onclick="toggleNotifDetail(this)">
+                        (click to expand)
+                    </button>
+                </div>
+                <div class="notif-detail hidden">
+                    <p class="detail-message">
+                        {% if note.message %}
+                            {{ note.message | safe }}
+                        {% else %}
+                            Payment of ₱{{ note.amount or 'N/A' }} paid on {{ note.timestamp.strftime('%B %d, %Y') if note.timestamp else 'N/A' }} has been **{{ note.status or 'N/A' }}**.
+                            {% if note.reason %}<br>Reason: {{ note.reason }}{% endif %}
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+            <form method="POST" action="{{ url_for('delete_notification', note_id=note.id) }}" class="delete-form">
+                <button type="submit" class="delete-btn" title="Delete Notification">🗑️</button>
+            </form>
+        </li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+      
+    {% else %}
+      <p>No new notifications at this time.</p>
+    {% endif %}
+</div>
 
                 <div class="dashboard-card status-usage-card">
-                  <h2>Account Status</h2>
-                  <p><strong>Status:</strong> Active</p>
-                  <p><strong>Billing Cycle:</strong> 01/07/2025 - 31/07/2025</p>
-                  <p><strong>Due Date:</strong> 25/07/2025</p>
+                    <h2>Account Status</h2>
+                    <p><strong>Status:</strong> Active</p>
+                    <p><strong>Billing Cycle:</strong> 01/07/2025 - 31/07/2025</p>
+                    <p><strong>Due Date:</strong> 25/07/2025</p>
 
-                  <h2 class="mt-4">Internet Usage</h2>
-                  <p><strong>Data Used:</strong> 150 GB / 500 GB</p>
-                  <div class="progress-bar-container">
-                    <div class="progress-bar" style="width: 30%;"></div> {# Example: 30% usage. Adjust 'width' dynamically with Jinja if needed #}
-                  </div>
-                  <p><small>Next reset: in 15 days</small></p>
+                    <h2 class="mt-4">Internet Usage</h2>
+                    <p><strong>Data Used:</strong> 150 GB / 500 GB</p>
+                    <div class="progress-bar-container">
+                      <div class="progress-bar" style="width: 30%;"></div> {# Example: 30% usage. Adjust 'width' dynamically with Jinja if needed #}
+                    </div>
+                    <p><small>Next reset: in 15 days</small></p>
                 </div>
             </div>
 
@@ -92,7 +165,32 @@
             </div>
         {% endif %} {# <-- THIS IS THE CRUCIAL {% endif %} THAT CLOSES THE 'if active_tab' BLOCK #}
     </div> {# Closes .tab-wrapper #}
-</div> {# Closes .main-content #}
+</div> {# Closes .main #}
+
+
+{% if verified == 'true' %}
+<script>
+Swal.fire({
+    title: 'Payment Verified!',
+    text: 'Your uploaded proof of payment has been marked as VERIFIED.',
+    icon: 'success',
+    confirmButtonColor: '#1a7f37'
+});
+</script>
+{% endif %}
+
+{# -- CX Dashboard Notification (Triggered from verified param or session) -- #}
+{% if user_notification %}
+<script>
+Swal.fire({
+  title: 'Payment Update!',
+  text: "{{ user_notification }}",
+  icon: 'info',
+  confirmButtonColor: '#FF325C'
+});
+</script>
+{% endif %}
+
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
@@ -173,4 +271,34 @@ document.addEventListener('DOMContentLoaded', function () {
     document.addEventListener('DOMContentLoaded', setGreeting);
 </script>
 
-{% endblock %} {# <-- THIS {% endblock %} IS CORRECTLY PLACED AT THE VERY END OF THE BLOCK CONTENT #}
+<script>
+// --- New JavaScript for individual notification expand/collapse ---
+function toggleNotifDetail(button) {
+    const notifBox = button.closest('.notif-box'); // Finds the nearest parent with class 'notif-box'
+    const detailContent = notifBox.querySelector('.notif-detail'); // Finds the hidden detail div within that box
+
+    if (detailContent.classList.contains('hidden')) {
+        detailContent.classList.remove('hidden');
+        button.textContent = '(click to hide)'; // Change button text
+    } else {
+        detailContent.classList.add('hidden');
+        button.textContent = '(click to expand)'; // Change button text back
+    }
+}
+
+  function toggleNotifications() {
+    const allNotifs = document.getElementById("allNotifications");
+    const button = document.getElementById("expandNotifBtn");
+
+    if (allNotifs.classList.contains("hidden")) {
+      allNotifs.classList.remove("hidden");
+      button.innerHTML = "🔼 Show Less";
+    } else {
+      allNotifs.classList.add("hidden");
+      button.innerHTML = "🔽 Show All";
+    }
+  }
+</script>
+
+
+{% endblock %}

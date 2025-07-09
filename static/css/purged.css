@@ -27,7 +27,6 @@ html, body {
 }
 
 
-
 body {
     margin: 0;
     font-family: 'Titillium Web', sans-serif;
@@ -38,44 +37,369 @@ body {
 
 
 main {
-  padding-top: 0 !important; /* remove global padding */
+  padding-top: 0; /* remove global padding */
   margin-top: 70px; /* add space once below fixed header */
 }
 
 
 
+/* --- Notification Dropdown Container --- */
+.notifications-dropdown {
+    position: absolute;
+    top: 60px; /* Adjust based on your header height */
+    right: 15px; /* Slightly less space from right */
+    width: 280px; /* Reduced default width for more compression */
+    max-height: 350px; /* Reduced max height */
+    overflow-y: auto;
+    background-color: var(--bg-light);
+    border: 1px solid var(--border-color);
+    border-radius: 8px; /* Slightly smaller border-radius */
+    box-shadow: 0 5px 18px var(--shadow-strong); /* Adjusted shadow */
+    z-index: 1000;
+    padding: 10px; /* Reduced padding */
+    animation: fadeIn 0.3s ease-out forwards;
+    box-sizing: border-box;
+}
 
-/* Header core */
-header {
-    background-color: #FF325C;
-    color: #ffffff;
-    text-align: center;
-    padding: 1rem 0.5rem;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 999; /* Ensure header is below toggle button but above content */
-    height: 70px; /* Explicit height for margin calculations */
+.notifications-dropdown.hidden {
+    display: none;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-8px); } /* Adjusted translateY */
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Notification Item (notif-box) Refinement --- */
+.notif-box {
+    background-color: var(--bg-light);
+    border: 1px solid var(--border-color);
+    padding: 8px 10px; /* Reduced padding */
+    margin-bottom: 8px; /* Reduced margin */
+    border-left: 4px solid; /* Slightly thinner status indicator */
+    border-radius: 6px; /* Slightly smaller border-radius */
+    position: relative;
     display: flex;
-    flex-direction: column; /* FIXED: Stacks content vertically (perfect for your HTML) */
-    align-items: center; /* Centers horizontally in the column */
-    justify-content: center; /* Centers the stacked content vertically within the header height */
+    align-items: flex-start;
+    gap: 0.6rem; /* Reduced gap */
+    transition: all 0.2s ease-in-out;
+    min-width: 0;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04); /* Subtle shadow */
 }
 
-/* Slimmed compact version */
-.compact-header {
-    padding: 0.6rem 0.5rem;
+.notif-box:last-child {
+    margin-bottom: 0;
 }
 
-/* Logo (compact) */
-.logo {
-    width: 48px;
-    height: auto;
-    margin: 0 auto 0.25rem;
+.notif-box:hover {
+    background-color: var(--bg-faded);
+    border-color: #d0d0d0;
+    transform: translateY(-1px); /* Less pronounced hover effect */
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08); /* Slightly less prominent shadow on hover */
+}
+
+/* Wrapper for summary and detail content */
+.notif-main-content {
+    flex-grow: 1;
+    min-width: 0;
+}
+
+/* Styles for the visible, minimalist part of the notification */
+.notif-summary {
+    display: flex;
+    flex-direction: column;
+}
+
+.notif-line {
+    margin: 0;
+    padding: 1px 0; /* Reduced vertical padding */
+    color: var(--text-dark);
+    font-size: 0.8rem; /* Slightly smaller font size */
+    line-height: 1.2; /* Tighter line height */
+    display: flex;
+    justify-content: start;
+    align-items: baseline;
+}
+
+.notif-line .notif-value {
+    font-weight: 600;
+    color: #444;
+    word-break: break-all;
+    margin-left: 0.4rem; /* Reduced space between label and value */
+    text-align: right;
+}
+
+.notif-list {
+    display: flex;
+    flex-direction: column;
+    padding-left: 0px;
+    /* If you want more consistent spacing *between* items using flexbox gap,
+       you could add `gap: 8px;` here and remove `margin-bottom` from `.notif-box`.
+       However, current setup with margin-bottom on .notif-box is also fine. */
+}
+
+/* Style for the 'click to expand/hide' button */
+.expand-toggle {
+    background: none;
+    border: none;
+    color: var(--primary-color);
+    cursor: pointer;
+    font-size: 0.7rem; /* Smaller text */
+    text-align: left;
+    padding: 3px 0; /* Reduced padding */
     display: block;
-	
+    width: fit-content;
+    margin-top: 3px; /* Reduced space */
+    transition: color 0.2s ease;
+    text-decoration: none;
 }
+
+.expand-toggle:hover {
+    color: var(--primary-dark);
+    text-decoration: underline;
+}
+
+/* Styles for the hidden detailed message */
+.notif-detail {
+    margin-top: 0.6rem; /* Reduced space from summary when visible */
+    border-top: 1px dashed var(--border-color);
+    padding-top: 0.6rem; /* Reduced padding */
+    font-size: 0.75rem; /* Smaller font for details */
+    color: #666;
+    line-height: 1.4; /* Tighter line height */
+    word-break: break-all;
+}
+
+.notif-detail.hidden {
+    display: none;
+}
+
+.detail-message {
+    margin: 0;
+}
+
+/* Delete Button specific styles */
+/* Delete Button specific styles */
+.delete-form {
+    flex-shrink: 0;
+    margin-left: auto;
+    align-self: flex-start;
+    width: fit-content;    /* Ensures it only takes content width */
+    max-width: 40px;       /* Explicitly caps its maximum width */
+    flex-basis: content;   /* Can help in flex containers to size based on content */
+    display: flex;         /* Ensure it's a flex container itself to control its children */
+    align-items: center;   /* Center button vertically within the form if form has height */
+    justify-content: center; /* Center button horizontally within the form */
+}
+
+.delete-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 0.7rem; /* VERY AGGRESSIVELY SMALL emoji/icon size */
+    color: var(--text-muted);
+    padding: 0;
+    transition: color 0.2s ease-in-out;
+    line-height: 1; /* Keep line height tight */
+    flex-shrink: 0;
+    white-space: nowrap; /* Prevent emoji from wrapping */
+    /* Ensure no default minimum size is applied to the button itself */
+    min-width: 0; 
+    min-height: 0;
+    display: block; /* Ensure it behaves as a block for precise sizing */
+}
+
+.delete-btn:hover {
+    color: var(--danger-color);
+}
+
+/* Status-specific notification styling (keep as is, adjust border-left-color) */
+
+
+/* Responsive Adjustments for Mobile Screens (adjust as needed) */
+@media (max-width: 480px) {
+    .notifications-dropdown {
+        width: 250px; /* Further reduced width for mobile */
+        right: 10px; /* Less space from right */
+        padding: 8px; /* Further reduced padding */
+    }
+    .notif-box {
+        padding: 6px 8px; /* Further reduced padding for very small screens */
+        gap: 0.3rem; /* Smaller gap */
+    }
+    .notif-line {
+        font-size: 0.75rem; /* Even smaller font for summary on very small screens */
+    }
+    .notif-line .notif-value {
+        margin-left: 0.1rem; /* Reduce space */
+    }
+    .expand-toggle {
+        font-size: 0.65rem; /* Even smaller expand text */
+    }
+    .notif-detail {
+        font-size: 0.7rem; /* Even smaller detail font */
+        margin-top: 0.5rem;
+        padding-top: 0.5rem;
+    }
+    .delete-btn {
+        font-size: 1rem; /* Slightly smaller emoji */
+    }
+}
+
+/* --- Header Styles --- */
+
+header {
+    /* Very minimal padding to achieve a super thin header */
+    padding: 2px 0; /* */
+    text-align: center;
+    box-shadow: 0 0.5px 1px rgba(0,0,0,0.03); /* A very subtle shadow */
+    transition: all 0.2s ease-in-out;
+    border-bottom: 1px solid #FF325C; /* Keeps the red line at the bottom */
+}
+
+.header-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 5px; /* Minimal horizontal padding */
+    display: flex;
+    flex-direction: column; /* Stacks image and slogan vertically */
+    align-items: center; /* Centers items horizontally */
+    justify-content: center; /* Centers items vertically within the compact space */
+    /* Ensure no extra padding/margin on header-content itself that adds height */
+}
+
+/* Dashboard Header Styles (no changes from previous for this, as the focus is on compact header) */
+.dashboard-header {
+    background-color: #000;
+    color: #fff;
+    border-bottom: 1px solid #FF325C;
+}
+
+.dashboard-header .main-title-bold {
+    font-size: 1.6em;
+    font-weight: 800;
+    margin-bottom: 1px;
+    color: #FF325C;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.dashboard-header .subtitle-minimal {
+    font-size: 0.7em;
+    font-weight: 400;
+    color: #eee;
+    margin-top: 0;
+}
+
+/* Compact Header Styles (for non-dashboard pages - this is where the main changes are) */
+.compact-header {
+    background-color: #F8F8F8; /* Light background for clear logo visibility */
+    color: #333; /* Dark text for slogan for contrast */
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    header {
+        padding: 1px 0; /* Even more minimal padding on mobile */
+    }
+
+    .dashboard-header .main-title-bold {
+        font-size: 1.2em;
+    }
+    .dashboard-header .subtitle-minimal {
+        font-size: 0.6em;
+    }
+}
+
+
+/* Admin Header */
+.admin-header {
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid #e0e0e0;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 1000;
+    position: sticky;
+    top: 0;
+}
+
+.admin-header-content {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.admin-title-group h1.admin-main-title {
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin: 0;
+    color: #FF325C;
+}
+
+.admin-subtitle {
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 4px;
+}
+
+.admin-user-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.admin-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #FF325C;
+}
+
+.admin-user-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.admin-name {
+    font-weight: 500;
+    font-size: 0.95rem;
+    color: #333;
+}
+
+.admin-logout-btn {
+    font-size: 0.85rem;
+    color: #FF325C;
+    text-decoration: none;
+}
+
+.admin-logout-btn:hover {
+    text-decoration: underline;
+}
+
+/* PoP Status */
+.proof-status {
+  font-weight: bold;
+  padding: 2px 8px;
+  border-radius: 8px;
+  text-transform: uppercase;
+}
+
+.admin-proof-card select {
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin-top: 6px;
+  margin-bottom: 8px;
+}
+
+
+
 
 /* Footer Styling */
 .main-footer {
@@ -83,7 +407,6 @@ header {
     color: #f8f8f8; /* Light text color */
     padding-top: 2.5rem; /* Vertical padding for the whole footer */
     padding-bottom: 2.5rem; /* Vertical padding for the whole footer */
-    /* IMPORTANT: Remove padding-left and padding-right from here */
     margin-top: 3rem; /* Space above the footer */
     font-size: 0.95rem;
     line-height: 1.6;
@@ -92,7 +415,10 @@ header {
 .main-footer .footer-content {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-around;
+    /* --- MODIFIED/ADDED --- */
+    justify-content: center; /* Changed from space-around to center for better grouping */
+    gap: 2.5rem; /* Added gap to control space between sections (adjust as needed) */
+    /* --- END MODIFIED/ADDED --- */
     max-width: 1200px; /* This defines the main content column width */
     margin: 0 auto; /* This centers the main content column */
     padding: 0 1.5rem; /* Horizontal padding for spacing within the column */
@@ -100,9 +426,12 @@ header {
 }
 
 .main-footer .footer-section {
-    flex: 1; /* Allows sections to grow and shrink */
+    /* --- MODIFIED/ADDED --- */
+    /* Removed flex: 1; - sections will size based on content and min-width */
     min-width: 250px; /* Minimum width before wrapping */
-    margin: 1rem; /* Space around each section */
+    /* Removed margin: 1rem; - gap property on parent now handles spacing */
+    flex-shrink: 0; /* Prevents sections from shrinking below min-width */
+    /* --- END MODIFIED/ADDED --- */
 }
 
 .main-footer .footer-section h3 {
@@ -137,16 +466,11 @@ header {
 }
 
 .main-footer .footer-bottom {
-    text-align: center; /* Centers the copyright text */
-    padding-top: 1.5rem; /* Space between the line and the copyright text */
-    padding-bottom: 0.5rem; /* Some padding at the very bottom */
-    border-top: 1px solid rgba(255, 255, 255, 0.1); /* The whitish line */
+    padding-top: 0px;
+    padding-bottom: 0px;
     color: #cccccc;
     font-size: 0.85rem;
-	max-width: 1200px; /* This makes the line span the same width as .footer-content */
-    margin-left: auto; /* Centers the section horizontally */
-    margin-right: auto; /* Centers the section horizontally */
-	
+    max-width: 1200px; /* This makes the line span the same width as .footer-content */
 }
 
 /* Responsive adjustments for very small screens */
@@ -154,6 +478,7 @@ header {
     .main-footer .footer-content {
         flex-direction: column; /* Stack sections vertically */
         align-items: center; /* Center sections */
+        gap: 1.5rem; /* Adjust gap for smaller screens if sections are stacked */
     }
     .main-footer .footer-section {
         width: 90%; /* Take more width */
@@ -165,30 +490,6 @@ header {
 }
 
 
-/* Dashboard title - bold and elegant */
-.dashboard-header .main-title {
-    font-size: 1.6rem;
-    margin: 0;
-    font-weight: 700;
-    letter-spacing: 0.4px;
-}
-
-/* Dashboard subtitle - light and fine */
-.dashboard-header .subtitle {
-    font-size: 1rem;
-    font-weight: 300;
-    margin: 0.2rem 0 0;
-    opacity: 0.85;
-}
-
-/* Compact tagline version (non-dashboard) */
-.tagline {
-    margin: 0;
-    font-size: 1.1rem;
-    font-weight: 600;
-    letter-spacing: 0.4px;
-    opacity: 0.92;
-}
 
 /* Typography focus */
 h1, p {
@@ -197,14 +498,6 @@ h1, p {
 
 /* Responsive refinement for smaller screens (less than 600px) */
 @media (max-width: 600px) {
-    .dashboard-header .main-title {
-        font-size: 1.35rem;
-    }
-
-    .dashboard-header .subtitle,
-    .tagline {
-        font-size: 0.95rem;
-    }
 
     .logo {
         width: 42px;
@@ -212,39 +505,38 @@ h1, p {
 }
 
 
-/* Dashboard Widgets Grid Layout */
+/* Existing CSS for Dashboard Widgets Grid Layout */
 .dashboard-widgets-grid {
     display: grid;
-    /* This creates two columns:
-       - On larger screens, minmax(0, 1fr) ensures columns are at least 0 and grow equally.
-       - gap creates space between grid items. */
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Adjusted for better responsiveness */
-    gap: 1.5rem; /* Space between the dashboard cards */
-    margin-top: 1.5rem; /* Space from the profile summary above */
+    /* Adapts grid columns based on available space:
+       Each column will be at least 280px wide, and they'll expand to fill available space equally.
+       This provides a good minimum size for content on smaller desktop screens. */
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem; /* Consistent spacing between grid items */
+    margin-top: 1.5rem;
+    padding: 0 1.5rem; /* Add horizontal padding for a balanced look on larger screens */
 }
 
-/* Styling for all Dashboard Cards */
+/* Existing Styling for all Dashboard Cards */
 .dashboard-card {
-    background-color: #ffffff; /* White background for the cards */
-    border-radius: 12px; /* Slightly rounded corners */
-    padding: 1.8rem; /* Inner spacing within the cards */
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); /* Soft shadow for depth */
-    border: 1px solid #e0e0e0; /* Subtle border */
-    display: flex; /* Using flexbox for content alignment within cards */
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 1.8rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e0e0e0;
+    display: flex;
     flex-direction: column;
-    justify-content: space-between; /* Distributes space vertically */
-    transition: transform 0.2s ease-in-out; /* Smooth hover effect */
+    justify-content: space-between;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 }
 
 .dashboard-card:hover {
-    transform: translateY(-5px); /* Lift effect on hover */
+    transform: translateY(-5px);
 }
 
 .dashboard-card h2 {
-    color: #333;
-    margin-top: 0;
+    font-size: 1.5rem; /* Base font size for desktop */
     margin-bottom: 1rem;
-    font-size: 1.4rem; /* Slightly larger heading for cards */
 }
 
 .dashboard-card p {
@@ -255,43 +547,60 @@ h1, p {
 
 /* Specific styling for the 'About Us' card if needed to stretch */
 .dashboard-card.about-us-container {
-    grid-column: 1 / -1; /* Makes this card span across all columns in the grid */
-    margin-top: 1.5rem; /* Space between grid and about us */
+    grid-column: 1 / -1;
+    margin-top: 1.5rem;
 }
 
-/* Progress Bar for Internet Usage */
+/* Progress Bar for Internet Usage (existing) */
 .progress-bar-container {
     width: 100%;
     background-color: #e0e0e0;
     border-radius: 8px;
     height: 12px;
-    overflow: hidden; /* Ensures the progress bar stays within bounds */
+    overflow: hidden;
     margin-top: 0.8rem;
     margin-bottom: 0.5rem;
 }
 
 .progress-bar {
     height: 100%;
-    background-color: #FF325C; /* Your brand color for the progress */
+    background-color: #FF325C;
     border-radius: 8px;
     text-align: center;
     color: white;
-    transition: width 0.5s ease-in-out; /* Smooth animation for progress updates */
+    transition: width 0.5s ease-in-out;
 }
 
 /* Responsive adjustments for smaller screens */
 @media (max-width: 768px) {
     .dashboard-widgets-grid {
         grid-template-columns: 1fr; /* Stack cards vertically on smaller screens */
-        gap: 1.2rem;
+        gap: 1.2rem; /* Slightly reduced gap for mobile */
+        padding: 0 1rem; /* Adjust horizontal padding for mobile to provide breathing room */
     }
 
     .dashboard-card {
-        padding: 1.5rem;
+        padding: 1.2rem; /* Reduced padding for mobile cards */
     }
 
     .dashboard-card h2 {
-        font-size: 1.2rem;
+        font-size: 1.3rem; /* Adjusted font size for mobile headings */
+    }
+}
+
+/* Optional: Even smaller screens (e.g., very small phones) */
+@media (max-width: 480px) {
+    .dashboard-widgets-grid {
+        gap: 1rem; /* Slightly tighter gap on very small screens */
+        padding: 0 0.8rem; /* Further reduce padding for very narrow viewports */
+    }
+
+    .dashboard-card {
+        padding: 1rem; /* Minimal padding for compact view */
+    }
+
+    .dashboard-card h2 {
+        font-size: 1.1rem; /* Smaller font size for very small screens */
     }
 }
 
@@ -325,24 +634,6 @@ h1, p {
     box-shadow: 2px 0 35px var(--shadow-strong); /* Stronger shadow when open */
 }
 
-/* Sidebar Overlay (dims background content when sidebar is open on mobile) */
-.sidebar-overlay {
-    display: none; /* Hidden by default, shown when 'active' */
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw; /* Full viewport width */
-    height: 100vh; /* Full viewport height */
-    background-color: rgba(0, 0, 0, 0.7); /* Dims background */
-    z-index: 999; /* Below sidebar, above main content */
-    opacity: 0; /* Starts transparent, fades in */
-    transition: opacity 0.3s ease;
-}
-
-.sidebar-overlay.active {
-    display: block; /* Make visible */
-    opacity: 1; /* Fade in to full opacity */
-}
 
 
 /* Sidebar Header (User Avatar, Name, Account Number) */
@@ -517,6 +808,7 @@ h1, p {
     display: inline-block;
     text-align: center;
     min-width: 160px; /* Ensures buttons have a consistent minimum width */
+   
 }
 .btn:hover, button:hover, .toggle-btn:hover {
     background-color: #e0254d;
@@ -530,6 +822,22 @@ h1, p {
     background-color: #5a6268;
     box-shadow: 0 4px 10px rgba(108, 117, 125, 0.4);
 }
+
+.tertiary-btn {
+    background-color: transparent;
+    color: #FF325C;
+    border: 1px solid #FF325C;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.tertiary-btn:hover {
+    background-color: #FF325C;
+    color: white;
+}
+
 
 /* --- Toggle Button Specific Styles (FIXED: Reinforcing positioning) --- */
 .toggle-btn {
@@ -548,10 +856,10 @@ h1, p {
     justify-content: center;
     transition: background-color 0.2s ease, color 0.2s ease;
     /* FIXED: Explicitly re-asserting position with !important to ensure it stays fixed */
-    position: fixed !important;
-    top: 1rem !important;
-    left: 1rem !important;
-    z-index: 1000 !important;
+    position: fixed ;
+    top: 1rem;
+    left: 1rem;
+    z-index: 1000;
 }
 
 .toggle-btn:hover {
@@ -573,61 +881,526 @@ h1, p {
 }
 
 /* Profile Container - general styling for the card that holds the profile */
-.profile-container {
-    background-color: #fff;
-    border: 1px solid #e0e0e0;
-    border-radius: 12px;
-    padding: 3rem;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
-    max-width: 800px;
-    margin: 2rem auto;
-    animation: fadeIn 0.5s ease;
-    width: 95%; /* Make it fluid up to max-width */
-    box-sizing: border-box; /* Include padding in width */
-}
-
-/* --- Login Page Specific Styles (Minimalist & Consistent Redesign) --- */
-
-/* Full page container for centering the login card */
 .login-container {
     display: flex;
     justify-content: center;
     align-items: center;
-    /* Adjusted min-height for potential header. If you have a fixed header,
-       adjust '70px' to its actual height. Otherwise, remove '- 70px'. */
-    min-height: calc(100vh - 70px);
-    background-color: #f8f8f8; /* Light background for the page */
-    padding: 2rem 1rem; /* Padding for small screens, acts as margin on larger screens */
-    box-sizing: border-box; /* Include padding in height calculation */
+    min-height: calc(100vh - var(--header-height) - 3rem);
+    padding: 20px;
+    background-color: #f4f7f6;
 }
 
-/* The actual login card */
 .login-card {
-    background: #ffffff;
-    border-radius: 16px; /* Slightly more rounded for a softer look */
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08); /* Softer, deeper shadow */
-    padding: 2.5rem; /* Increased padding for more breathing room */
-    max-width: 420px; /* Slightly increased max-width for better balance */
-    width: 100%; /* Ensure it fills available width up to max-width */
-    text-align: center; /* Center align content inside the card */
-    animation: fadeIn 0.6s ease-out; /* Smooth fade-in animation */
-    border: 1px solid #eee; /* Subtle border for definition */
+    background-color: #ffffff;
+    padding: 2.5rem;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    width: 90%;
+    max-width: 450px;
+    margin: auto;
+    border: 1px solid #e0e0e0;
+    text-align: center;
+
+    /* CRITICAL FOR ALIGNMENT OF CHILDREN (Logo, Header, Forms) */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem; /* Space between major sections */
 }
 
-/* Login Logo */
+/* Logo */
 .login-logo {
-    width: 80px; /* Adjust size as needed */
-    height: auto;
-    margin: 0 auto 1.5rem; /* Center and add space below */
-    display: block; /* Ensure it behaves as a block element */
+    max-width: 150px;
+    margin: 0; /* Ensure no default margins interfere with gap */
+    display: block;
 }
 
-/* Login Title */
+/* Header within Login Card */
+#login-header {
+    margin: 0; /* Ensure no default margins interfere with gap */
+    width: 100%;
+    /* Add any sticky header styles here if needed */
+}
+
+
 .login-title {
-    font-size: 2.2rem; /* Larger, more welcoming title */
+    font-size: 2em;
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
     font-weight: 700;
-    color: #FF325C;
-    margin-bottom: 0.5rem; /* Reduced margin for tighter typography */
+}
+
+.login-subtitle {
+    font-size: 1.1em;
+    color: #555;
+    margin-top: 0;
+}
+
+/* --- Redesigned Toggle Buttons for Minimalist Switching (from previous turn) --- */
+.toggle-buttons {
+    display: flex;
+    margin-top: 0; /* Reset margin top if subtitle adds space below */
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+    border: 1px solid #eee;
+    border-radius: 8px;
+
+}
+
+/* Styles for the individual login/admin toggle buttons */
+.auth-toggle-btn {
+    flex: 1;
+    padding: 10px 20px;
+    border: none;
+    background-color: transparent;
+    color: #666;
+    font-size: 0.95em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    /* Crucially, remove any fixed positioning or conflicting margins/widths */
+    position: static; /* Ensure it behaves normally within its parent */
+    margin: 0; /* No external margins */
+    min-width: unset; /* Allows buttons to size dynamically */
+    width: auto; /* Allows buttons to size dynamically */
+}
+
+.auth-toggle-btn:first-child {
+    border-top-left-radius: 7px;
+    border-bottom-left-radius: 7px;
+}
+
+.auth-toggle-btn:last-child {
+    border-top-right-radius: 7px;
+    border-bottom-right-radius: 7px;
+}
+
+.auth-toggle-btn.active {
+    background-color: #FF325C;
+    color: white;
+    border-color: #FF325C;
+    box-shadow: 0 2px 5px rgba(255, 50, 92, 0.2);
+}
+
+.auth-toggle-btn:hover:not(.active) {
+    background-color: #e0e0e0;
+}
+
+/* --- Form Styles (from your CSS, remains unchanged) --- */
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group {
+    width: 100%;
+    margin: 0; /* IMPORTANT: Remove any default margins on form-groups */
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #333;
+    font-weight: 500;
+    font-size: 0.95em;
+}
+
+.form-group input[type="email"],
+.form-group input[type="password"],
+.form-group input[type="text"],
+.form-group input[type="date"],
+.form-group select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1em;
+    color: #333;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(255, 50, 92, 0.2);
+    outline: none;
+}
+
+.login-btn {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 14px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+    margin-top: 1rem;
+}
+
+.login-btn:hover {
+    background-color: #E62A50; /* Slightly darker on hover */
+    transform: translateY(-1px); /* Slight lift effect */
+    box-shadow: 0 4px 10px rgba(255, 50, 92, 0.2);
+}
+
+.login-btn:active {
+    transform: translateY(0);
+}
+
+.secondary-btn {
+    background-color: #6c757d;
+}
+
+.secondary-btn:hover {
+    background-color: #5a6268;
+}
+
+/* Extra Link (e.g., Register Here) */
+.extra-link {
+    margin-top: 1.5rem;
+    font-size: 0.95em;
+    color: #666;
+}
+
+.extra-link a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.extra-link a:hover {
+    text-decoration: underline;
+}
+
+/* Specific form hiding (handled by JavaScript in login.html) */
+/* Removed empty ruleset for #customer-form, #admin-form */
+
+/* --- Responsive adjustments for smaller screens (from your CSS) --- */
+@media (max-width: 480px) {
+    .login-card {
+        padding: 1.8rem;
+        border-radius: 10px;
+    }
+
+    .login-title {
+        font-size: 1.8em;
+    }
+
+    .login-subtitle {
+        font-size: 1em;
+    }
+
+    .login-logo {
+        max-width: 120px;
+        margin-bottom: 1.5rem;
+    }
+
+    .toggle-btn {
+        padding: 8px 15px;
+        font-size: 0.85em;
+    }
+
+    .login-btn {
+        padding: 12px 18px;
+        font-size: 1em;
+    }
+
+    .extra-link {
+        font-size: 0.9em;
+    }
+}
+
+
+/* --- Landing Page Specific Styles --- */
+
+.landing-page-container {
+    max-width: 1200px; /* Limits content width for readability */
+    margin: 0 auto; /* Centers the container */
+    padding: 2rem 1.5rem; /* Padding on top/bottom and sides */
+}
+
+/* Hero Section */
+.hero-section {
+    display: flex;
+    flex-direction: row; /* Default: content and image side-by-side */
+    align-items: center;
+    justify-content: space-between;
+    padding: 4rem 0; /* More vertical padding */
+    gap: 2rem; /* Space between content and image */
+    text-align: left;
+}
+
+.hero-content {
+    flex: 1; /* Takes up available space */
+    max-width: 600px;
+}
+
+.hero-section h1 {
+    font-size: 3.5rem; /* Large, impactful headline */
+    color: var(--secondary-color); /* Darker text for prominence */
+    line-height: 1.1;
+    margin-bottom: 1rem;
+    font-weight: 700;
+}
+
+.hero-tagline {
+    font-size: 1.3rem; /* Prominent tagline */
+    color: #555;
+    margin-bottom: 2rem;
+    line-height: 1.5;
+}
+
+.hero-actions {
+    display: flex;
+    gap: 1rem; /* Space between buttons */
+}
+
+/* Specific button styles for hero section */
+.btn-primary-hero {
+    display: inline-block;
+    background-color: var(--primary-color);
+    color: var(--text-light);
+    padding: 0.9rem 1.8rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.btn-primary-hero:hover {
+    background-color: var(--primary-dark); /* Using a darker primary */
+    transform: translateY(-2px);
+}
+
+/* Optional: Secondary button style if you add "Register Now" */
+
+
+.hero-image-placeholder {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 300px; /* Ensure image area has minimum size */
+}
+
+.hero-image-placeholder img {
+    max-width: 100%; /* Image should scale */
+    height: auto;
+    border-radius: 10px; /* Optional: subtle rounding */
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15); /* Soft shadow for depth */
+}
+
+/* Features Section */
+.features-section {
+    padding: 4rem 0;
+    text-align: center;
+    background-color: #f9f9f9; /* Light background for contrast */
+    border-radius: 10px; /* Match hero section rounding */
+    margin-bottom: 2rem;
+}
+
+.features-section h2 {
+    font-size: 2.5rem;
+    color: var(--secondary-color);
+    margin-bottom: 3rem;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Responsive grid */
+    gap: 2rem;
+    max-width: 1000px; /* Constrain grid width */
+    margin: 0 auto; /* Center the grid */
+}
+
+.feature-card {
+    background-color: #ffffff;
+    border-radius: 10px;
+    padding: 2rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px); /* Lift effect on hover */
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.icon-feature {
+    font-size: 3rem; /* Large icons */
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.feature-card h3 {
+    font-size: 1.5rem;
+    color: var(--secondary-color);
+    margin-bottom: 0.8rem;
+}
+
+.feature-card p {
+    font-size: 1rem;
+    color: #666;
+    line-height: 1.6;
+}
+
+/* Call to Action Section */
+.cta-section {
+    background-color: var(--primary-color);
+    color: var(--text-light);
+    padding: 4rem 1.5rem;
+    text-align: center;
+    border-radius: 10px;
+    margin-top: 2rem;
+}
+
+.cta-section h2 {
+    font-size: 2.8rem;
+    margin-bottom: 1rem;
+    color: var(--text-light);
+}
+
+.cta-section p {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+}
+
+/* Specific button style for CTA section */
+.btn-primary-large {
+    display: inline-block;
+    background-color: var(--text-light); /* White button on primary background */
+    color: var(--primary-color); /* Primary color text */
+    padding: 1.2rem 2.5rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 1.3rem;
+    transition: background-color 0.3s ease, transform 0.2s ease, color 0.3s ease;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+}
+
+.btn-primary-large:hover {
+    background-color: #f0f0f0; /* Slightly darker white on hover */
+    transform: translateY(-3px);
+    color: var(--primary-dark); /* Ensure text color changes correctly if primary-dark is defined */
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 992px) {
+    .hero-section {
+        flex-direction: column; /* Stack content and image vertically */
+        text-align: center;
+    }
+
+    .hero-content {
+        max-width: 100%;
+    }
+
+    .hero-section h1 {
+        font-size: 2.8rem;
+    }
+
+    .hero-tagline {
+        font-size: 1.1rem;
+    }
+
+    .hero-actions {
+        justify-content: center; /* Center buttons when stacked */
+    }
+
+    .hero-image-placeholder {
+        margin-top: 2rem; /* Add space when image is below content */
+    }
+
+    .features-section h2 {
+        font-size: 2rem;
+    }
+
+    .cta-section h2 {
+        font-size: 2.2rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .landing-page-container {
+        padding: 1.5rem 1rem;
+    }
+
+    .hero-section {
+        padding: 3rem 0;
+    }
+
+    .hero-section h1 {
+        font-size: 2.2rem;
+    }
+
+    .hero-tagline {
+        font-size: 1rem;
+    }
+
+    .btn-primary-hero {
+        padding: 0.8rem 1.5rem;
+        font-size: 1rem;
+    }
+
+    .features-section {
+        padding: 3rem 0;
+    }
+
+    .features-section h2 {
+        font-size: 1.8rem;
+        margin-bottom: 2rem;
+    }
+
+    .feature-card {
+        padding: 1.5rem;
+    }
+
+    .icon-feature {
+        font-size: 2.5rem;
+    }
+
+    .feature-card h3 {
+        font-size: 1.3rem;
+    }
+
+    .cta-section {
+        padding: 3rem 1rem;
+    }
+
+    .cta-section h2 {
+        font-size: 1.8rem;
+    }
+
+    .cta-section p {
+        font-size: 1rem;
+    }
+
+    .btn-primary-large {
+        padding: 1rem 2rem;
+        font-size: 1.1rem;
+    }
+}
+
+
+#customer-form,
+#admin-form {
+    display: flex;
+    flex-direction: column; /* Stack children (form-groups, button, links) vertically */
+    align-items: center; /* Horizontally centers children within the form */
+    gap: 1rem; /* Consistent vertical spacing between form elements (inputs, button, link) */
+    width: 100%; /* Ensure forms take full width of login-card for proper centering of their contents */
 }
 
 /* Login Subtitle - used for main subtitle and reset password form subtitle */
@@ -647,69 +1420,103 @@ h1, p {
 /* Input Fields - Unified style for all text/password inputs */
 .login-card input[type="email"],
 .login-card input[type="password"],
-.login-card input[type="text"] { /* In case you add text type inputs later */
-    width: 100%;
-    padding: 14px 18px; /* More generous padding for better feel */
-    font-size: 1.05rem; /* Slightly larger font */
-    border-radius: 10px; /* More rounded input fields */
-    border: 1px solid #ddd; /* Lighter border color */
-    background-color: #fdfdfd; /* Very subtle off-white background */
+.login-card input[type="text"] {
+    width: 100%; /* Makes inputs take full width of their .form-group parent */
+    padding: 14px 18px;
+    font-size: 1.05rem;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    background-color: #fdfdfd;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    -webkit-appearance: none; /* For better consistency across browsers */
+    -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
+    box-sizing: border-box; /* Ensures padding is included in the 100% width */
 }
 
 .login-card input[type="email"]:focus,
 .login-card input[type="password"]:focus,
 .login-card input[type="text"]:focus {
-    border-color: #FF325C; /* Highlight border on focus */
-    box-shadow: 0 0 0 3px rgba(255, 50, 92, 0.2); /* Soft focus ring */
-    outline: none; /* Remove default outline */
+    border-color: #FF325C;
+    box-shadow: 0 0 0 3px rgba(255, 50, 92, 0.2);
+    outline: none;
 }
 
 /* Login Button - Common style for all primary actions */
+/* Login Button - Sizing and Alignment */
 .login-btn {
-    width: 100%;
-    padding: 15px; /* Larger padding for a more substantial button */
-    font-size: 1.1rem; /* Larger font size for prominence */
+    width: 100%; /* Makes button take full width, matching inputs within the form */
+    padding: 14px 18px;
+    font-size: 1.05rem;
     font-weight: 600;
-    border-radius: 10px; /* Consistent rounding */
+    border-radius: 10px;
     background-color: #FF325C;
     color: white;
     border: none;
     cursor: pointer;
     transition: all 0.2s ease;
-    margin-top: 1rem; /* Space above button */
+    /* margin-top is removed, 'gap' on the parent form handles spacing */
     letter-spacing: 0.5px;
+    box-sizing: border-box;
+    text-align: center; /* Ensures text inside is centered horizontally */
+    display: block; /* Ensures it behaves as a block element for width/margins */
 }
 
 .login-btn:hover {
-    background-color: #e0254d;
-    transform: translateY(-2px); /* Subtle lift on hover */
-    box-shadow: 0 6px 15px rgba(255, 50, 92, 0.3); /* Enhanced shadow on hover */
+    background-color: #E62A50;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(255, 50, 92, 0.2);
 }
 
-/* Specific button style for "Send Reset Link" to differentiate */
-.login-btn.secondary-btn { /* Adding a new class for this button */
-    background-color: #6c757d; /* A neutral gray */
+/* Other links and buttons outside direct form-group but within forms */
+.extra-link {
+    font-size: 0.9rem;
+    margin-top: 0; /* Gap handles spacing */
+    text-align: center;
 }
 
-.login-btn.secondary-btn:hover {
-    background-color: #5a6268;
-    box-shadow: 0 6px 15px rgba(108, 117, 125, 0.3);
+.extra-link a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.secondary-btn, .tertiary-btn {
+    width: 100%; /* Make these buttons also take full width */
+    padding: 14px 18px;
+    border-radius: 10px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none; /* For links styled as buttons */
+    display: block; /* For links styled as buttons */
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+}
+
+.secondary-btn {
+    background-color: #4CAF50; /* Example for admin button */
+    color: white;
+    border: none;
+}
+
+.secondary-btn:hover {
+    background-color: #45a049;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(76, 175, 80, 0.2);
+}
+
+.tertiary-btn {
+    background-color: transparent;
+    color: #FF325C;
+    border: 1px solid #FF325C;
+}
+
+.tertiary-btn:hover {
+    background-color: rgba(255, 50, 92, 0.1);
 }
 
 /* Links (Forgot Password, Register, Back to Login) */
-.login-links {
-    margin-top: 1.8rem; /* Space above the links section */
-    font-size: 0.95rem;
-    color: #777;
-}
-
-.login-links p {
-    margin: 0.8rem 0 0; /* Adjust margin for paragraphs within links */
-}
 
 .login-card a { /* General link style within the card */
     color: #FF325C;
@@ -724,38 +1531,8 @@ h1, p {
 }
 
 /* Styling for "Forgot Password?" and "Back to Login" links */
-.forgot-password-toggle, /* Updated class name */
-.toggle-form-link {
-    display: block; /* Make them block to take full width */
-    text-align: center;
-    margin-bottom: 0.5rem; /* Space between links if stacked */
-}
 
 /* Forgot Password Form specific styling */
-#forgot-form {
-    padding-top: 1rem; /* Add internal padding */
-    border-top: 1px solid #eee; /* Subtle separator */
-    margin-top: 1.5rem; /* Space above the form - MOVED FROM INLINE STYLE */
-    /* Initially hidden via JavaScript, but add a class for smooth transitions later if desired */
-    /* display: none; */ /* REMOVED: Will be handled by JS on DOMContentLoaded */
-}
-
-#forgot-form .login-subtitle { /* Override margin for this specific subtitle */
-    margin-bottom: 1rem;
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: #333;
-}
-
-#forgot-form .forgot-form-text { /* Styling for the instruction text */
-    font-size: 0.9rem;
-    color: #666;
-    margin-bottom: 1.5rem;
-}
-
-.back-to-login-link { /* MOVED FROM INLINE STYLE */
-    margin-top: 1rem;
-}
 
 /* Accessibility: Visually hidden but available to screen readers */
 .sr-only {
@@ -771,13 +1548,6 @@ h1, p {
 }
 
 /* Utility class for forms that are hidden by JS - useful for transitions */
-.hidden-form {
-    opacity: 0;
-    pointer-events: none;
-    transform: translateY(10px);
-    transition: opacity 0.3s ease, transform 0.3s ease;
-   
-}
 
 
 /* --- Responsive Adjustments for Login Page --- */
@@ -816,25 +1586,6 @@ h1, p {
     .login-btn {
         padding: 13px; /* Adjust button padding */
         font-size: 1rem;
-    }
-
-    .login-links {
-        margin-top: 1.5rem;
-        font-size: 0.85rem;
-    }
-
-    .login-links p {
-        margin: 0.6rem 0 0;
-    }
-
-    #forgot-form .login-subtitle {
-        font-size: 1rem;
-        margin-bottom: 0.8rem;
-    }
-
-    #forgot-form .forgot-form-text {
-        font-size: 0.8rem;
-        margin-bottom: 1rem;
     }
 }
 
@@ -1120,30 +1871,6 @@ h1, p {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /* --- PROFILE PREVIEW STYLES --- */
 
 .profile-summary {
@@ -1156,13 +1883,23 @@ h1, p {
     position: relative;
 }
 
-/* Removed stray align-items and related properties that were outside a selector block */
+/* Add or update this rule for .profile-preview-header */
+.profile-preview-header {
+    display: flex; /* Make it a flex container */
+    align-items: center; /* Vertically align items in the middle */
+    justify-content: space-between; /* Distribute space between items (text and button) */
+    margin-bottom: 1.5rem; /* Add some space below the header, adjust as needed */
+    /* You might need to adjust margin-bottom here based on your overall layout */
+}
+
 
 .profile-preview-header .preview-heading {
     font-weight: 700;
     font-size: 2.2rem;
     margin-bottom: 0; /* Ensures it sits tightly with the button */
     color: #FF325C;
+    /* flex-grow: 1; Uncomment this if you want the heading to take up available space
+                  and push the button to the far right within the flex container */
 }
 
 .edit-profile-btn {
@@ -1174,22 +1911,22 @@ h1, p {
     border-radius: 50%;
     background-color: white;
     border: 1px solid #FF325C;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.15); /* FIXED: Improved shadow for a softer, more defined look */
-    margin-left: 0.8rem; /* FIXED: Increased space to the left of the pencil icon */
-
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    margin-left: 0.8rem; /* Space to the left of the pencil icon */
     text-decoration: none;
-    color: #FF325C; /* Color of the pencil icon itself */
+    color: #FF325C;
     font-size: 1.2rem;
     transition: all 0.2s ease;
-    line-height: 1; /* Better vertical alignment for emoji */
-    padding: 0; /* Ensure no default padding interferes with width/height */
+    line-height: 1;
+    padding: 0;
+    flex-shrink: 0; /* Prevent the button from shrinking on smaller screens if space is tight */
 }
 
 .edit-profile-btn:hover {
     background-color: #FF325C;
     color: white;
     transform: scale(1.1);
-    box-shadow: 0 6px 15px rgba(255, 50, 92, 0.4); /* FIXED: Stronger, more vibrant shadow on hover */
+    box-shadow: 0 6px 15px rgba(255, 50, 92, 0.4);
 }
 
 /* Responsive adjustments for .edit-profile-btn */
@@ -1198,7 +1935,7 @@ h1, p {
         width: 32px;
         height: 32px;
         font-size: 1rem;
-        margin-left: 0.5rem; /* Maintains increased relative space on smaller screens */
+        margin-left: 0.5rem;
     }
 }
 
@@ -1434,37 +2171,6 @@ hr {
     margin: 2rem 0;
 }
 
-/* Main content layout for desktop */
-@media (min-width: 992px) {
-  .main-content {
-    margin-left: 280px; /* Account for visible sidebar on desktop */
-    padding-top: 5.625rem; /* 90px for fixed header spacing */
-    padding-left: 2rem;
-    padding-right: 2rem;
-    padding-bottom: 2rem;
-    width: auto;
-    transition: margin-left 0.3s ease;
-    box-sizing: border-box;
-  }
-}
-
-
-
-
-
-
-
-/* Main content layout for tablets/phones */
-@media (max-width: 991px) {
-  .main-content.expanded {
-    margin-left: 0;
-    padding-top: 5.625rem; /* Same spacing on mobile */
-  }
-}
-
-
-
-
 
 /* Cards (General card style) */
 .card {
@@ -1520,12 +2226,6 @@ hr {
   transform: translateX(0);
 }
 
-.main-content,
-.main-content.expanded {
-  margin-left: 0;
-  padding: 1rem;
-}
-
 
     /* Profile container responsiveness */
     .profile-container {
@@ -1577,11 +2277,6 @@ hr {
     .profile-container form {
         padding: 0; /* Remove extra padding within form on mobile */
     }
-
-    .form-group {
-        max-width: 100%;
-    }
-
     .form-group label {
         text-align: left;
     }
@@ -1598,11 +2293,6 @@ hr {
     .sidebar {
         width: 220px; /* Slightly narrower sidebar than desktop */
         padding: 1.5rem 0.8rem;
-    }
-
-    .main-content {
-        margin-left: 220px; /* Adjust main content margin to match sidebar */
-        padding: 1.5rem; /* Slightly reduced padding */
     }
 
     .profile-container {
@@ -1636,10 +2326,6 @@ hr {
 
 /* General adjustments for larger screens (laptops, desktops) */
 @media screen and (min-width: 1025px) {
-    .main-content {
-        margin-left: 250px; /* Standard sidebar width */
-        padding: 2rem; /* Standard padding */
-    }
     .profile-container {
         max-width: 800px; /* Standard max-width */
         padding: 3rem; /* Standard padding */
@@ -1649,41 +2335,34 @@ hr {
 /* --- START: New Styles for Billing Tab Integration (Refined) --- */
 
 /* Billing Section Container - Consistent padding for a cleaner look */
+
 .billing-section {
     width: 100%; /* Ensures it takes full width on smaller screens */
     max-width: 900px; /* Sets a maximum width for readability on larger screens */
-    margin: 0 auto; /* Centers the section horizontally when max-width is applied */
+    margin: 0 auto; /* Centers the section horizontally and sets top/bottom margin to 0 */
 
     /* Order is important: Apply general padding first, then specific padding-top */
-    padding: 3rem; /* ENHANCED: Increased general padding for a more generous look (was 2.5rem) */
-    padding-top: calc(70px + 2rem); /* ENHANCED: Increased buffer for header clearance (was 70px + 1.5rem) */
+    padding: 3rem; /* General padding for a generous look (can be reduced if too much overall space) */
+    /* Adjust '1rem' here to reduce space between the header's clearance and the content below it on desktop */
+    padding-top: calc(70px + 1rem); /* Reduced from 2rem. This value clears the header height (70px) plus additional space. */
 
-    background-color: var(--background-light, #ffffff); /* Light background for the content area */
-    border-radius: 12px; /* Softened corners for a modern look */
-    border: 1px solid var(--border-light, #f0f0f0); /* Subtle border for clearer definition and depth */
-    box-shadow: 0 6px 15px rgba(0,0,0,0.08); /* Deeper, softer shadow for a more modern, layered look */
+    background-color: var(--background-light, #ffffff);
+    border-radius: 12px;
+    border: 1px solid var(--border-light, #f0f0f0);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.08);
 
-    animation: fadeIn 0.4s ease-in-out; /* Keeps your existing animation */
-    box-sizing: border-box; /* Ensures padding and border are included in the element's total width/height */
-    min-height: 250px; /* Ensures a minimum height for visual consistency even with sparse content */
+    animation: fadeIn 0.4s ease-in-out;
+    box-sizing: border-box;
+    min-height: 250px;
 }
 
-/* Responsive adjustments for smaller screens */
-@media (max-width: 767px) { /* Applies styles for screens up to 767px wide (common mobile breakpoint) */
+/* Responsive adjustments for smaller screens (Merged and streamlined) */
+@media (max-width: 767px) {
     .billing-section {
-        padding: 1.5rem; /* ENHANCED: Increased padding for a better fit on mobile (was 1.2rem) */
-        padding-top: calc(70px + 1.2rem); /* ENHANCED: Slightly more top buffer for mobile (was 70px + 1rem) */
-        border-radius: 0; /* Optional: Remove border-radius on very small screens for an edge-to-edge feel */
-        box-shadow: none; /* Optional: Remove shadow on very small screens for simplicity */
-        min-height: auto; /* Allow height to adjust dynamically on mobile */
-    }
-}
-
-/* Responsive adjustments for smaller screens */
-@media (max-width: 767px) { /* Applies styles for screens up to 767px wide (common mobile breakpoint) */
-    .billing-section {
-        padding: 1.2rem; /* ENHANCED: Adjusted padding for a better fit on mobile */
-        padding-top: calc(70px + 1rem); /* Keeping a consistent top buffer with the header on mobile */
+        margin-top: 0px; /* Explicitly ensure no top margin on mobile */
+        padding: 1.5rem; /* Adjusted padding for a better fit on mobile (was 1.2rem in one, 1.5rem in another) */
+        /* Adjust '0.5rem' here to reduce space between the header's clearance and the content below it on mobile */
+        padding-top: 24px; /* Reduced from 1rem. Keeps consistent top buffer with header on mobile. */
         border-radius: 0; /* Optional: Remove border-radius on very small screens for an edge-to-edge feel */
         box-shadow: none; /* Optional: Remove shadow on very small screens for simplicity */
         min-height: auto; /* Allow height to adjust dynamically on mobile */
@@ -1693,42 +2372,98 @@ hr {
 /* Billing Tabs Container */
 .billing-tabs-container {
     display: flex;
-    justify-content: flex-start; /* Align tabs to the left */
-    gap: 1rem; /* ENHANCED: Slightly more space between tab buttons for better visual separation */
-    margin-bottom: 2.5rem; /* ENHANCED: More space below tabs before content starts, improving flow */
-    flex-wrap: wrap; /* Allows tabs to wrap onto multiple lines on smaller screens */
-    border-bottom: 2px solid var(--border-light, #eee); /* Using a CSS variable for consistent border color */
-    padding-bottom: 1.2rem; /* ENHANCED: More breathing room below tabs and above the border */
+    /* On PC, align tabs to the center */
+    justify-content: center;
+    gap: 20px; /* Increased space between buttons for better separation */
+    margin-bottom: 25px; /* More space below the tabs before content starts */
+    
+    /* REMOVED: background-color, padding, border-radius, box-shadow from container
+       to make tabs feel more integrated with the page */
+    flex-wrap: wrap; /* Allows wrapping on smaller screens */
 }
-/* Styling for tab buttons - Enhanced for minimalism and usability */
 .tab-btn {
-    padding: 12px 20px; /* TWEAK: Slightly increased padding for better touch targets and visual presence */
+    flex-grow: 0; /* Prevents buttons from excessively stretching */
+    flex-shrink: 0;
+    flex-basis: auto; /* Buttons size to their content initially */
+
+    padding: 12px 25px; /* Generous padding for easier clicking */
     border: none;
-    background-color: #f0f0f0;
-    color: #555;
-    cursor: pointer;
-    border-radius: 8px 8px 0 0; /* Rounded top corners */
-    transition: all 0.3s ease;
-    font-size: 1rem; /* TWEAK: Slightly larger font size for improved readability */
+    background-color: transparent; /* Default inactive tabs are transparent */
+    color: #555; /* Muted text color for inactive tabs */
+    font-size: 1em;
     font-weight: 600;
-    /* Resetting/overriding inherited button styles */
-    min-width: unset; /* Allow natural width */
-    margin: 0; /* Remove default button margin */
+    cursor: pointer;
+    border-radius: 8px; /* Slightly more rounded corners for the buttons */
+    transition: all 0.3s ease;
+    white-space: nowrap; /* Prevents text from wrapping within a button */
+    
+    /* PC Design: Underline effect for active tab, subtle hint for others */
+    border-bottom: 3px solid transparent; /* Prepare for the underline effect */
 }
 
 .tab-btn:hover {
-    background-color: #e0e0e0;
-    color: #333;
-    transform: none; /* Prevent scaling from general button hover */
-    box-shadow: none; /* Prevent shadow from general button hover */
+    background-color: rgba(0,0,0,0.05); /* Very subtle hover background */
+    color: #333; /* Darker text on hover */
+    border-bottom: 3px solid rgba(0,0,0,0.1); /* Subtle underline hint on hover */
 }
 
 .tab-btn.active {
-    background-color: #FF325C;
-    color: white;
-    box-shadow: 0 -2px 8px rgba(0,0,0,0.1); /* Lift effect for active tab */
-    border-color: #FF325C; /* Match border color */
+    background-color: transparent; /* Active tab also remains transparent */
+    color: var(--primary-color); /* Primary color for active text */
+    /* Strong red underline for the active tab */
+    border-bottom: 3px solid var(--primary-color);
+    box-shadow: none; /* Remove any previous box shadow for cleaner look */
 }
+
+/* --- Responsive Adjustments for Tabs --- */
+@media (max-width: 768px) {
+    .billing-tabs-container {
+        flex-direction: column; /* Stack buttons vertically on mobile */
+        gap: 8px; /* Space between stacked buttons */
+        padding: 10px; /* Add some padding to the container on mobile */
+        background-color: #f0f0f0; /* On mobile, give container a light background for clear grouping */
+        border-radius: 8px; /* Rounded corners for the mobile container */
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Subtle shadow for the mobile container */
+    }
+
+    .tab-btn {
+        flex: none; /* No flex growth on mobile when stacked */
+        width: 100%; /* Make buttons take full width when stacked */
+        
+        /* Integrated inline styles: */
+        padding: 12px; /* Sets top/bottom and left/right padding to 12px */
+        margin-left: 0px; 
+        margin-right: 0px; 
+
+        font-size: 0.95em; /* Slightly smaller font on mobile */
+        
+        /* Mobile Design: Buttons become solid blocks for active state */
+        border-bottom: none; /* Remove underline effect on mobile */
+        border-radius: 8px; /* Changed to 8px for consistency with container, or keep 6px if preferred. */
+        outline: none; /* Remove default browser outline on focus */
+        
+
+    }
+
+    .tab-btn:hover {
+        background-color: #e8e8e8; /* Lighter hover for mobile (since container has background) */
+        color: #333;
+        border-bottom: none; /* No underline on hover for mobile */
+    }
+
+    .tab-btn.active {
+        background-color: var(--primary-color); /* Active button is a solid red block on mobile */
+        color: white; /* White text for active mobile button */
+        
+        /* --- FIX FOR RED EXCEEDING: Remove box-shadow --- */
+        box-shadow: none; /* Explicitly ensure no shadow that could cause visual bleed */
+        
+        border-bottom: none; /* No underline on active mobile button */
+        border-radius: 8px; /* Ensure consistency with .tab-btn */
+        outline: none; /* Ensure no outline even if somehow activated */
+    }
+}
+
 
 /* Styling for form hint text (e.g., for <small> tags) */
 .form-hint-text {
@@ -1800,7 +2535,7 @@ form .action-btn {
 
 /* Show only the active tab content */
 .tab-content.active {
-    display: block;
+    display: block !important;
 }
 
 /* Utility Class for margin-top */
@@ -1813,58 +2548,234 @@ form .action-btn {
     margin-top: 1.5rem;
     display: grid;
     gap: 1rem;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    /* Adjusted min-width for new compact card layout on PC */
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); /* Aims for 2-3 cards per row on wider screens */
+    max-width: 1200px; /* Aligns with your main content width */
+    margin-left: auto;
+    margin-right: auto;
+    padding-right: 0px;
+    padding-left: 0px;
 }
 
 .proof-card {
     background-color: #fcfcfc;
     border: 1px solid #e9e9e9;
     border-radius: 10px;
-    padding: 1rem;
+    padding: 1rem; /* Compact padding around the card content */
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 0.9rem;
-    line-height: 1.4;
+    flex-direction: column; /* Stacks the header line and details vertically */
+    gap: 0.8rem; /* Space between the header line and the transaction details */
+    font-size: 0.9rem; /* Standard font size for card content */
+    line-height: 1.4; /* Improves readability */
     box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.proof-card strong {
-    color: #333;
+.proof-card:hover {
+    transform: translateY(-3px); /* Subtle lift effect on hover */
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08); /* More prominent shadow on hover */
 }
 
-.proof-card .proof-info {
-    flex-grow: 1;
-    margin-right: 1rem;
+/* --- New Internal Card Structure CSS --- */
+.proof-card-header-line {
+    display: flex;
+    justify-content: space-between; /* Pushes user info to left, meta/actions to right */
+    align-items: center; /* Vertically aligns items in this row */
+    flex-wrap: wrap; /* Allows wrapping onto multiple lines if horizontal space is tight */
+    gap: 0.5rem; /* Gap between info groups if they wrap */
+    font-size: 0.85rem; /* Slightly smaller font for compactness */
+    color: #555; /* Muted text color for these details */
 }
 
-.proof-card .proof-meta {
-    text-align: right;
-    color: #777;
+.proof-main-info {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem; /* Smaller gap between Region | Name | Account # elements */
+    flex-wrap: wrap; /* Allows individual info elements to wrap if needed */
 }
 
-.proof-card .proof-meta a {
-    color: #FF325C;
+.proof-main-info .separator {
+    color: #ccc; /* Color for the pipe separator */
+    font-size: 0.9em;
+    margin: 0 0.2rem;
+}
+
+.proof-secondary-info {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem; /* Space between Payment Status, Uploaded, and View Proof */
+    flex-wrap: wrap; /* Allows these elements to wrap if needed */
+    margin-left: auto; /* Pushes this group to the far right */
+    text-align: right; /* Aligns text within this group to the right */
+}
+
+.proof-status-display,
+.proof-uploaded-display {
+    white-space: nowrap; /* Keeps the status and uploaded date on a single line */
+}
+
+.proof-card-details {
+    display: flex;
+    flex-direction: column; /* Stacks Ref No, Amount, Payment Date vertically */
+    gap: 0.2rem; /* Very small gap between detail lines */
+    font-size: 0.9rem; /* Consistent with overall card font size */
+}
+
+.proof-card-details p {
+    margin: 0; /* Removes default paragraph margins for tight spacing */
+    white-space: nowrap; /* Prevents these detail lines from wrapping */
+    overflow: hidden; /* Hides any text that overflows */
+    text-overflow: ellipsis; /* Adds "..." for overflowing text */
+}
+
+/* --- Existing status and link styles (adjusted for compactness) --- */
+.proof-status {
+    font-weight: 700;
+    padding: 0.2rem 0.6rem;
+    border-radius: 5px;
+    display: inline-block;
+    margin-left: 0.5rem; /* Space from 'Status:' label */
+    font-size: 0.75rem; /* Slightly smaller for compactness */
+    border: 1px solid transparent;
+}
+
+.view-proof-link {
+    display: inline-block;
+    color: var(--primary-color);
     text-decoration: none;
     font-weight: 600;
+    transition: color 0.2s ease;
+    font-size: 0.85rem; /* Consistent with header line */
 }
 
-.proof-card .proof-meta a:hover {
+.view-proof-link:hover {
+    color: var(--primary-dark);
     text-decoration: underline;
 }
 
-/* Responsive adjustments for proof cards */
-@media (max-width: 600px) {
+/* Responsive adjustments for smaller screens (mobile) */
+@media (max-width: 768px) {
+    .proof-history {
+        grid-template-columns: 1fr; /* Forces a single column on small screens */
+        padding: 0 0rem; /* Adjust horizontal padding for mobile view */
+    }
+
     .proof-card {
-        flex-direction: column;
+        flex-direction: column; /* Stacks sections vertically on mobile */
+        align-items: flex-start; /* Aligns content to the left */
+        padding: 1rem; /* Consistent padding */
+        gap: 0.8rem; /* Adjust gap for vertical stacking */
+    }
+
+    .proof-card-header-line {
+        flex-direction: column; /* Stacks top line content vertically */
         align-items: flex-start;
+        width: 100%; /* Takes full width */
+        gap: 0.5rem;
     }
-    .proof-card .proof-info {
-        margin-right: 0;
-        margin-bottom: 0.5rem;
+
+    .proof-main-info,
+    .proof-secondary-info {
+        flex-direction: column; /* Stacks contents vertically */
+        align-items: flex-start;
+        width: 100%;
+        gap: 0.2rem;
+        margin-left: 0; /* Removes auto margin */
+        text-align: left; /* Aligns text left */
     }
-    .proof-card .proof-meta {
-        text-align: left;
+
+    .proof-main-info .separator {
+        display: none; /* Hides separators on mobile when content is stacked */
+    }
+
+    .proof-status-display strong,
+    .proof-uploaded-display strong {
+        display: block; /* Makes labels block to stack with values if space is tight */
+    }
+
+    .proof-status {
+        margin-left: 0; /* Removes margin from status badge */
+    }
+
+    .proof-card-details p {
+        white-space: normal; /* Allows text to wrap on mobile */
+        overflow: visible; /* Shows full text */
+        text-overflow: clip; /* No ellipsis on mobile */
     }
 }
+
+/* --- FILE UPLOAD STYLES --- */
+
+.custom-file-upload-group {
+    margin-bottom: 1.5rem; /* Space below the upload group */
+}
+
+.upload-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Pushes button and filename apart */
+    background-color: #f9f9f9;
+    border: 1px dashed #ccc; /* Dashed border to indicate drop/click area */
+    border-radius: 8px;
+    padding: 1rem 1.2rem;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.upload-label:hover {
+    background-color: #f0f0f0;
+    border-color: var(--primary-color); /* Highlight on hover */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.upload-button {
+    background-color: var(--primary-color);
+    color: var(--text-light);
+    padding: 0.75rem 1.2rem;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    display: flex; /* For icon and text alignment */
+    align-items: center;
+    gap: 0.5rem; /* Space between icon and text */
+    transition: background-color 0.2s ease;
+    white-space: nowrap; /* Prevent text from wrapping */
+}
+
+.upload-button .fas { /* Styling for Font Awesome icon */
+    font-size: 1.1rem;
+}
+
+.upload-button:hover {
+    background-color: var(--primary-dark); /* Slightly darker on hover */
+}
+
+.file-name {
+    margin-left: 1rem;
+    flex-grow: 1; /* Allows file name to take remaining space */
+    color: var(--text-dark);
+    font-size: 0.9rem;
+    overflow: hidden; /* Hide overflowing text */
+    text-overflow: ellipsis; /* Add ellipsis for long file names */
+    white-space: nowrap; /* Keep filename on single line */
+}
+
+/* Hide the actual file input */
+.hidden-file-input {
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
+}
+
+/* Optional: Add focus styles for accessibility */
+.hidden-file-input:focus + .upload-label {
+    border-color: var(--primary-color);
+    outline: 2px solid var(--primary-color); /* Visible outline on focus */
+    outline-offset: 2px;
+}
+
 /* --- END: New Styles for Billing Tab Integration (Refined) --- */

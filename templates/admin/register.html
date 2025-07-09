@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="admin-register-container">
+    <div class="admin-register-card">
+        <a href="{{ url_for('admin_login') }}" class="back-to-login-btn" aria-label="Back to Admin Login">
+            <i class="fas fa-arrow-left"></i> </a>
+        
+        <h2>Register New Admin</h2>
+        <form method="POST">
+            <input type="hidden" name="email" value="admin@coronatel.ph" readonly>
+            <input type="text" name="name" placeholder="Admin Name (optional)">
+            <input type="password" name="password" placeholder="Your password" required>
+            <input type="text" name="access_key" placeholder="Admin access key" required>
+            <button type="submit">Register</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

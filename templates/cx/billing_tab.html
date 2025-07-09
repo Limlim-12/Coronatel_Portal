@@ -1,13 +1,29 @@
 <div class="billing-section">
-    <div class="billing-tabs-container">
-        <button class="tab-btn active" onclick="showTab('upload', this)">📤 Payment Verification</button>
-        <button class="tab-btn" onclick="showTab('rebate', this)">💸 Rebate Request</button>
-        <button class="tab-btn" onclick="showTab('overcharge', this)">💸 Overcharge Request</button>
-        <button class="tab-btn" onclick="showTab('soa', this)">📥 Download SOA</button>
+    <!-- 🔄 Replaced tab buttons with feature grid -->
+    <div class="features-grid billing-features">
+    <div class="feature-card billing-feature-card active" onclick="showTab('upload', this)" data-tab="upload">
+        <img src="{{ url_for('static', filename='images/payment_verification.png') }}" alt="Payment Verification">
+        <h3>Payment Verification</h3>
     </div>
+    <div class="feature-card billing-feature-card" onclick="showTab('rebate', this)" data-tab="rebate">
+        <img src="{{ url_for('static', filename='images/request_rebate.png') }}" alt="Rebate Request">
+        <h3>Rebate Request</h3>
+    </div>
+    <div class="feature-card billing-feature-card" onclick="showTab('overcharge', this)" data-tab="overcharge">
+        <img src="{{ url_for('static', filename='images/overcharge_request.png') }}" alt="Overcharge Report">
+        <h3>Overcharge Report</h3>
+    </div>
+    <div class="feature-card billing-feature-card" onclick="showTab('soa', this)" data-tab="soa">
+        <img src="{{ url_for('static', filename='images/download_soa.png') }}" alt="Download SOA">
+        <h3>Download SOA</h3>
+    </div>
+</div>
+
+  
 
     <div id="upload" class="tab-content active">
         <h3>Upload Proof of Payment</h3>
+
         <form id="uploadForm" action="{{ url_for('upload_proof') }}" method="POST" enctype="multipart/form-data">
             <div class="form-group custom-file-upload-group">
                 <label for="proof_file" class="upload-label">
@@ -82,147 +98,315 @@
         {% endfor %}
     </div>
 {% endif %}
-        
-    </div> <div id="rebate" class="tab-content">
-        <h3>Request a Rebate</h3>
-        <form action="{{ url_for('rebate_request') }}" method="POST" enctype="multipart/form-data">
-            <input type="hidden" name="type" value="rebate">
 
-            <div class="form-group">
-                <label for="rebate_account_number">Account Number</label>
-                <input type="text" name="account_number" id="rebate_account_number" value="{{ current_user.account_number }}" readonly>
-            </div>
 
-            <div class="form-group">
-                <label>Billing Cycle</label>
-                <div class="form-date-range">
-                    <input type="date" name="billing_from" required>
-                    <span class="date-range-separator">to</span>
-                    <input type="date" name="billing_to" required>
-                </div>
-            </div>
+    </div> 
+    
+   <div id="rebate" class="tab-content">
+    <h3>Request a Rebate</h3>
+    <form action="{{ url_for('rebate_request') }}" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="type" value="rebate">
 
-            <div class="form-group">
-                <label for="soa_file_rebate">Upload Latest SOA</label>
-                <input type="file" name="soa_file" id="soa_file_rebate" accept=".pdf,.jpg,.jpeg,.png" required>
-            </div>
-
-            <div class="form-group">
-                <label for="rebate_amount">Requested Rebate Amount (₱)</label>
-                <input type="number" name="rebate_amount" id="rebate_amount" step="0.01" min="0" placeholder="₱0.00" required>
-            </div>
-
-            <button type="submit" class="action-btn">📨 Submit Rebate Request</button>
-        </form>
-    </div> <div id="overcharge" class="tab-content">
-        <h3>Report Overcharge</h3>
-        <form action="{{ url_for('rebate_request') }}" method="POST" enctype="multipart/form-data">
-            <input type="hidden" name="type" value="overcharge">
-
-            <div class="form-group">
-                <label for="overcharge_account_number">Account Number</label>
-                <input type="text" name="account_number" id="overcharge_account_number" value="{{ current_user.account_number }}" readonly>
-            </div>
-
-            <div class="form-group">
-                <label>Billing Cycle</label>
-                <div class="form-date-range">
-                    <input type="date" name="billing_from" required>
-                    <span class="date-range-separator">to</span>
-                    <input type="date" name="billing_to" required>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="soa_file_overcharge">Upload Latest SOA</label>
-                <input type="file" name="soa_file" id="soa_file_overcharge" accept=".pdf,.jpg,.jpeg,.png" required>
-            </div>
-
-            <div class="form-group">
-                <label for="overcharge_reason">Explanation of Overcharge</label>
-                <textarea name="overcharge_reason" id="overcharge_reason" rows="4" placeholder="Describe the overcharge issue..." required></textarea>
-            </div>
-
-            <button type="submit" class="action-btn">📨 Submit Overcharge Report</button>
-        </form>
-    </div> <div id="soa" class="tab-content">
-        <h3>Download or View Your Statement</h3>
-        <form action="{{ url_for('download_soa') }}" method="GET" class="mb-4">
-            <button type="submit" class="action-btn">⬇️ Download Latest SOA</button>
-        </form>
-        <div class="soa-viewer-container">
-            <iframe src="{{ url_for('serve_soa_pdf') }}" width="100%" height="500px" class="soa-iframe"></iframe>
+        <div class="form-group">
+            <label for="rebate_account_number">Account Number</label>
+            <input type="text" name="account_number" id="rebate_account_number" value="{{ current_user.account_number }}" readonly>
         </div>
-    </div> </div> <script>
-    // Function to handle tab switching
-    function showTab(tabId, clickedButton) {
-        // Remove 'active' class from all tab buttons
-        const tabButtons = document.querySelectorAll('.tab-btn');
-        tabButtons.forEach(button => {
-            button.classList.remove('active');
-        });
 
-        // Hide all tab content
+        <div class="form-group">
+            <label>Billing Cycle</label>
+            <div class="form-date-range">
+                <input type="date" name="billing_from" required>
+                <span class="date-range-separator">to</span>
+                <input type="date" name="billing_to" required>
+            </div>
+        </div>
+
+       <div class="form-group custom-file-upload-group">
+        <label for="soa_file_rebate" class="upload-label">
+        <span class="upload-button">
+            <i class="fas fa-cloud-upload-alt"></i> Upload Latest SOA
+        </span>
+        <span id="soa-file-name-rebate" class="file-name">No file chosen</span>
+        </label>
+    <input type="file" name="soa_file" id="soa_file_rebate" accept=".pdf,.jpg,.jpeg,.png" required class="hidden-file-input">
+        </div>
+
+        <div class="form-group">
+            <label for="rebate_amount">Requested Rebate Amount (₱)</label>
+            <input type="number" name="rebate_amount" id="rebate_amount" step="0.01" min="0" placeholder="₱0.00" required>
+        </div>
+
+        <button type="submit" class="action-btn">📨 Submit Rebate Request</button>
+    </form>
+
+    {# Filter user_requests for rebate type only #}
+    {% set previous_rebates = user_requests | selectattr("type", "equalto", "rebate") | list %}
+    {% if previous_rebates %}
+    <h4 class="mt-4">Previous Rebate Requests</h4>
+    <div class="rebate-history">
+        {% for rebate in previous_rebates %}
+        <div class="rebate-card">
+            <div class="rebate-card-header-line">
+                <div class="rebate-main-info">
+                    <span>{{ current_user.location_region or 'N/A' }}</span>
+                    <span class="separator">|</span>
+                    <span>{{ current_user.name or 'N/A' }}</span>
+                    <span class="separator">|</span>
+                    <span>{{ current_user.account_number or 'N/A' }}</span>
+                </div>
+                <div class="rebate-secondary-info">
+                    <span class="rebate-status-display">
+                        <strong>Status:</strong>
+                        <span class="rebate-status status-{{ rebate.status | lower }}">{{ rebate.status }}</span>
+                    </span>
+                    <span class="rebate-uploaded-display">
+                        <strong>Submitted:</strong>
+                        {{ rebate.uploaded_at.strftime('%b %d, %Y %I:%M %p') if rebate.uploaded_at else 'N/A' }}
+                    </span>
+                    {% if rebate.soa_filename %}
+                    <a class="view-proof-link" href="{{ url_for('static', filename='soa/' + rebate.soa_filename) }}" target="_blank">View SOA</a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="rebate-card-details">
+                <p><strong>Billing Cycle:</strong> {{ rebate.billing_from.strftime('%b %d, %Y') }} to {{ rebate.billing_to.strftime('%b %d, %Y') }}</p>
+                <p><strong>Rebate Amount:</strong> ₱{{ '%.2f'|format(rebate.amount or 0) }}</p>
+                {% if rebate.admin_note %}
+                <p><strong>Admin Note:</strong> {{ rebate.admin_note }}</p>
+                {% endif %}
+            </div>
+
+            {% if rebate.status == 'NEEDS ACTION' %}
+            <form class="rebate-response-form" action="{{ url_for('rebate_request') }}" method="POST">
+                <input type="hidden" name="request_id" value="{{ rebate.id }}">
+                <textarea name="response_note" placeholder="Reply to admin's note..." required></textarea>
+                <button type="submit">Reply</button>
+            </form>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+
+
+
+
+
+
+
+
+   <div id="overcharge" class="tab-content">
+    <h3>Report Overcharge</h3>
+    <form action="{{ url_for('rebate_request') }}" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="type" value="overcharge">
+
+        <div class="form-group">
+            <label for="overcharge_account_number">Account Number</label>
+            <input type="text" name="account_number" id="overcharge_account_number" value="{{ current_user.account_number }}" readonly>
+        </div>
+
+        <div class="form-group">
+            <label>Billing Cycle</label>
+            <div class="form-date-range">
+                <input type="date" name="billing_from" required>
+                <span class="date-range-separator">to</span>
+                <input type="date" name="billing_to" required>
+            </div>
+        </div>
+
+        <div class="form-group custom-file-upload-group">
+            <label for="soa_file_overcharge" class="upload-label">
+        <span class="upload-button">
+            <i class="fas fa-cloud-upload-alt"></i> Upload Latest SOA
+        </span>
+        <span id="soa-file-name-overcharge" class="file-name">No file chosen</span>
+    </label>
+    <input type="file" name="soa_file" id="soa_file_overcharge" accept=".pdf,.jpg,.jpeg,.png" required class="hidden-file-input">
+        </div>
+
+
+        <div class="form-group">
+            <label for="overcharge_reason">Explanation of Overcharge</label>
+            <textarea name="overcharge_reason" id="overcharge_reason" rows="4" placeholder="Describe the overcharge issue..." required></textarea>
+        </div>
+
+        <button type="submit" class="action-btn">📨 Submit Overcharge Report</button>
+    </form>
+
+    {% set previous_overcharges = user_requests | selectattr("type", "equalto", "overcharge") | list %}
+    {% if previous_overcharges %}
+    <h4 class="mt-4">Previous Overcharge Reports</h4>
+    <div class="overcharge-history">
+        {% for over in previous_overcharges %}
+        <div class="overcharge-card">
+            <div class="overcharge-card-header-line">
+                <div class="overcharge-main-info">
+                    <span>{{ current_user.location_region or 'N/A' }}</span>
+                    <span class="separator">|</span>
+                    <span>{{ current_user.name or 'N/A' }}</span>
+                    <span class="separator">|</span>
+                    <span>{{ current_user.account_number or 'N/A' }}</span>
+                </div>
+                <div class="overcharge-secondary-info">
+                    <span class="overcharge-status-display">
+                        <strong>Status:</strong>
+                        <span class="overcharge-status status-{{ over.status | lower }}">{{ over.status }}</span>
+                    </span>
+                    <span class="overcharge-uploaded-display">
+                        <strong>Submitted:</strong>
+                        {{ over.uploaded_at.strftime('%b %d, %Y %I:%M %p') if over.uploaded_at else 'N/A' }}
+                    </span>
+                    {% if over.soa_filename %}
+                    <a class="view-proof-link" href="{{ url_for('static', filename='soa/' + over.soa_filename) }}" target="_blank">View SOA</a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="overcharge-card-details">
+                <p><strong>Billing Cycle:</strong> {{ over.billing_from.strftime('%b %d, %Y') }} to {{ over.billing_to.strftime('%b %d, %Y') }}</p>
+                <p><strong>Explanation:</strong> {{ over.reason }}</p>
+                {% if over.admin_note %}
+                <p><strong>Admin Note:</strong> {{ over.admin_note }}</p>
+                {% endif %}
+            </div>
+
+            {% if over.status == 'NEEDS ACTION' %}
+            <form class="overcharge-response-form" action="{{ url_for('rebate_request') }}" method="POST">
+                <input type="hidden" name="request_id" value="{{ over.id }}">
+                <textarea name="response_note" placeholder="Reply to admin's note..." required></textarea>
+                <button type="submit">Reply</button>
+            </form>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+
+    
+    
+    <div id="soa" class="tab-content">
+  <h3>Statements of Account</h3>
+
+  {% if soa_files %}
+    <div class="soa-history">
+      {% for soa in soa_files %}
+        <div class="soa-card">
+          <div class="soa-card-header-line">
+            <div class="soa-main-info">
+              <span>{{ current_user.location_region or 'N/A' }}</span>
+              <span class="separator">|</span>
+              <span>{{ current_user.name or 'N/A' }}</span>
+              <span class="separator">|</span>
+              <span>{{ current_user.account_number or 'N/A' }}</span>
+            </div>
+            <div class="soa-secondary-info">
+              <span class="soa-posted-date">
+                <strong>Posted:</strong>
+                {{ soa.uploaded_at.strftime('%b %d, %Y %I:%M %p') if soa.uploaded_at else 'N/A' }}
+              </span>
+              <a class="view-proof-link" href="{{ url_for('static', filename='soa/' + soa.filename) }}" download>
+                📥 Download SOA
+              </a>
+            </div>
+          </div>
+          <div class="soa-card-details">
+            <p><strong>Filename:</strong> {{ soa.filename }}</p>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p>No statements available at the moment.</p>
+  {% endif %}
+</div>
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+  <script>
+    function showTab(tabId, clickedElement) {
+        // Remove 'active' from all feature cards
+        const allTriggers = document.querySelectorAll('.feature-card, .tab-btn');
+        allTriggers.forEach(el => el.classList.remove('active'));
+
+        // Hide all tab contents
         const tabContents = document.querySelectorAll('.tab-content');
-        tabContents.forEach(content => {
-            content.classList.remove('active');
-        });
+        tabContents.forEach(content => content.classList.remove('active'));
 
-        // Add 'active' class to the clicked button
-        clickedButton.classList.add('active');
-
-        // Show the corresponding tab content
+        // Show the clicked tab and highlight the card
+        clickedElement.classList.add('active');
         document.getElementById(tabId).classList.add('active');
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
-        // --- Bank Select Hint Logic ---
+    document.addEventListener('DOMContentLoaded', function () {
+        const initialTab = document.querySelector('.feature-card.active');
+        if (initialTab) {
+            const tabId = initialTab.getAttribute('data-tab');
+            showTab(tabId, initialTab);
+        }
+
         const bankSelect = document.getElementById('bank_select');
         const refHint = document.getElementById('ref_hint');
         if (bankSelect && refHint) {
-            bankSelect.addEventListener('change', function() {
+            bankSelect.addEventListener('change', function () {
                 let hintText = '';
                 switch (this.value) {
-                    case 'gcash':
-                        hintText = 'Enter the 11-digit GCash Reference Number (starts with 2 or 3).';
-                        break;
-                    case 'seabank':
-                        hintText = 'Enter the SeaBank Transaction ID. It\'s usually 10-12 digits.';
-                        break;
-                    case 'ubp':
-                        hintText = 'Enter the UnionBank Transfer Reference Number. (e.g., 1234567890ABCDEF).';
-                        break;
-                    case 'cimb':
-                        hintText = 'Enter the CIMB Bank Transaction Ref. ID. Check your CIMB app for details.';
-                        break;
-                    default:
-                        hintText = 'Enter the complete reference number from your payment receipt or transaction confirmation.';
+                    case 'gcash': hintText = 'Enter the 11-digit GCash Reference Number (starts with 2 or 3).'; break;
+                    case 'seabank': hintText = 'Enter the SeaBank Transaction ID. It\'s usually 10-12 digits.'; break;
+                    case 'ubp': hintText = 'Enter the UnionBank Transfer Reference Number. (e.g., 1234567890ABCDEF).'; break;
+                    case 'cimb': hintText = 'Enter the CIMB Bank Transaction Ref. ID. Check your CIMB app for details.'; break;
+                    default: hintText = 'Enter the complete reference number from your payment receipt or transaction confirmation.';
                 }
                 refHint.textContent = hintText;
             });
-            // Trigger the change event once on page load to set initial hint
             bankSelect.dispatchEvent(new Event('change'));
         }
 
-        // --- Initial Tab Display Logic ---
-        // This ensures the first tab is visible on page load
-        const initialTabButton = document.querySelector('.billing-tabs-container .tab-btn.active');
-        if (initialTabButton) {
-            const initialTabId = initialTabButton.getAttribute('onclick').match(/'([^']+)'/)[1];
-            showTab(initialTabId, initialTabButton);
-        }
-
-        // --- File Upload Display Logic ---
+        // File name preview for proof_file
         const fileInput = document.getElementById('proof_file');
         const fileNameSpan = document.getElementById('file-name');
         if (fileInput && fileNameSpan) {
-            fileInput.addEventListener('change', function() {
-                if (this.files && this.files.length > 0) {
-                    fileNameSpan.textContent = this.files[0].name;
-                } else {
-                    fileNameSpan.textContent = 'No file chosen';
-                }
+            fileInput.addEventListener('change', function () {
+                fileNameSpan.textContent = this.files?.[0]?.name || 'No file chosen';
             });
         }
+    });
+
+    // File name display for rebate
+    document.getElementById("soa_file_rebate").addEventListener("change", function () {
+        document.getElementById("soa-file-name-rebate").textContent = this.files[0]?.name || "No file chosen";
+    });
+
+    // File name display for overcharge
+    document.getElementById("soa_file_overcharge").addEventListener("change", function () {
+        document.getElementById("soa-file-name-overcharge").textContent = this.files[0]?.name || "No file chosen";
     });
 </script>

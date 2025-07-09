@@ -27,7 +27,6 @@ html, body {
 }
 
 
-
 body {
     margin: 0;
     font-family: 'Titillium Web', sans-serif;
@@ -44,38 +43,392 @@ main {
 
 
 
+/* --- Notification Dropdown Container --- */
+.notifications-dropdown {
+    position: absolute;
+    top: 60px; /* Adjust based on your header height */
+    right: 15px; /* Slightly less space from right */
+    width: 280px; /* Reduced default width for more compression */
+    max-height: 350px; /* Reduced max height */
+    overflow-y: auto;
+    background-color: var(--bg-light);
+    border: 1px solid var(--border-color);
+    border-radius: 8px; /* Slightly smaller border-radius */
+    box-shadow: 0 5px 18px var(--shadow-strong); /* Adjusted shadow */
+    z-index: 1000;
+    padding: 10px; /* Reduced padding */
+    animation: fadeIn 0.3s ease-out forwards;
+    box-sizing: border-box;
+}
 
-/* Header core */
-header {
-    background-color: #FF325C;
-    color: #ffffff;
-    text-align: center;
-    padding: 1rem 0.5rem;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 999; /* Ensure header is below toggle button but above content */
-    height: 70px; /* Explicit height for margin calculations */
+.notifications-dropdown.hidden {
+    display: none;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-8px); } /* Adjusted translateY */
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Notification Item (notif-box) Refinement --- */
+.notif-box {
+    background-color: var(--bg-light);
+    border: 1px solid var(--border-color);
+    padding: 8px 10px; /* Reduced padding */
+    margin-bottom: 8px; /* Reduced margin */
+    border-left: 4px solid; /* Slightly thinner status indicator */
+    border-radius: 6px; /* Slightly smaller border-radius */
+    position: relative;
     display: flex;
-    flex-direction: column; /* FIXED: Stacks content vertically (perfect for your HTML) */
-    align-items: center; /* Centers horizontally in the column */
-    justify-content: center; /* Centers the stacked content vertically within the header height */
+    align-items: flex-start;
+    gap: 0.6rem; /* Reduced gap */
+    transition: all 0.2s ease-in-out;
+    min-width: 0;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04); /* Subtle shadow */
 }
 
-/* Slimmed compact version */
-.compact-header {
-    padding: 0.6rem 0.5rem;
+.notif-box:last-child {
+    margin-bottom: 0;
 }
 
-/* Logo (compact) */
-.logo {
-    width: 48px;
-    height: auto;
-    margin: 0 auto 0.25rem;
+.notif-box:hover {
+    background-color: var(--bg-faded);
+    border-color: #d0d0d0;
+    transform: translateY(-1px); /* Less pronounced hover effect */
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08); /* Slightly less prominent shadow on hover */
+}
+
+/* Wrapper for summary and detail content */
+.notif-main-content {
+    flex-grow: 1;
+    min-width: 0;
+}
+
+/* Styles for the visible, minimalist part of the notification */
+.notif-summary {
+    display: flex;
+    flex-direction: column;
+}
+
+.notif-line {
+    margin: 0;
+    padding: 1px 0; /* Reduced vertical padding */
+    color: var(--text-dark);
+    font-size: 0.8rem; /* Slightly smaller font size */
+    line-height: 1.2; /* Tighter line height */
+    display: flex;
+    justify-content: start;
+    align-items: baseline;
+}
+
+.notif-line .notif-value {
+    font-weight: 600;
+    color: #444;
+    word-break: break-all;
+    margin-left: 0.4rem; /* Reduced space between label and value */
+    text-align: right;
+}
+
+.notif-list {
+    display: flex;
+    flex-direction: column;
+    padding-left: 0px;
+    /* If you want more consistent spacing *between* items using flexbox gap,
+       you could add `gap: 8px;` here and remove `margin-bottom` from `.notif-box`.
+       However, current setup with margin-bottom on .notif-box is also fine. */
+}
+
+/* Style for the 'click to expand/hide' button */
+.expand-toggle {
+    background: none;
+    border: none;
+    color: var(--primary-color);
+    cursor: pointer;
+    font-size: 0.7rem; /* Smaller text */
+    text-align: left;
+    padding: 3px 0; /* Reduced padding */
     display: block;
-	
+    width: fit-content;
+    margin-top: 3px; /* Reduced space */
+    transition: color 0.2s ease;
+    text-decoration: none;
 }
+
+.expand-toggle:hover {
+    color: var(--primary-dark);
+    text-decoration: underline;
+}
+
+/* Styles for the hidden detailed message */
+.notif-detail {
+    margin-top: 0.6rem; /* Reduced space from summary when visible */
+    border-top: 1px dashed var(--border-color);
+    padding-top: 0.6rem; /* Reduced padding */
+    font-size: 0.75rem; /* Smaller font for details */
+    color: #666;
+    line-height: 1.4; /* Tighter line height */
+    word-break: break-all;
+}
+
+.notif-detail.hidden {
+    display: none;
+}
+
+.detail-message {
+    margin: 0;
+}
+
+/* Delete Button specific styles */
+/* Delete Button specific styles */
+.delete-form {
+    flex-shrink: 0;
+    margin-left: auto;
+    align-self: flex-start;
+    width: fit-content;    /* Ensures it only takes content width */
+    max-width: 40px;       /* Explicitly caps its maximum width */
+    flex-basis: content;   /* Can help in flex containers to size based on content */
+    display: flex;         /* Ensure it's a flex container itself to control its children */
+    align-items: center;   /* Center button vertically within the form if form has height */
+    justify-content: center; /* Center button horizontally within the form */
+}
+
+.delete-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 0.7rem; /* VERY AGGRESSIVELY SMALL emoji/icon size */
+    color: var(--text-muted);
+    padding: 0;
+    transition: color 0.2s ease-in-out;
+    line-height: 1; /* Keep line height tight */
+    flex-shrink: 0;
+    white-space: nowrap; /* Prevent emoji from wrapping */
+    /* Ensure no default minimum size is applied to the button itself */
+    min-width: 0; 
+    min-height: 0;
+    display: block; /* Ensure it behaves as a block for precise sizing */
+}
+
+.delete-btn:hover {
+    color: var(--danger-color);
+}
+
+/* Status-specific notification styling (keep as is, adjust border-left-color) */
+
+
+/* Responsive Adjustments for Mobile Screens (adjust as needed) */
+@media (max-width: 480px) {
+    .notifications-dropdown {
+        width: 250px; /* Further reduced width for mobile */
+        right: 10px; /* Less space from right */
+        padding: 8px; /* Further reduced padding */
+    }
+    .notif-box {
+        padding: 6px 8px; /* Further reduced padding for very small screens */
+        gap: 0.3rem; /* Smaller gap */
+    }
+    .notif-line {
+        font-size: 0.75rem; /* Even smaller font for summary on very small screens */
+    }
+    .notif-line .notif-value {
+        margin-left: 0.1rem; /* Reduce space */
+    }
+    .expand-toggle {
+        font-size: 0.65rem; /* Even smaller expand text */
+    }
+    .notif-detail {
+        font-size: 0.7rem; /* Even smaller detail font */
+        margin-top: 0.5rem;
+        padding-top: 0.5rem;
+    }
+    .delete-btn {
+        font-size: 1rem; /* Slightly smaller emoji */
+    }
+}
+
+/* --- Header Styles --- */
+
+header {
+    /* Very minimal padding to achieve a super thin header */
+    padding: 2px 0; /* */
+    text-align: center;
+    box-shadow: 0 0.5px 1px rgba(0,0,0,0.03); /* A very subtle shadow */
+    transition: all 0.2s ease-in-out;
+    border-bottom: 1px solid #FF325C; /* Keeps the red line at the bottom */
+    
+}
+
+.header-content {
+    max-width: 1350px;
+    margin: 0 auto;
+    padding: 0 5px; /* Minimal horizontal padding */
+    display: flex;
+    flex-direction: column; /* Stacks image and slogan vertically */
+    align-items: center; /* Centers items horizontally */
+    justify-content: center; /* Centers items vertically within the compact space */
+    /* Ensure no extra padding/margin on header-content itself that adds height */
+}
+
+.header-image {
+    display: block;
+    width: 100%; /* Ensures it fills its container on smaller screens */
+    max-width: 1641px; /* Stretches the image up to the new desired width on large screens */
+    height: 162px; /* Forces the image to the new desired height */
+    object-fit: fill; /* This will stretch the image to fill the specified width and height, potentially distorting its aspect ratio */
+    margin: 0 auto; /* Centers the image horizontally within its container */
+    /* Removed redundant margin-right: 0px; and margin-left: 0px; as margin: 0 auto; covers this */
+}
+
+
+/* Dashboard Header Styles (no changes from previous for this, as the focus is on compact header) */
+.dashboard-header {
+    background-color: #000;
+    color: #fff;
+    border-bottom: 1px solid #FF325C;
+}
+
+.dashboard-header .main-title-bold {
+    font-size: 1.6em;
+    font-weight: 800;
+    margin-bottom: 1px;
+    color: #FF325C;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.dashboard-header .subtitle-minimal {
+    font-size: 0.7em;
+    font-weight: 400;
+    color: #eee;
+    margin-top: 0;
+}
+
+/* Compact Header Styles (for non-dashboard pages - this is where the main changes are) */
+.compact-header {
+    background-color: #F8F8F8; /* Light background for clear logo visibility */
+    color: #333; /* Dark text for slogan for contrast */
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    header {
+        padding: 5px 0; /* Even more minimal padding on mobile */
+        
+    }
+
+    .dashboard-header .main-title-bold {
+        font-size: 1.2em;
+    }
+    .dashboard-header .subtitle-minimal {
+        font-size: 0.6em;
+    }
+    .header-image {
+        height: auto; /* Allow height to adjust proportionally on smaller screens */
+        object-fit: cover; /* Use cover on small screens to avoid excessive distortion */
+    }
+}
+
+/* Smaller phones */
+@media (max-width: 480px) {
+    /* Further adjustments for very small screens */
+    header {
+        padding: 2px 0; /* Minimal padding */
+    }
+    .header-image {
+        height: auto; /* Keep height auto */
+        object-fit: cover; /* Keep cover */
+    }
+}
+
+
+/* Admin Header */
+.admin-header {
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid #e0e0e0;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 1000;
+    position: sticky;
+    top: 0;
+}
+
+.admin-header-content {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.admin-title-group h1.admin-main-title {
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin: 0;
+    color: #FF325C;
+}
+
+.admin-subtitle {
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 4px;
+}
+
+.admin-user-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.admin-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #FF325C;
+}
+
+.admin-user-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.admin-name {
+    font-weight: 500;
+    font-size: 0.95rem;
+    color: #333;
+}
+
+.admin-logout-btn {
+    font-size: 0.85rem;
+    color: #FF325C;
+    text-decoration: none;
+}
+
+.admin-logout-btn:hover {
+    text-decoration: underline;
+}
+
+/* PoP Status */
+.proof-status {
+  font-weight: bold;
+  padding: 2px 8px;
+  border-radius: 8px;
+  text-transform: uppercase;
+}
+
+.admin-proof-card select {
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin-top: 6px;
+  margin-bottom: 8px;
+}
+
+
+
 
 /* Footer Styling */
 .main-footer {
@@ -166,30 +519,6 @@ header {
 }
 
 
-/* Dashboard title - bold and elegant */
-.dashboard-header .main-title {
-    font-size: 1.6rem;
-    margin: 0;
-    font-weight: 700;
-    letter-spacing: 0.4px;
-}
-
-/* Dashboard subtitle - light and fine */
-.dashboard-header .subtitle {
-    font-size: 1rem;
-    font-weight: 300;
-    margin: 0.2rem 0 0;
-    opacity: 0.85;
-}
-
-/* Compact tagline version (non-dashboard) */
-.tagline {
-    margin: 0;
-    font-size: 1.1rem;
-    font-weight: 600;
-    letter-spacing: 0.4px;
-    opacity: 0.92;
-}
 
 /* Typography focus */
 h1, p {
@@ -198,14 +527,6 @@ h1, p {
 
 /* Responsive refinement for smaller screens (less than 600px) */
 @media (max-width: 600px) {
-    .dashboard-header .main-title {
-        font-size: 1.35rem;
-    }
-
-    .dashboard-header .subtitle,
-    .tagline {
-        font-size: 0.95rem;
-    }
 
     .logo {
         width: 42px;
@@ -213,39 +534,38 @@ h1, p {
 }
 
 
-/* Dashboard Widgets Grid Layout */
+/* Existing CSS for Dashboard Widgets Grid Layout */
 .dashboard-widgets-grid {
     display: grid;
-    /* This creates two columns:
-       - On larger screens, minmax(0, 1fr) ensures columns are at least 0 and grow equally.
-       - gap creates space between grid items. */
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Adjusted for better responsiveness */
-    gap: 1.5rem; /* Space between the dashboard cards */
-    margin-top: 1.5rem; /* Space from the profile summary above */
+    /* Adapts grid columns based on available space:
+       Each column will be at least 280px wide, and they'll expand to fill available space equally.
+       This provides a good minimum size for content on smaller desktop screens. */
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem; /* Consistent spacing between grid items */
+    margin-top: 1.5rem;
+    padding: 0 1.5rem; /* Add horizontal padding for a balanced look on larger screens */
 }
 
-/* Styling for all Dashboard Cards */
+/* Existing Styling for all Dashboard Cards */
 .dashboard-card {
-    background-color: #ffffff; /* White background for the cards */
-    border-radius: 12px; /* Slightly rounded corners */
-    padding: 1.8rem; /* Inner spacing within the cards */
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); /* Soft shadow for depth */
-    border: 1px solid #e0e0e0; /* Subtle border */
-    display: flex; /* Using flexbox for content alignment within cards */
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 1.8rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e0e0e0;
+    display: flex;
     flex-direction: column;
-    justify-content: space-between; /* Distributes space vertically */
-    transition: transform 0.2s ease-in-out; /* Smooth hover effect */
+    justify-content: space-between;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 }
 
 .dashboard-card:hover {
-    transform: translateY(-5px); /* Lift effect on hover */
+    transform: translateY(-5px);
 }
 
 .dashboard-card h2 {
-    color: #333;
-    margin-top: 0;
+    font-size: 1.5rem; /* Base font size for desktop */
     margin-bottom: 1rem;
-    font-size: 1.4rem; /* Slightly larger heading for cards */
 }
 
 .dashboard-card p {
@@ -256,84 +576,101 @@ h1, p {
 
 /* Specific styling for the 'About Us' card if needed to stretch */
 .dashboard-card.about-us-container {
-    grid-column: 1 / -1; /* Makes this card span across all columns in the grid */
-    margin-top: 1.5rem; /* Space between grid and about us */
+    grid-column: 1 / -1;
+    margin-top: 1.5rem;
 }
 
-/* Progress Bar for Internet Usage */
+/* Progress Bar for Internet Usage (existing) */
 .progress-bar-container {
     width: 100%;
     background-color: #e0e0e0;
     border-radius: 8px;
     height: 12px;
-    overflow: hidden; /* Ensures the progress bar stays within bounds */
+    overflow: hidden;
     margin-top: 0.8rem;
     margin-bottom: 0.5rem;
 }
 
 .progress-bar {
     height: 100%;
-    background-color: #FF325C; /* Your brand color for the progress */
+    background-color: #FF325C;
     border-radius: 8px;
     text-align: center;
     color: white;
-    transition: width 0.5s ease-in-out; /* Smooth animation for progress updates */
+    transition: width 0.5s ease-in-out;
 }
 
 /* Responsive adjustments for smaller screens */
 @media (max-width: 768px) {
     .dashboard-widgets-grid {
         grid-template-columns: 1fr; /* Stack cards vertically on smaller screens */
-        gap: 1.2rem;
+        gap: 1.2rem; /* Slightly reduced gap for mobile */
+        padding: 0 1rem; /* Adjust horizontal padding for mobile to provide breathing room */
     }
 
     .dashboard-card {
-        padding: 1.5rem;
+        padding: 1.2rem; /* Reduced padding for mobile cards */
     }
 
     .dashboard-card h2 {
-        font-size: 1.2rem;
+        font-size: 1.3rem; /* Adjusted font size for mobile headings */
+    }
+}
+
+/* Optional: Even smaller screens (e.g., very small phones) */
+@media (max-width: 480px) {
+    .dashboard-widgets-grid {
+        gap: 1rem; /* Slightly tighter gap on very small screens */
+        padding: 0 0.8rem; /* Further reduce padding for very narrow viewports */
+    }
+
+    .dashboard-card {
+        padding: 1rem; /* Minimal padding for compact view */
+    }
+
+    .dashboard-card h2 {
+        font-size: 1.1rem; /* Smaller font size for very small screens */
     }
 }
 
 
-
 /* --- Sidebar Styling --- */
-/* IMPORTANT: Ensure these are the ONLY .sidebar related rules in your entire CSS */
+/* IMPORTANT: Ensure this is the ONLY sidebar block to prevent override conflicts */
 .sidebar {
-    position: fixed; /* Fixed position relative to the viewport */
+    position: fixed;
     top: 0;
     left: 0;
-    width: 280px; /* Default width of the sidebar for desktop */
-    height: 100vh; /* Full viewport height */
-    background-color: var(--secondary-color); /* Now correctly uses the minimalist black variable */
-    color: var(--text-light); /* Light text color for contrast */
-    padding: 2.5rem 1.8rem; /* More generous padding */
-    overflow-y: auto; /* Enable vertical scrolling if content exceeds height */
-    z-index: 1000; /* Stacks above most content */
-    box-shadow: 2px 0 20px var(--shadow-light); /* Initial shadow */
+    width: 280px;
+    height: 100vh;
+    background-color: var(--secondary-color);
+    color: var(--text-light);
+    padding: 2.5rem 1.8rem;
+    overflow-y: auto;
+    z-index: 1000;
     display: flex;
-    flex-direction: column; /* Stacks header, nav vertically */
+    flex-direction: column;
+    box-shadow: 2px 0 20px var(--shadow-light);
 
-    /* Initial state for mobile: off-screen. Desktop will override this in media query. */
+    /* Hidden on mobile by default */
     transform: translateX(-100%);
-    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s ease, padding 0.3s ease;
+    transition: 
+        transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+        width 0.3s ease,
+        padding 0.3s ease,
+        box-shadow 0.3s ease;
 }
 
-/* When 'active' class is added by JS, slide sidebar into view */
 .sidebar.active {
-    transform: translateX(0); /* Slides into view */
-    box-shadow: 2px 0 35px var(--shadow-strong); /* Stronger shadow when open */
+    transform: translateX(0);
+    box-shadow: 2px 0 35px var(--shadow-strong);
 }
 
-
-
-/* Sidebar Header (User Avatar, Name, Account Number) */
+/* Sidebar Header */
 .sidebar-header {
     text-align: center;
     padding-bottom: 2.5rem;
     margin-bottom: 2.5rem;
-    border-bottom: 1px solid var(--border-light); /* Subtle separator */
+    border-bottom: 1px solid var(--border-light);
 }
 
 .sidebar-avatar {
@@ -341,9 +678,9 @@ h1, p {
     height: 95px;
     border-radius: 50%;
     object-fit: cover;
-    border: 4px solid var(--primary-color); /* Accent border */
+    border: 4px solid var(--primary-color);
     margin-bottom: 1rem;
-    box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.08); /* Inner shadow for depth */
+    box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.08);
 }
 
 .sidebar-user-name {
@@ -362,8 +699,7 @@ h1, p {
     font-weight: 400;
 }
 
-
-/* Sidebar Navigation Links */
+/* Sidebar Navigation */
 .sidebar-nav {
     flex-grow: 1;
     display: flex;
@@ -383,37 +719,35 @@ h1, p {
 .sidebar-link {
     display: flex;
     align-items: center;
-    padding: 1rem 0.8rem; /* Adjusted horizontal padding */
+    padding: 1rem 0.8rem;
     color: var(--text-light);
     text-decoration: none;
-    font-size: 1.1rem; /* Slightly increased font size for better readability */
+    font-size: 1.1rem;
     font-weight: 500;
     border-radius: 12px;
     transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
-    flex-wrap: wrap; /* Allows items to wrap to the next line */
-    flex-direction: row-reverse; /* Places the icon to the right of the text */
+    flex-wrap: wrap;
+    flex-direction: row-reverse;
 }
 
 .sidebar-link i {
     font-size: 1.4rem;
-    margin-right: 1rem; /* Reduced margin-right */
+    margin-right: 1rem;
     color: var(--text-light);
     width: 30px;
     text-align: center;
     transition: color 0.3s ease;
-    flex-shrink: 0; /* Prevents the icon from shrinking */
+    flex-shrink: 0;
 }
 
 .sidebar-link span {
-    display: block; /* Ensures the span behaves as a block element */
-    flex-grow: 1; /* Allows the text to take available space */
-    /* REMOVED: white-space: nowrap;, overflow: hidden;, text-overflow: ellipsis; */
-    /* This allows the "Billing & Payment" text to wrap onto multiple lines if needed */
+    display: block;
+    flex-grow: 1;
 }
 
-/* Hover state for navigation links */
+/* Hover Effects */
 .sidebar-link:hover {
-    background-color: var(--hover-bg); /* Will use the new, slightly more visible value */
+    background-color: var(--hover-bg);
     color: var(--primary-color);
     transform: translateX(10px);
 }
@@ -421,7 +755,7 @@ h1, p {
     color: var(--primary-color);
 }
 
-/* Active state for the currently selected navigation link */
+/* Active Nav Link */
 .sidebar-link.active {
     background-color: var(--primary-color);
     color: #ffffff;
@@ -433,41 +767,17 @@ h1, p {
     color: #ffffff;
 }
 
-/* Logout link specific styling */
+/* Logout Special Styling */
 .logout-link {
     margin-top: auto;
     border-top: 1px solid var(--border-light);
     padding-top: 2.5rem;
 }
 .logout-link:hover {
-    background-color: rgba(255, 50, 92, 0.15); /* Remains consistent */
+    background-color: rgba(255, 50, 92, 0.15);
 }
 
-
-/* --- Responsive Adjustments for Sidebar (within media queries) --- */
-
-/* --- Sidebar Toggle Logic (Unified for All Devices) --- */
-.sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 280px;
-    height: 100vh;
-    background-color: var(--secondary-color);
-    color: var(--text-light);
-    padding: 2.5rem 1.8rem;
-    overflow-y: auto;
-    z-index: 1000;
-    box-shadow: 2px 0 20px var(--shadow-light);
-    transform: translateX(-100%);
-    transition: transform 0.35s ease, box-shadow 0.3s ease;
-}
-.sidebar.active {
-    transform: translateX(0);
-    box-shadow: 2px 0 35px var(--shadow-strong);
-}
-
-/* Overlay (for mobile view when sidebar is open) */
+/* Overlay for mobile view */
 .sidebar-overlay {
     display: none;
     position: fixed;
@@ -500,7 +810,7 @@ h1, p {
     display: inline-block;
     text-align: center;
     min-width: 160px; /* Ensures buttons have a consistent minimum width */
-    left: 300px ;
+   
 }
 .btn:hover, button:hover, .toggle-btn:hover {
     background-color: #e0254d;
@@ -514,6 +824,22 @@ h1, p {
     background-color: #5a6268;
     box-shadow: 0 4px 10px rgba(108, 117, 125, 0.4);
 }
+
+.tertiary-btn {
+    background-color: transparent;
+    color: #FF325C;
+    border: 1px solid #FF325C;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.tertiary-btn:hover {
+    background-color: #FF325C;
+    color: white;
+}
+
 
 /* --- Toggle Button Specific Styles (FIXED: Reinforcing positioning) --- */
 .toggle-btn {
@@ -556,65 +882,282 @@ h1, p {
     box-sizing: border-box; /* Crucial for responsive padding */
 }
 
-/* Profile Container - general styling for the card that holds the profile */
-.profile-container {
-    background-color: #fff;
-    border: 1px solid #e0e0e0;
-    border-radius: 12px;
-    padding: 3rem;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
-    max-width: 800px;
-    margin: 2rem auto;
-    animation: fadeIn 0.5s ease;
-    width: 95%; /* Make it fluid up to max-width */
-    box-sizing: border-box; /* Include padding in width */
-}
 
-/* --- Login Page Specific Styles (Minimalist & Consistent Redesign) --- */
-
-/* Full page container for centering the login card */
+/* --- Login Page Layout --- */
 .login-container {
     display: flex;
     justify-content: center;
     align-items: center;
-    /* Adjusted min-height for potential header. If you have a fixed header,
-       adjust '70px' to its actual height. Otherwise, remove '- 70px'. */
-    min-height: calc(100vh - 70px);
-    background-color: #f8f8f8; /* Light background for the page */
-    padding: 2rem 1rem; /* Padding for small screens, acts as margin on larger screens */
-    box-sizing: border-box; /* Include padding in height calculation */
+    /* Adjust min-height to push card slightly up if header is large, or remove if body scroll */
+    min-height: calc(100vh - var(--header-height) - 2rem);
+    padding: 20px;
+    background-color: var(--background-light);
+    box-sizing: border-box; /* Ensures padding is included in element's total width/height */
 }
 
-/* The actual login card */
 .login-card {
-    background: #ffffff;
-    border-radius: 16px; /* Slightly more rounded for a softer look */
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08); /* Softer, deeper shadow */
+    background-color: var(--background-card);
     padding: 2.5rem; /* Increased padding for more breathing room */
-    max-width: 420px; /* Slightly increased max-width for better balance */
-    width: 100%; /* Ensure it fills available width up to max-width */
-    text-align: center; /* Center align content inside the card */
-    animation: fadeIn 0.6s ease-out; /* Smooth fade-in animation */
-    border: 1px solid #eee; /* Subtle border for definition */
+    border-radius: 14px; /* Slightly more rounded corners */
+    box-shadow: 0 10px 30px var(--shadow-light); /* More pronounced shadow */
+    width: 95%; /* More responsive on smaller screens */
+    max-width: 450px;
+    border: 1px solid #e0e0e0;
+    text-align: center; /* For centering text elements like titles directly within the card */
+
+    /* CRITICAL FOR VERTICAL ALIGNMENT & SPACING OF DIRECT CHILDREN */
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Horizontally centers children like logo, header, and forms */
+    gap: 2rem; /* Increased space between major sections (logo, header, forms) */
 }
 
-/* Login Logo */
+/* --- Login Card Elements --- */
 .login-logo {
-    width: 80px; /* Adjust size as needed */
-    height: auto;
-    margin: 0 auto 1.5rem; /* Center and add space below */
-    display: block; /* Ensure it behaves as a block element */
+    max-width: 160px; /* Slightly larger logo */
+    margin: 0; /* Ensures gap property on parent handles spacing */
+    display: block; /* Important for width and margin auto behavior */
 }
 
-/* Login Title */
+#login-header {
+    margin: 0; /* Ensures gap property on parent handles spacing */
+    width: 100%; /* Important for text alignment within header */
+    /* Sticky header styles (if desired, from your original code) */
+    background-color: var(--background-card);
+    z-index: 10;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem; /* Adjusted padding */
+}
+
 .login-title {
-    font-size: 2.2rem; /* Larger, more welcoming title */
+    font-size: 2.2em; /* Slightly larger title */
+    color: var(--primary-color);
+    margin-bottom: 0.5rem; /* Maintain small gap between title and subtitle */
     font-weight: 700;
-    color: #FF325C;
-    margin-bottom: 0.5rem; /* Reduced margin for tighter typography */
+}
+
+.login-subtitle {
+    font-size: 1.1em;
+    color: var(--text-color-medium);
+    margin-top: 0; /* Reset default margin */
+}
+
+/* --- Toggle Buttons for Customer/Admin --- */
+.toggle-buttons {
+    display: flex;
+    width: fit-content;
+    margin: 0 auto; /* Center the toggle buttons group */
+    border: 1px solid var(--border-color-light);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.auth-toggle-btn {
+    flex: 1;
+    padding: 12px 25px;
+    border: none;
+    background-color: transparent;
+    color: #666;
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    white-space: nowrap;
+    position: static; /* Ensures it behaves normally within its parent */
+    margin: 0;
+    min-width: unset;
+    width: auto;
+}
+
+.auth-toggle-btn:first-child {
+    border-top-left-radius: 9px;
+    border-bottom-left-radius: 9px;
+}
+
+.auth-toggle-btn:last-child {
+    border-top-right-radius: 9px;
+    border-bottom-right-radius: 9px;
+}
+
+.auth-toggle-btn.active {
+    background-color: var(--primary-color);
+    color: white;
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.auth-toggle-btn:hover:not(.active) {
+    background-color: #f0f0f0;
+}
+
+/* --- Media Query for Mobile Phones (to ensure responsiveness) --- */
+@media (max-width: 600px) {
+    .toggle-buttons {
+        width: 100%;
+        box-shadow: none;
+        border-radius: 8px;
+    }
+
+    .auth-toggle-btn {
+        padding: 10px 15px;
+        font-size: 0.9em;
+    }
+}
+
+/* Optional: Further reduction for very small phones */
+@media (max-width: 380px) {
+    .auth-toggle-btn {
+        padding: 8px 12px;
+        font-size: 0.85em;
+    }
+}
+
+/* --- Form Specific Styles --- */
+/* CRITICAL: Make the FORM elements Flex Containers to manage their children's spacing */
+#customer-form,
+#admin-form {
+    display: flex;
+    flex-direction: column; /* Stack children vertically */
+    align-items: center; /* Horizontally centers children within the form's width */
+    gap: 1.2rem; /* Consistent vertical spacing between form elements (inputs, button, link) */
+    width: 100%; /* Ensures forms fill the width provided by .login-card's centering */
+    margin: 0; /* IMPORTANT: Remove any default form margins that might interfere */
+}
+
+.form-group {
+    width: 100%; /* Ensures form-group takes full width of its parent (the form) */
+    margin: 0; /* Ensure no default margins on form-groups */
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--text-color-dark);
+    font-weight: 500;
+    font-size: 0.95em;
+    text-align: left; /* Align labels to the left */
+}
+
+/* --- Input Fields --- */
+.login-card input[type="email"],
+.login-card input[type="password"],
+.login-card input[type="text"],
+.form-group input[type="date"], /* Added from your original .form-group input rule */
+.form-group select { /* Added from your original .form-group select rule */
+    width: 100%;
+    padding: 14px 18px; /* Consistent with button padding */
+    font-size: 1.05rem; /* Consistent with button font size */
+    border-radius: 10px; /* Match button border-radius */
+    border: 1px solid var(--border-color-light);
+    background-color: var(--background-card);
+    color: var(--text-color-dark);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    box-sizing: border-box; /* Ensures padding is included in the 100% width */
+    margin: 0; /* IMPORTANT: Explicitly remove any default browser margins on inputs */
+}
+
+.login-card input:focus,
+.form-group select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px var(--focus-ring-color);
+    outline: none;
+}
+
+/* Disabled Input and Select Styles (Combined and refined) */
+.login-card input[type="email"]:disabled,
+.login-card input[type="password"]:disabled,
+.login-card input[type="text"]:disabled,
+.form-group select:disabled {
+    background-color: #f9f9f9;
+    color: var(--text-color-light);
+    cursor: not-allowed;
+    border-style: dashed; /* Visual cue for disabled */
+    opacity: 0.8; /* Slightly dim it */
 }
 
 
+/* --- Buttons --- */
+.login-btn {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 14px 20px; /* Slightly more vertical padding than inputs for visual weight */
+    border: none;
+    border-radius: 10px; /* Consistent with inputs */
+    font-size: 1.1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.25s ease, transform 0.1s ease, box-shadow 0.25s ease;
+    width: 100%; /* Match inputs' width */
+    box-sizing: border-box; /* Essential for padding to be inside width */
+    margin: 0; /* IMPORTANT: Remove default margin-top from original, let gap handle spacing */
+    letter-spacing: 0.5px;
+    text-transform: uppercase; /* Slight stylistic choice */
+}
+
+.login-btn:hover {
+    background-color: #E62A50;
+    transform: translateY(-2px); /* More noticeable lift */
+    box-shadow: 0 6px 15px rgba(255, 50, 92, 0.3); /* Stronger shadow on hover */
+}
+
+.login-btn:active {
+    transform: translateY(0);
+    box-shadow: none; /* Reset shadow on click */
+}
+
+.secondary-btn {
+    background-color: #6c757d; /* A neutral gray */
+}
+
+.secondary-btn:hover {
+    background-color: #5a6268;
+}
+
+/* Tertiary Button (e.g., Register as Admin) */
+.tertiary-btn {
+    background-color: transparent;
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+    padding: 14px 20px;
+    border-radius: 10px;
+    font-size: 1.1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    width: 100%;
+    box-sizing: border-box;
+    margin: 0; /* Ensure no unwanted margins */
+    text-decoration: none; /* Remove underline for link styled as button */
+    display: block; /* Make <a> behave like a block for width/padding */
+    text-transform: uppercase;
+}
+
+.tertiary-btn:hover {
+    background-color: rgba(255, 50, 92, 0.08); /* Light fill on hover */
+    box-shadow: 0 2px 8px rgba(255, 50, 92, 0.1);
+}
+
+/* --- Extra Link (e.g., Register Here) --- */
+.extra-link {
+    font-size: 0.95em; /* Keep original font size or adjust as needed */
+    color: var(--text-color-medium); /* Use a consistent text color for the surrounding text */
+    text-align: center;
+    margin: 0; /* Ensures the form's 'gap' property handles spacing */
+}
+
+.extra-link a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 600;
+    transition: text-decoration 0.2s ease;
+}
+
+.extra-link a:hover {
+    text-decoration: underline;
+}
 
 
 /* --- Landing Page Specific Styles --- */
@@ -681,24 +1224,6 @@ h1, p {
 }
 
 /* Optional: Secondary button style if you add "Register Now" */
-.btn-secondary-hero {
-    display: inline-block;
-    background-color: transparent;
-    color: var(--primary-color);
-    border: 2px solid var(--primary-color);
-    padding: 0.9rem 1.8rem;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 1.1rem;
-    transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
-}
-
-.btn-secondary-hero:hover {
-    background-color: var(--primary-color);
-    color: var(--text-light);
-    transform: translateY(-2px);
-}
 
 
 .hero-image-placeholder {
@@ -773,6 +1298,75 @@ h1, p {
     color: #666;
     line-height: 1.6;
 }
+
+
+.billing-features {
+    display: flex;
+    flex-wrap: nowrap;         /* Prevent wrapping */
+    overflow-x: auto;          /* Enable scroll */
+    gap: 1.2rem;
+    padding: 1rem;
+    scroll-snap-type: x mandatory; /* Optional: for snap scrolling */
+    scrollbar-width: none;
+}
+
+.billing-features .feature-card {
+    flex: 0 0 250px; /* Medium fixed width */
+    scroll-snap-align: start;
+    padding: 1.2rem;
+    border-radius: 8px;
+    background-color: #fff;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.billing-features::-webkit-scrollbar {
+    height: 8px;
+}
+
+.billing-features::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    border-radius: 4px;
+}
+
+.billing-features .feature-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+.billing-features .feature-card img {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    margin-bottom: 0.8rem;
+}
+
+.billing-features .feature-card h3 {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    color: var(--secondary-color, #333);
+}
+
+.billing-features .feature-card p {
+    font-size: 0.9rem;
+    color: #666;
+    line-height: 1.4;
+}
+
+
+/* 🔁 Optional: Smooth scroll & hide scrollbar for cleaner UX */
+.billing-features {
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Firefox */
+}
+.billing-features::-webkit-scrollbar {
+    display: none; /* Chrome, Safari */
+}
+
 
 /* Call to Action Section */
 .cta-section {
@@ -869,7 +1463,7 @@ h1, p {
         font-size: 1rem;
     }
 
-    .btn-primary-hero, .btn-secondary-hero {
+    .btn-primary-hero {
         padding: 0.8rem 1.5rem;
         font-size: 1rem;
     }
@@ -914,7 +1508,14 @@ h1, p {
 }
 
 
-
+#customer-form,
+#admin-form {
+    display: flex;
+    flex-direction: column; /* Stack children (form-groups, button, links) vertically */
+    align-items: center; /* Horizontally centers children within the form */
+    gap: 1rem; /* Consistent vertical spacing between form elements (inputs, button, link) */
+    width: 100%; /* Ensure forms take full width of login-card for proper centering of their contents */
+}
 
 /* Login Subtitle - used for main subtitle and reset password form subtitle */
 .login-subtitle {
@@ -933,115 +1534,123 @@ h1, p {
 /* Input Fields - Unified style for all text/password inputs */
 .login-card input[type="email"],
 .login-card input[type="password"],
-.login-card input[type="text"] { /* In case you add text type inputs later */
-    width: 100%;
-    padding: 14px 18px; /* More generous padding for better feel */
-    font-size: 1.05rem; /* Slightly larger font */
-    border-radius: 10px; /* More rounded input fields */
-    border: 1px solid #ddd; /* Lighter border color */
-    background-color: #fdfdfd; /* Very subtle off-white background */
+.login-card input[type="text"] {
+    width: 100%; /* Makes inputs take full width of their .form-group parent */
+    padding: 14px 18px;
+    font-size: 1.05rem;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    background-color: #fdfdfd;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    -webkit-appearance: none; /* For better consistency across browsers */
+    -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
+    box-sizing: border-box; /* Ensures padding is included in the 100% width */
 }
 
 .login-card input[type="email"]:focus,
 .login-card input[type="password"]:focus,
 .login-card input[type="text"]:focus {
-    border-color: #FF325C; /* Highlight border on focus */
-    box-shadow: 0 0 0 3px rgba(255, 50, 92, 0.2); /* Soft focus ring */
-    outline: none; /* Remove default outline */
+    border-color: #FF325C;
+    box-shadow: 0 0 0 3px rgba(255, 50, 92, 0.2);
+    outline: none;
 }
 
 /* Login Button - Common style for all primary actions */
+/* Login Button - Sizing and Alignment */
 .login-btn {
-    width: 100%;
-    padding: 15px; /* Larger padding for a more substantial button */
-    font-size: 1.1rem; /* Larger font size for prominence */
+    width: 100%; /* Makes button take full width, matching inputs within the form */
+    padding: 14px 18px;
+    font-size: 1.05rem;
     font-weight: 600;
-    border-radius: 10px; /* Consistent rounding */
+    border-radius: 10px;
     background-color: #FF325C;
     color: white;
     border: none;
     cursor: pointer;
     transition: all 0.2s ease;
-    margin-top: 1rem; /* Space above button */
+    /* margin-top is removed, 'gap' on the parent form handles spacing */
     letter-spacing: 0.5px;
+    box-sizing: border-box;
+    text-align: center; /* Ensures text inside is centered horizontally */
+    display: block; /* Ensures it behaves as a block element for width/margins */
 }
 
 .login-btn:hover {
-    background-color: #e0254d;
-    transform: translateY(-2px); /* Subtle lift on hover */
-    box-shadow: 0 6px 15px rgba(255, 50, 92, 0.3); /* Enhanced shadow on hover */
+    background-color: #E62A50;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(255, 50, 92, 0.2);
 }
 
-/* Specific button style for "Send Reset Link" to differentiate */
-.login-btn.secondary-btn { /* Adding a new class for this button */
-    background-color: #6c757d; /* A neutral gray */
+/* Other links and buttons outside direct form-group but within forms */
+.extra-link {
+    font-size: 0.9rem;
+    margin-top: 0; /* Gap handles spacing */
+    text-align: center;
 }
 
-.login-btn.secondary-btn:hover {
-    background-color: #5a6268;
-    box-shadow: 0 6px 15px rgba(108, 117, 125, 0.3);
-}
-
-/* Links (Forgot Password, Register, Back to Login) */
-.login-links {
-    margin-top: 1.8rem; /* Space above the links section */
-    font-size: 0.95rem;
-    color: #777;
-}
-
-.login-links p {
-    margin: 0.8rem 0 0; /* Adjust margin for paragraphs within links */
-}
-
-.login-card a { /* General link style within the card */
-    color: #FF325C;
+.extra-link a {
+    color: var(--primary-color);
     text-decoration: none;
     font-weight: 600;
-    transition: color 0.2s ease, text-decoration 0.2s ease;
 }
 
+.secondary-btn {
+    width: 100%; /* Make these buttons also take full width */
+    padding: 14px 18px;
+    border-radius: 10px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    text-align: center;
+    color: white;
+    border: none;
+    text-decoration: none; /* For links styled as buttons */
+    display: block; /* For links styled as buttons */
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+    background-color: #4CAF50; /* Example for admin button */
+}
+
+
+.secondary-btn:hover {
+    background-color: #45a049;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(76, 175, 80, 0.2);
+}
+
+.tertiary-btn {
+   width: 100%; /* Make these buttons also take full width */
+    padding: 14px 18px;
+    border-radius: 10px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    text-align: center;
+    color: white;
+    border: none;
+    text-decoration: none; /* For links styled as buttons */
+    display: block; /* For links styled as buttons */
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+    background-color: #4CAF50; /* Example for admin button */
+}
+
+.tertiary-btn:hover {
+    background-color: rgba(255, 50, 92, 0.08); /* Light fill on hover */
+    box-shadow: 0 2px 8px rgba(255, 50, 92, 0.1);
+}
+/* Links (Forgot Password, Register, Back to Login) */
+
+/* General link style within the login card */
+
+
 .login-card a:hover {
-    color: #e0254d;
-    text-decoration: underline;
+    color: var(--primary-color); /* Original primary color on hover for an interactive feel */
+    text-decoration: underline; /* Add underline on hover for clear indication */
 }
 
 /* Styling for "Forgot Password?" and "Back to Login" links */
-.forgot-password-toggle, /* Updated class name */
-.toggle-form-link {
-    display: block; /* Make them block to take full width */
-    text-align: center;
-    margin-bottom: 0.5rem; /* Space between links if stacked */
-}
 
 /* Forgot Password Form specific styling */
-#forgot-form {
-    padding-top: 1rem; /* Add internal padding */
-    border-top: 1px solid #eee; /* Subtle separator */
-    margin-top: 1.5rem; /* Space above the form - MOVED FROM INLINE STYLE */
-    /* Initially hidden via JavaScript, but add a class for smooth transitions later if desired */
-    /* display: none; */ /* REMOVED: Will be handled by JS on DOMContentLoaded */
-}
-
-#forgot-form .login-subtitle { /* Override margin for this specific subtitle */
-    margin-bottom: 1rem;
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: #333;
-}
-
-#forgot-form .forgot-form-text { /* Styling for the instruction text */
-    font-size: 0.9rem;
-    color: #666;
-    margin-bottom: 1.5rem;
-}
-
-.back-to-login-link { /* MOVED FROM INLINE STYLE */
-    margin-top: 1rem;
-}
 
 /* Accessibility: Visually hidden but available to screen readers */
 .sr-only {
@@ -1057,13 +1666,6 @@ h1, p {
 }
 
 /* Utility class for forms that are hidden by JS - useful for transitions */
-.hidden-form {
-    opacity: 0;
-    pointer-events: none;
-    transform: translateY(10px);
-    transition: opacity 0.3s ease, transform 0.3s ease;
-   
-}
 
 
 /* --- Responsive Adjustments for Login Page --- */
@@ -1102,25 +1704,6 @@ h1, p {
     .login-btn {
         padding: 13px; /* Adjust button padding */
         font-size: 1rem;
-    }
-
-    .login-links {
-        margin-top: 1.5rem;
-        font-size: 0.85rem;
-    }
-
-    .login-links p {
-        margin: 0.6rem 0 0;
-    }
-
-    #forgot-form .login-subtitle {
-        font-size: 1rem;
-        margin-bottom: 0.8rem;
-    }
-
-    #forgot-form .forgot-form-text {
-        font-size: 0.8rem;
-        margin-bottom: 1rem;
     }
 }
 
@@ -1405,19 +1988,190 @@ h1, p {
 
 
 
+/* --- Admin Register Page Specific Styling --- */
 
+/* Main container for the Admin Register Form */
+.admin-register-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - var(--header-height) - 2rem);
+    padding: 20px; /* Base padding for all screen sizes */
+    background-color: var(--background-light);
+    box-sizing: border-box;
+}
 
+/* Card containing the register form */
+.admin-register-card {
+    background-color: var(--background-card);
+    padding: 3rem; /* Generous padding for desktop */
+    border-radius: 12px;
+    box-shadow: 0 8px 25px var(--shadow-light);
+    width: 90%; /* Responsive width that scales */
+    max-width: 480px; /* Maximum width on larger screens */
+    margin: auto; /* Centers the card horizontally */
+    border: 1px solid #e0e0e0;
+    text-align: center;
 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem; /* Space between major sections within the card */
+}
 
+/* Title for the Admin Register Form */
+.admin-register-card h2 {
+    font-size: 2.2em;
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+    margin-top: 0.5rem;
+    font-weight: 700;
+}
 
+/* Form layout */
+.admin-register-card form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem; /* Spacing between form elements */
+    width: 100%; /* Form takes full width of its parent card */
+    margin: 0; /* Reset default form margins */
+}
 
+/* Input field styling */
+.admin-register-card input[type="text"],
+.admin-register-card input[type="password"],
+.admin-register-card input[type="email"],
+.admin-register-card input[type="hidden"] {
+    width: 100%;
+    padding: 14px 18px;
+    font-size: 1.05rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color-light);
+    background-color: #fdfdfd;
+    color: var(--text-color-dark);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    box-sizing: border-box;
+    margin: 0;
+}
 
+/* Placeholder text style */
+.admin-register-card input::placeholder {
+    color: var(--text-color-light);
+    opacity: 0.8;
+}
 
+/* Focus state for inputs */
+.admin-register-card input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px var(--focus-ring-color);
+    outline: none;
+}
 
+/* Disabled input style */
+.admin-register-card input:disabled,
+.admin-register-card input[readonly] {
+    background-color: #f9f9f9;
+    color: var(--text-color-light);
+    cursor: not-allowed;
+    border-style: solid;
+    border-color: #e9e9e9;
+    opacity: 0.7;
+}
 
+/* Submit button styling */
+.admin-register-card button[type="submit"] {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 15px 25px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.15em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.25s ease, transform 0.1s ease, box-shadow 0.25s ease;
+    width: 100%;
+    box-sizing: border-box;
+    margin: 0;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+}
 
+.admin-register-card button[type="submit"]:hover {
+    background-color: #E62A50;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(255, 50, 92, 0.3);
+}
 
+.admin-register-card button[type="submit"]:active {
+    transform: translateY(0);
+    box-shadow: none;
+}
 
+/* --- Media Queries for Responsiveness --- */
+
+/* Tablets and larger phones (e.g., screen width up to 768px) */
+@media (max-width: 768px) {
+    .admin-register-container {
+        padding: 15px; /* Slightly less padding around the container */
+    }
+
+    .admin-register-card {
+        padding: 2rem; /* Reduce card padding on smaller screens */
+        border-radius: 10px; /* Slightly less rounded */
+        box-shadow: 0 6px 20px var(--shadow-light); /* Lighter shadow */
+        gap: 1.5rem; /* Reduce gap between major sections */
+    }
+
+    .admin-register-card h2 {
+        font-size: 2em; /* Slightly smaller title */
+    }
+
+    .admin-register-card form {
+        gap: 1rem; /* Reduce gap between form elements */
+    }
+
+    .admin-register-card input[type="text"],
+    .admin-register-card input[type="password"],
+    .admin-register-card input[type="email"] {
+        padding: 12px 16px; /* Slightly less padding for inputs */
+        font-size: 1em; /* Adjust font size for better fit */
+    }
+
+    .admin-register-card button[type="submit"] {
+        padding: 14px 20px; /* Slightly less padding for button */
+        font-size: 1.05em; /* Adjust font size for better fit */
+    }
+}
+
+/* Smaller phones (e.g., screen width up to 480px) */
+@media (max-width: 480px) {
+    .admin-register-container {
+        padding: 10px; /* Minimal padding around the container */
+    }
+
+    .admin-register-card {
+        padding: 1.5rem; /* Further reduce card padding */
+        border-radius: 8px; /* More subtle rounding */
+        box-shadow: 0 4px 15px var(--shadow-light); /* Even lighter shadow */
+        gap: 1rem; /* Smaller gap between major sections */
+    }
+
+    .admin-register-card h2 {
+        font-size: 1.8em; /* Smaller title for very small screens */
+    }
+
+    .admin-register-card input[type="text"],
+    .admin-register-card input[type="password"],
+    .admin-register-card input[type="email"] {
+        padding: 10px 14px; /* Even less padding for inputs */
+        font-size: 0.95em; /* Ensure text fits well */
+    }
+
+    .admin-register-card button[type="submit"] {
+        padding: 12px 18px; /* Smaller button padding */
+        font-size: 1em; /* Smaller button font size */
+    }
+}
 
 
 
@@ -1635,10 +2389,6 @@ h1, p {
     border-bottom: 1px solid #eee;
 }
 
-.form-group {
-    width: 100%;
-}
-
 .form-group label {
     display: block;
     margin-bottom: 0.4rem;
@@ -1730,37 +2480,6 @@ hr {
     margin: 2rem 0;
 }
 
-/* Main content layout for desktop */
-@media (min-width: 992px) {
-  .main-content {
-    margin-left: 280px; /* Account for visible sidebar on desktop */
-    padding-top: 5.625rem; /* 90px for fixed header spacing */
-    padding-left: 2rem;
-    padding-right: 2rem;
-    padding-bottom: 2rem;
-    width: auto;
-    transition: margin-left 0.3s ease;
-    box-sizing: border-box;
-  }
-}
-
-
-
-
-
-
-
-/* Main content layout for tablets/phones */
-@media (max-width: 991px) {
-  .main-content.expanded {
-    margin-left: 0;
-    padding-top: 5.625rem; /* Same spacing on mobile */
-  }
-}
-
-
-
-
 
 /* Cards (General card style) */
 .card {
@@ -1812,15 +2531,7 @@ hr {
   transition: transform 0.3s ease;
 }
 
-.sidebar.active {
-  transform: translateX(0);
-}
 
-.main-content,
-.main-content.expanded {
-  margin-left: 0;
-  padding: 1rem;
-}
 
 
     /* Profile container responsiveness */
@@ -1873,11 +2584,6 @@ hr {
     .profile-container form {
         padding: 0; /* Remove extra padding within form on mobile */
     }
-
-    .form-group {
-        max-width: 100%;
-    }
-
     .form-group label {
         text-align: left;
     }
@@ -1894,11 +2600,6 @@ hr {
     .sidebar {
         width: 220px; /* Slightly narrower sidebar than desktop */
         padding: 1.5rem 0.8rem;
-    }
-
-    .main-content {
-        margin-left: 220px; /* Adjust main content margin to match sidebar */
-        padding: 1.5rem; /* Slightly reduced padding */
     }
 
     .profile-container {
@@ -1932,10 +2633,6 @@ hr {
 
 /* General adjustments for larger screens (laptops, desktops) */
 @media screen and (min-width: 1025px) {
-    .main-content {
-        margin-left: 250px; /* Standard sidebar width */
-        padding: 2rem; /* Standard padding */
-    }
     .profile-container {
         max-width: 800px; /* Standard max-width */
         padding: 3rem; /* Standard padding */
@@ -1945,41 +2642,34 @@ hr {
 /* --- START: New Styles for Billing Tab Integration (Refined) --- */
 
 /* Billing Section Container - Consistent padding for a cleaner look */
+
 .billing-section {
     width: 100%; /* Ensures it takes full width on smaller screens */
     max-width: 900px; /* Sets a maximum width for readability on larger screens */
-    margin: 0 auto; /* Centers the section horizontally when max-width is applied */
+    margin: 0 auto; /* Centers the section horizontally and sets top/bottom margin to 0 */
 
     /* Order is important: Apply general padding first, then specific padding-top */
-    padding: 3rem; /* ENHANCED: Increased general padding for a more generous look (was 2.5rem) */
-    padding-top: calc(70px + 2rem); /* ENHANCED: Increased buffer for header clearance (was 70px + 1.5rem) */
+    padding: 3rem; /* General padding for a generous look (can be reduced if too much overall space) */
+    /* Adjust '1rem' here to reduce space between the header's clearance and the content below it on desktop */
+    padding-top: calc(70px + 1rem); /* Reduced from 2rem. This value clears the header height (70px) plus additional space. */
 
-    background-color: var(--background-light, #ffffff); /* Light background for the content area */
-    border-radius: 12px; /* Softened corners for a modern look */
-    border: 1px solid var(--border-light, #f0f0f0); /* Subtle border for clearer definition and depth */
-    box-shadow: 0 6px 15px rgba(0,0,0,0.08); /* Deeper, softer shadow for a more modern, layered look */
+    background-color: var(--background-light, #ffffff);
+    border-radius: 12px;
+    border: 1px solid var(--border-light, #f0f0f0);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.08);
 
-    animation: fadeIn 0.4s ease-in-out; /* Keeps your existing animation */
-    box-sizing: border-box; /* Ensures padding and border are included in the element's total width/height */
-    min-height: 250px; /* Ensures a minimum height for visual consistency even with sparse content */
+    animation: fadeIn 0.4s ease-in-out;
+    box-sizing: border-box;
+    min-height: 250px;
 }
 
-/* Responsive adjustments for smaller screens */
-@media (max-width: 767px) { /* Applies styles for screens up to 767px wide (common mobile breakpoint) */
+/* Responsive adjustments for smaller screens (Merged and streamlined) */
+@media (max-width: 767px) {
     .billing-section {
-        padding: 1.5rem; /* ENHANCED: Increased padding for a better fit on mobile (was 1.2rem) */
-        padding-top: calc(70px + 1.2rem); /* ENHANCED: Slightly more top buffer for mobile (was 70px + 1rem) */
-        border-radius: 0; /* Optional: Remove border-radius on very small screens for an edge-to-edge feel */
-        box-shadow: none; /* Optional: Remove shadow on very small screens for simplicity */
-        min-height: auto; /* Allow height to adjust dynamically on mobile */
-    }
-}
-
-/* Responsive adjustments for smaller screens */
-@media (max-width: 767px) { /* Applies styles for screens up to 767px wide (common mobile breakpoint) */
-    .billing-section {
-        padding: 1.2rem; /* ENHANCED: Adjusted padding for a better fit on mobile */
-        padding-top: calc(70px + 1rem); /* Keeping a consistent top buffer with the header on mobile */
+        margin-top: 0px; /* Explicitly ensure no top margin on mobile */
+        padding: 1.5rem; /* Adjusted padding for a better fit on mobile (was 1.2rem in one, 1.5rem in another) */
+        /* Adjust '0.5rem' here to reduce space between the header's clearance and the content below it on mobile */
+        padding-top: 24px; /* Reduced from 1rem. Keeps consistent top buffer with header on mobile. */
         border-radius: 0; /* Optional: Remove border-radius on very small screens for an edge-to-edge feel */
         box-shadow: none; /* Optional: Remove shadow on very small screens for simplicity */
         min-height: auto; /* Allow height to adjust dynamically on mobile */
@@ -1989,42 +2679,98 @@ hr {
 /* Billing Tabs Container */
 .billing-tabs-container {
     display: flex;
-    justify-content: flex-start; /* Align tabs to the left */
-    gap: 1rem; /* ENHANCED: Slightly more space between tab buttons for better visual separation */
-    margin-bottom: 2.5rem; /* ENHANCED: More space below tabs before content starts, improving flow */
-    flex-wrap: wrap; /* Allows tabs to wrap onto multiple lines on smaller screens */
-    border-bottom: 2px solid var(--border-light, #eee); /* Using a CSS variable for consistent border color */
-    padding-bottom: 1.2rem; /* ENHANCED: More breathing room below tabs and above the border */
+    /* On PC, align tabs to the center */
+    justify-content: center;
+    gap: 20px; /* Increased space between buttons for better separation */
+    margin-bottom: 25px; /* More space below the tabs before content starts */
+    
+    /* REMOVED: background-color, padding, border-radius, box-shadow from container
+       to make tabs feel more integrated with the page */
+    flex-wrap: wrap; /* Allows wrapping on smaller screens */
 }
-/* Styling for tab buttons - Enhanced for minimalism and usability */
 .tab-btn {
-    padding: 12px 20px; /* TWEAK: Slightly increased padding for better touch targets and visual presence */
+    flex-grow: 0; /* Prevents buttons from excessively stretching */
+    flex-shrink: 0;
+    flex-basis: auto; /* Buttons size to their content initially */
+
+    padding: 12px 25px; /* Generous padding for easier clicking */
     border: none;
-    background-color: #f0f0f0;
-    color: #555;
-    cursor: pointer;
-    border-radius: 8px 8px 0 0; /* Rounded top corners */
-    transition: all 0.3s ease;
-    font-size: 1rem; /* TWEAK: Slightly larger font size for improved readability */
+    background-color: transparent; /* Default inactive tabs are transparent */
+    color: #555; /* Muted text color for inactive tabs */
+    font-size: 1em;
     font-weight: 600;
-    /* Resetting/overriding inherited button styles */
-    min-width: unset; /* Allow natural width */
-    margin: 0; /* Remove default button margin */
+    cursor: pointer;
+    border-radius: 8px; /* Slightly more rounded corners for the buttons */
+    transition: all 0.3s ease;
+    white-space: nowrap; /* Prevents text from wrapping within a button */
+    
+    /* PC Design: Underline effect for active tab, subtle hint for others */
+    border-bottom: 3px solid transparent; /* Prepare for the underline effect */
 }
 
 .tab-btn:hover {
-    background-color: #e0e0e0;
-    color: #333;
-    transform: none; /* Prevent scaling from general button hover */
-    box-shadow: none; /* Prevent shadow from general button hover */
+    background-color: rgba(0,0,0,0.05); /* Very subtle hover background */
+    color: #333; /* Darker text on hover */
+    border-bottom: 3px solid rgba(0,0,0,0.1); /* Subtle underline hint on hover */
 }
 
 .tab-btn.active {
-    background-color: #FF325C;
-    color: white;
-    box-shadow: 0 -2px 8px rgba(0,0,0,0.1); /* Lift effect for active tab */
-    border-color: #FF325C; /* Match border color */
+    background-color: transparent; /* Active tab also remains transparent */
+    color: var(--primary-color); /* Primary color for active text */
+    /* Strong red underline for the active tab */
+    border-bottom: 3px solid var(--primary-color);
+    box-shadow: none; /* Remove any previous box shadow for cleaner look */
 }
+
+/* --- Responsive Adjustments for Tabs --- */
+@media (max-width: 768px) {
+    .billing-tabs-container {
+        flex-direction: column; /* Stack buttons vertically on mobile */
+        gap: 8px; /* Space between stacked buttons */
+        padding: 10px; /* Add some padding to the container on mobile */
+        background-color: #f0f0f0; /* On mobile, give container a light background for clear grouping */
+        border-radius: 8px; /* Rounded corners for the mobile container */
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Subtle shadow for the mobile container */
+    }
+
+    .tab-btn {
+        flex: none; /* No flex growth on mobile when stacked */
+        width: 100%; /* Make buttons take full width when stacked */
+        
+        /* Integrated inline styles: */
+        padding: 12px; /* Sets top/bottom and left/right padding to 12px */
+        margin-left: 0px; 
+        margin-right: 0px; 
+
+        font-size: 0.95em; /* Slightly smaller font on mobile */
+        
+        /* Mobile Design: Buttons become solid blocks for active state */
+        border-bottom: none; /* Remove underline effect on mobile */
+        border-radius: 8px; /* Changed to 8px for consistency with container, or keep 6px if preferred. */
+        outline: none; /* Remove default browser outline on focus */
+        
+
+    }
+
+    .tab-btn:hover {
+        background-color: #e8e8e8; /* Lighter hover for mobile (since container has background) */
+        color: #333;
+        border-bottom: none; /* No underline on hover for mobile */
+    }
+
+    .tab-btn.active {
+        background-color: var(--primary-color); /* Active button is a solid red block on mobile */
+        color: white; /* White text for active mobile button */
+        
+        /* --- FIX FOR RED EXCEEDING: Remove box-shadow --- */
+        box-shadow: none; /* Explicitly ensure no shadow that could cause visual bleed */
+        
+        border-bottom: none; /* No underline on active mobile button */
+        border-radius: 8px; /* Ensure consistency with .tab-btn */
+        outline: none; /* Ensure no outline even if somehow activated */
+    }
+}
+
 
 /* Styling for form hint text (e.g., for <small> tags) */
 .form-hint-text {
@@ -2103,6 +2849,85 @@ form .action-btn {
 .mt-4 {
     margin-top: 1.5rem; /* Adjust this value as desired for spacing */
 }
+
+
+
+/* --- FILE UPLOAD STYLES --- */
+
+.custom-file-upload-group {
+    margin-bottom: 1.5rem; /* Space below the upload group */
+}
+
+.upload-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Pushes button and filename apart */
+    background-color: #f9f9f9;
+    border: 1px dashed #ccc; /* Dashed border to indicate drop/click area */
+    border-radius: 8px;
+    padding: 1rem 1.2rem;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.upload-label:hover {
+    background-color: #f0f0f0;
+    border-color: var(--primary-color); /* Highlight on hover */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.upload-button {
+    background-color: var(--primary-color);
+    color: var(--text-light);
+    padding: 0.75rem 1.2rem;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    display: flex; /* For icon and text alignment */
+    align-items: center;
+    gap: 0.5rem; /* Space between icon and text */
+    transition: background-color 0.2s ease;
+    white-space: nowrap; /* Prevent text from wrapping */
+}
+
+.upload-button .fas { /* Styling for Font Awesome icon */
+    font-size: 1.1rem;
+}
+
+.upload-button:hover {
+    background-color: var(--primary-dark); /* Slightly darker on hover */
+}
+
+.file-name {
+    margin-left: 1rem;
+    flex-grow: 1; /* Allows file name to take remaining space */
+    color: var(--text-dark);
+    font-size: 0.9rem;
+    overflow: hidden; /* Hide overflowing text */
+    text-overflow: ellipsis; /* Add ellipsis for long file names */
+    white-space: nowrap; /* Keep filename on single line */
+}
+
+/* Hide the actual file input */
+.hidden-file-input {
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
+}
+
+/* Optional: Add focus styles for accessibility */
+.hidden-file-input:focus + .upload-label {
+    border-color: var(--primary-color);
+    outline: 2px solid var(--primary-color); /* Visible outline on focus */
+    outline-offset: 2px;
+}
+
+/* --- END: New Styles for Billing Tab Integration (Refined) --- */
+
 
 /* Styles for Previous Uploads section */
 .proof-history {
@@ -2200,24 +3025,6 @@ form .action-btn {
     border: 1px solid transparent;
 }
 
-.status-verified {
-    background-color: #e6ffe6;
-    color: #28a745;
-    border-color: #28a745;
-}
-
-.status-denied {
-    background-color: #ffe6e6;
-    color: #dc3545;
-    border-color: #dc3545;
-}
-
-.status-pending {
-    background-color: #fffacd;
-    color: #ffc107;
-    border-color: #ffc107;
-}
-
 .view-proof-link {
     display: inline-block;
     color: var(--primary-color);
@@ -2283,78 +3090,497 @@ form .action-btn {
     }
 }
 
-/* --- FILE UPLOAD STYLES --- */
 
-.custom-file-upload-group {
-    margin-bottom: 1.5rem; /* Space below the upload group */
+
+/* Styles for Previous Rebate Requests section */
+.rebate-history {
+    margin-top: 1.5rem;
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-right: 0px;
+    padding-left: 0px;
 }
 
-.upload-label {
+.rebate-card {
+    background-color: #fcfcfc;
+    border: 1px solid #e9e9e9;
+    border-radius: 10px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.rebate-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+.rebate-card-header-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: #555;
+}
+
+.rebate-main-info {
     display: flex;
     align-items: center;
-    justify-content: space-between; /* Pushes button and filename apart */
-    background-color: #f9f9f9;
-    border: 1px dashed #ccc; /* Dashed border to indicate drop/click area */
-    border-radius: 8px;
-    padding: 1rem 1.2rem;
-    cursor: pointer;
-    transition: all 0.2s ease-in-out;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    gap: 0.4rem;
+    flex-wrap: wrap;
 }
 
-.upload-label:hover {
-    background-color: #f0f0f0;
-    border-color: var(--primary-color); /* Highlight on hover */
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+.rebate-main-info .separator {
+    color: #ccc;
+    font-size: 0.9em;
+    margin: 0 0.2rem;
 }
 
-.upload-button {
-    background-color: var(--primary-color);
-    color: var(--text-light);
-    padding: 0.75rem 1.2rem;
-    border-radius: 6px;
-    font-weight: 600;
-    font-size: 0.95rem;
-    display: flex; /* For icon and text alignment */
+.rebate-secondary-info {
+    display: flex;
     align-items: center;
-    gap: 0.5rem; /* Space between icon and text */
-    transition: background-color 0.2s ease;
-    white-space: nowrap; /* Prevent text from wrapping */
+    gap: 0.8rem;
+    flex-wrap: wrap;
+    margin-left: auto;
+    text-align: right;
 }
 
-.upload-button .fas { /* Styling for Font Awesome icon */
-    font-size: 1.1rem;
+.rebate-status-display,
+.rebate-uploaded-display {
+    white-space: nowrap;
 }
 
-.upload-button:hover {
-    background-color: var(--primary-dark); /* Slightly darker on hover */
-}
-
-.file-name {
-    margin-left: 1rem;
-    flex-grow: 1; /* Allows file name to take remaining space */
-    color: var(--text-dark);
+.rebate-card-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
     font-size: 0.9rem;
-    overflow: hidden; /* Hide overflowing text */
-    text-overflow: ellipsis; /* Add ellipsis for long file names */
-    white-space: nowrap; /* Keep filename on single line */
 }
 
-/* Hide the actual file input */
-.hidden-file-input {
-    width: 0.1px;
-    height: 0.1px;
-    opacity: 0;
+.rebate-card-details p {
+    margin: 0;
+    white-space: nowrap;
     overflow: hidden;
-    position: absolute;
-    z-index: -1;
+    text-overflow: ellipsis;
 }
 
-/* Optional: Add focus styles for accessibility */
-.hidden-file-input:focus + .upload-label {
-    border-color: var(--primary-color);
-    outline: 2px solid var(--primary-color); /* Visible outline on focus */
-    outline-offset: 2px;
+.rebate-status {
+    font-weight: 700;
+    padding: 0.2rem 0.6rem;
+    border-radius: 5px;
+    display: inline-block;
+    margin-left: 0.5rem;
+    font-size: 0.75rem;
+    border: 1px solid transparent;
 }
 
-/* --- END: New Styles for Billing Tab Integration (Refined) --- */
+/* Optional: response textarea styling */
+.rebate-response-form {
+    margin-top: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.rebate-response-form textarea {
+    width: 100%;
+    padding: 0.5rem;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-family: inherit;
+    font-size: 0.85rem;
+    resize: vertical;
+}
+
+.rebate-response-form button {
+    align-self: flex-end;
+    padding: 0.4rem 1rem;
+    background-color: var(--primary-color);
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.rebate-response-form button:hover {
+    background-color: var(--primary-dark);
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 768px) {
+    .rebate-history {
+        grid-template-columns: 1fr;
+        padding: 0 0rem;
+    }
+
+    .rebate-card {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 1rem;
+        gap: 0.8rem;
+    }
+
+    .rebate-card-header-line {
+        flex-direction: column;
+        align-items: flex-start;
+        width: 100%;
+        gap: 0.5rem;
+    }
+
+    .rebate-main-info,
+    .rebate-secondary-info {
+        flex-direction: column;
+        align-items: flex-start;
+        width: 100%;
+        gap: 0.2rem;
+        margin-left: 0;
+        text-align: left;
+    }
+
+    .rebate-main-info .separator {
+        display: none;
+    }
+
+    .rebate-status-display strong,
+    .rebate-uploaded-display strong {
+        display: block;
+    }
+
+    .rebate-status {
+        margin-left: 0;
+    }
+
+    .rebate-card-details p {
+        white-space: normal;
+        overflow: visible;
+        text-overflow: clip;
+    }
+}
+
+
+/* Styles for Previous Overcharge section */
+.overcharge-history {
+    margin-top: 1.5rem;
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 0px;
+    padding-right: 0px;
+}
+
+.overcharge-card {
+    background-color: #fffdfc;
+    border: 1px solid #e4e4e4;
+    border-radius: 10px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.04);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.overcharge-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+.overcharge-card-header-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: #555;
+}
+
+.overcharge-main-info {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+}
+
+.overcharge-main-info .separator {
+    color: #ccc;
+    font-size: 0.9em;
+    margin: 0 0.2rem;
+}
+
+.overcharge-secondary-info {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+    margin-left: auto;
+    text-align: right;
+}
+
+.overcharge-status-display,
+.overcharge-uploaded-display {
+    white-space: nowrap;
+}
+
+.overcharge-card-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    font-size: 0.9rem;
+}
+
+.overcharge-card-details p {
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.overcharge-status {
+    font-weight: 700;
+    padding: 0.2rem 0.6rem;
+    border-radius: 5px;
+    display: inline-block;
+    margin-left: 0.5rem;
+    font-size: 0.75rem;
+    border: 1px solid transparent;
+}
+
+.overcharge-response-form {
+    margin-top: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.overcharge-response-form textarea {
+    width: 100%;
+    padding: 0.6rem;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    resize: vertical;
+    font-family: inherit;
+}
+
+.overcharge-response-form button {
+    align-self: flex-start;
+    background-color: #FF325C;
+    color: #fff;
+    border: none;
+    padding: 0.4rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.overcharge-response-form button:hover {
+    background-color: #e62950;
+}
+
+@media (max-width: 768px) {
+    .overcharge-history {
+        grid-template-columns: 1fr;
+        padding: 0 0rem;
+    }
+
+    .overcharge-card {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 1rem;
+        gap: 0.8rem;
+    }
+
+    .overcharge-card-header-line {
+        flex-direction: column;
+        align-items: flex-start;
+        width: 100%;
+        gap: 0.5rem;
+    }
+
+    .overcharge-main-info,
+    .overcharge-secondary-info {
+        flex-direction: column;
+        align-items: flex-start;
+        width: 100%;
+        gap: 0.2rem;
+        margin-left: 0;
+        text-align: left;
+    }
+
+    .overcharge-main-info .separator {
+        display: none;
+    }
+
+    .overcharge-status-display strong,
+    .overcharge-uploaded-display strong {
+        display: block;
+    }
+
+    .overcharge-status {
+        margin-left: 0;
+    }
+
+    .overcharge-card-details p {
+        white-space: normal;
+        overflow: visible;
+        text-overflow: clip;
+    }
+}
+
+
+/* ADMIN SOA MANAGEMENT STYLES (scoped to #soa-tab) */
+#soa-tab .soa-management-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 1200px;
+  margin: 1.5rem auto;
+}
+
+/* Card layout for each customer row */
+#soa-tab .soa-management-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  padding: 1.5rem;
+  border-radius: 10px;
+  background-color: #ffffff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e6e6e6;
+  font-size: 0.95rem;
+}
+
+/* LEFT column – Customer info and upload form */
+#soa-tab .soa-management-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+#soa-tab .soa-management-left p {
+  margin: 0;
+  font-weight: 500;
+  color: #333;
+}
+
+#soa-tab .soa-management-left form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* File upload block (custom upload like in rebates) */
+#soa-tab .custom-file-upload-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+#soa-tab .upload-label {
+  cursor: pointer;
+  background-color: #f5f5f5;
+  border: 1px dashed #bbb;
+  border-radius: 8px;
+  padding: 0.7rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: border-color 0.3s ease;
+}
+
+#soa-tab .upload-label:hover {
+  border-color: var(--primary-color);
+}
+
+#soa-tab .upload-button {
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+#soa-tab .file-name {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+#soa-tab .hidden-file-input {
+  display: none;
+}
+
+/* Submit button */
+#soa-tab .action-btn {
+  background-color: var(--primary-color);
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border: none;
+  font-size: 0.85rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+#soa-tab .action-btn:hover {
+  background-color: var(--primary-dark);
+}
+
+/* RIGHT column – Latest SOA info */
+#soa-tab .soa-management-right {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  justify-content: center;
+}
+
+#soa-tab .soa-management-right p {
+  margin: 0;
+  color: #555;
+}
+
+#soa-tab .view-proof-link {
+  display: inline-block;
+  color: var(--primary-color);
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+#soa-tab .view-proof-link:hover {
+  color: var(--primary-dark);
+  text-decoration: underline;
+}
+
+/* Responsive behavior */
+@media (max-width: 768px) {
+  #soa-tab .soa-management-card {
+    grid-template-columns: 1fr;
+  }
+
+  #soa-tab .upload-label {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  #soa-tab .action-btn {
+    width: 100%;
+  }
+}

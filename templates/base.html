@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Corona Telecom</title>
   <link href="https://fonts.googleapis.com/css2?family=Titillium+Web&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -25,15 +25,48 @@
 <body>
 
 
- <header class="{% if dashboard_header %}dashboard-header{% else %}compact-header{% endif %}">
+{% if current_user.is_authenticated and session.get('user_type') == 'admin' and current_user.__class__.__name__ == 'AdminUser' %}
+  <!-- ✅ ADMIN DASHBOARD HEADER (only if truly authenticated as admin) -->
+  <header class="admin-header">
+      <div class="admin-header-content">
+          <div class="admin-title-group">
+              <h1 class="admin-main-title">Corona Telecom Admin Panel</h1>
+              <p class="admin-subtitle">Monitor. Manage. Empower.</p>
+          </div>
+          <div class="admin-user-controls">
+              <img src="{{ url_for('static', filename='images/' + (current_user.avatar or 'admin.png')) }}" alt="Admin Avatar" class="admin-avatar">
+              <div class="admin-user-info">
+                  <span class="admin-name">{{ current_user.name or current_user.email }}</span>
+                  <a href="{{ url_for('logout') }}" class="admin-logout-btn">Logout</a>
+              </div>
+          </div>
+      </div>
+  </header>
+
+{% elif is_admin_login %}
+  <!-- ✅ ADMIN LOGIN PAGE HEADER (before logging in) -->
+  <header class="admin-header admin-login">
+      <div class="admin-header-content">
+          <div class="admin-title-group">
+              <h1 class="admin-main-title">Admin Panel Login</h1>
+              <p class="admin-subtitle">Welcome back, administrator.</p>
+          </div>
+      </div>
+  </header>
+
+{% else %}
+  <!-- ✅ CX HEADER (dashboard or compact) -->
+  <header class="{% if dashboard_header %}dashboard-header{% else %}compact-header{% endif %}">
       {% if dashboard_header %}
-        <h1 class="main-title">Welcome to Corona Telecom</h1>
-        <p class="subtitle">Empowering through connectivity.</p>
+          <div class="header-content">
+              <h1 class="main-title-bold">Welcome to Corona Telecom</h1>
+              <p class="subtitle-minimal">Empowering through connectivity.</p>
+          </div>
       {% else %}
-        <img src="{{ url_for('static', filename='logo2.png') }}" alt="Corona Telecom" class="logo">
-        <h1 class="tagline">Empowering through connectivity.</h1>
+          <img src="{{ url_for('static', filename='header.png') }}" alt="Corona Telecom Logo" class="header-image">
       {% endif %}
-    </header>
+  </header>
+{% endif %}
 
 
 
@@ -73,8 +106,8 @@
         <div class="footer-section footer-bottom">
         <h3>Developers</h3>
         <p>&copy; 2025 Corona Telecom. All rights reserved.</p>
-		<p>&trade; Web Creator: Engr. Lim</p>
-		<p>&trade; Web Designer: Arch. Zxak</p>
+		<p>&trade; Web Creator: WonderTech</p>
+		<p>&trade; Web Designer: WonderTech</p>
     </div>
 
     
