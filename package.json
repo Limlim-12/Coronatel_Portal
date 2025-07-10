@@ -4,7 +4,7 @@
   "main": "purgecss.config.js",
   "scripts": {
     "dev": "echo 'Running in dev mode (full CSS used)'",
-    "purge": "purgecss --content templates/**/*.html --css static/css/style.css --output static/css/purged.css",
+    "purge": "purgecss --content templates/**/*.html --css static/css/style.css --output static/css/",
     "build": "npm run purge",
     "watch": "npx chokidar 'templates/**/*.html' 'static/css/style.css' -c 'npm run purge'"
   },

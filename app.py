@@ -10,7 +10,9 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_migrate import Migrate
 from flask_login import login_user, login_required, logout_user, current_user # Removed LoginManager here
 from datetime import datetime, date
+from pytz import timezone
 from extensions import db, login_manager, mail # Keep this import
+from mailer import send_request_status_email  # Make sure this is imported at the top
 import pytz
 import os
 
@@ -35,6 +37,9 @@ app.config['MAIL_PASSWORD'] = 'ttxjsetcjlddstss'  # Use Gmail App Password
 app.config['MAIL_DEFAULT_SENDER'] = ('Corona Telecom', 'lim.coronatel@gmail.com')
 
 mail = Mail(app)
+
+philippines_tz = timezone('Asia/Manila')
+now_ph = datetime.now(philippines_tz)
 
 app.secret_key = 'admin123coronatel'  # already done if using app.config['SECRET_KEY']
 login_manager.init_app(app)
@@ -180,25 +185,9 @@ def cx_dashboard():
     soa_files = SOA.query.filter_by(cx_id=current_user.id).order_by(SOA.uploaded_at.desc()).all()
 
 
-    # Build payment notifications
-    payment_notifications = []
-    for proof in uploads:
-        if proof.status == 'VERIFIED':
-            msg = f"✅ Your payment from {proof.payment_date.strftime('%b %d')} was marked as VERIFIED."
-        elif proof.status == 'REJECTED':
-            msg = f"❌ Your payment from {proof.payment_date.strftime('%b %d')} was REJECTED. Please re-upload."
-        elif proof.status == 'PENDING':
-            msg = f"⏳ Your payment from {proof.payment_date.strftime('%b %d')} is still pending verification."
-        else:
-            msg = f"ℹ️ Your payment from {proof.payment_date.strftime('%b %d')} has status: {proof.status}."
+  # Load all notifications from the Notification table
+    all_notifications = Notification.query.filter_by(cx_id=current_user.id).order_by(Notification.created_at.desc()).all()
 
-        payment_notifications.append({
-            'id': proof.id,
-            'date': proof.payment_date.strftime('%b %d, %Y'),
-            'amount': proof.amount,
-            'status': proof.status,
-            'message': msg
-        })
 
     return render_template(
         'cx/dashboard.html',
@@ -208,7 +197,7 @@ def cx_dashboard():
         dashboard_header=True,
         previous_uploads=uploads,
         user_requests=requests,
-        payment_notifications=payment_notifications,
+        all_notifications=all_notifications,
         verified=verified,
         now=datetime.now(),
         previous_rebates=previous_rebates,             
@@ -305,8 +294,8 @@ def rebate_request():
         billing_to=billing_to,
         amount=float(rebate_amount) if rebate_amount else None,
         soa_filename=filename,
-        uploaded_at=datetime.utcnow(),
-        created_at=datetime.utcnow(),
+        uploaded_at=datetime.now(timezone('Asia/Manila')),
+        created_at=datetime.now(timezone('Asia/Manila')),
         status='PENDING'
     )
 
@@ -408,18 +397,16 @@ def admin_login():
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
-
-        admin = AdminUser.query.filter_by(email=email).first()
-
+        admin = AdminUser .query.filter_by(email=email).first()
+        # Check if admin exists and password is correct
         if admin and admin.check_password(password):
-            session['user_type'] = 'admin'
-            login_user(admin)
+            session['user_type'] = 'admin'  # Set session variable for admin
+            login_user(admin)  # Log the user in
             flash('Logged in successfully!', 'success')
-            return redirect(url_for('admin_dashboard'))
+            return redirect(url_for('admin_dashboard'))  # Redirect to admin dashboard
         else:
-            flash('Invalid credentials', 'danger')
-
-    return render_template('cx/login.html', is_admin_login=True)
+            flash('Invalid credentials', 'danger')  # Show error message
+    return render_template('cx/login.html', is_admin_login=True)  # Render login page
 
 
 
@@ -483,6 +470,7 @@ def admin_dashboard():
         abort(403)
 
     tab = request.args.get('tab', 'overview')
+    inner_tab = request.args.get('inner_tab', 'payments')
 
     customers = Cx.query.all()
     payment_proofs = PaymentProof.query.order_by(PaymentProof.uploaded_at.desc()).all()
@@ -494,6 +482,7 @@ def admin_dashboard():
     return render_template(
         template,
         active_tab=tab,
+        inner_tab=inner_tab,
         customers=customers,
         payment_proofs=payment_proofs,
         customer_requests=customer_requests
@@ -516,19 +505,40 @@ def admin_update_payment_status(proof_id):
 
     customer = proof.cx
     if customer and customer.email and new_status in ['VERIFIED', 'REJECTED']:
+    # Send email
         send_payment_status_email(
-            name=proof.cx.name,
-            email=proof.cx.email,
-            account_number=proof.cx.account_number,
-            status=new_status,
-            reference_number=proof.reference_number,
-            payment_date=proof.payment_date,
-            amount=proof.amount
-)
+        name=proof.cx.name,
+        email=proof.cx.email,
+        account_number=proof.cx.account_number,
+        status=new_status,
+        reference_number=proof.reference_number,
+        payment_date=proof.payment_date,
+        amount=proof.amount
+    )
+
+    # Create dashboard notification
+    payment_date_str = proof.payment_date.strftime('%B %d, %Y') if proof.payment_date else 'N/A'
+    message = (
+        f"Your payment of ₱{proof.amount:.2f} made on {payment_date_str} "
+        f"(Ref: {proof.reference_number}) has been {new_status}."
+    )
+
+    notif = Notification(
+        cx_id=customer.id,
+        notif_type='payment',
+        status=new_status,
+        amount=proof.amount,
+        reference_id=proof.reference_number,
+        message=message
+    )
+    db.session.add(notif)
+    db.session.commit()
+
 
 
     flash(f'Payment marked as {new_status} and customer has been notified.', 'success')
-    return redirect(url_for('admin_dashboard', tab='billing'))
+    return redirect(url_for('admin_dashboard', tab='billing', inner_tab='payments'))
+
 
 
 
@@ -546,6 +556,37 @@ def delete_notification(note_id):
     db.session.commit()
     return redirect(url_for('cx_dashboard'))
 
+@app.route('/admin/delete_payment/<int:proof_id>', methods=['POST'])
+@login_required
+def admin_delete_payment(proof_id):
+    proof = PaymentProof.query.get_or_404(proof_id)
+    db.session.delete(proof)
+    db.session.commit()
+    flash('Payment proof deleted.', 'success')
+    return redirect(url_for('admin_dashboard', tab='billing', inner_tab='payments'))
+
+@app.route('/admin/delete_request/<int:req_id>', methods=['POST'])
+@login_required
+def admin_delete_request(req_id):
+    req = CxRequest.query.get_or_404(req_id)
+    db.session.delete(req)
+    db.session.commit()
+    flash('Request deleted.', 'success')
+    return redirect(url_for('admin_dashboard', tab='billing', inner_tab='requests'))
+
+
+@app.route('/admin/delete_soa/<int:soa_id>', methods=['POST'])
+@login_required
+def admin_delete_soa(soa_id):
+    soa = SOA.query.get_or_404(soa_id)
+    db.session.delete(soa)
+    db.session.commit()
+    flash('SOA deleted.', 'success')
+    return redirect(url_for('admin_dashboard', tab='billing', inner_tab='soa-tab'))
+
+
+
+
 
 
 
@@ -554,38 +595,105 @@ def delete_notification(note_id):
 def admin_update_request_status(request_id):
     req = CxRequest.query.get_or_404(request_id)
     new_status = request.form.get('new_status')
+
     if new_status in ['APPROVED', 'REJECTED']:
         req.status = new_status
         db.session.commit()
-        flash(f'Request status updated to {new_status}.', 'success')
+
+        # ✅ Email notification (only if email exists)
+        if req.customer and req.customer.email:
+            send_request_status_email(
+                name=req.customer.name,
+                email=req.customer.email,
+                account_number=req.customer.account_number,
+                req_type=req.type,
+                status=new_status,
+                billing_from=req.billing_from.strftime('%b %d, %Y') if req.billing_from else 'N/A',
+                billing_to=req.billing_to.strftime('%b %d, %Y') if req.billing_to else 'N/A',
+                amount=req.amount
+            )
+
+        # ✅ Safely build message with checks
+        amount_str = f"₱{req.amount:.2f}" if req.amount is not None else "an unspecified amount"
+        billing_range = ""
+        if req.billing_from and req.billing_to:
+            billing_range = f" ({req.billing_from.strftime('%b %d')}–{req.billing_to.strftime('%b %d')})"
+        elif req.billing_from:
+            billing_range = f" (from {req.billing_from.strftime('%b %d')})"
+        elif req.billing_to:
+            billing_range = f" (until {req.billing_to.strftime('%b %d')})"
+
+        message = f"Your {req.type.lower()} request for {amount_str}{billing_range} has been {new_status}."
+
+        # ✅ Create dashboard notification
+        notif = Notification(
+            cx_id=req.customer.id,
+            notif_type=req.type.lower(),
+            status=new_status,
+            amount=req.amount,
+            reference_id=str(req.id),
+            message=message
+        )
+        db.session.add(notif)
+        db.session.commit()
+
+        flash(f'{req.type.capitalize()} request marked as {new_status} and customer notified.', 'success')
+    else:
+        flash('Invalid status update.', 'danger')
+
     return redirect(url_for('admin_dashboard', tab='billing'))
 
+
+
+
+
+from datetime import datetime
 
 @app.route('/admin/upload_soa', methods=['POST'])
 @login_required
 def admin_upload_soa():
     account_number = request.form.get('account_number')
+    billing_from = request.form.get('billing_from')
+    billing_to = request.form.get('billing_to')
     soa_file = request.files.get('soa_file')
 
+    # Check for file
     if not soa_file or soa_file.filename == '':
         flash('No file selected.', 'danger')
         return redirect(url_for('admin_dashboard', tab='billing'))
 
+    # Validate customer
     user = Cx.query.filter_by(account_number=account_number).first()
     if not user:
         flash('Account number not found.', 'danger')
         return redirect(url_for('admin_dashboard', tab='billing'))
 
+    # Parse billing dates
+    try:
+        billing_from_date = datetime.strptime(billing_from, "%Y-%m-%d").date()
+        billing_to_date = datetime.strptime(billing_to, "%Y-%m-%d").date()
+    except (TypeError, ValueError):
+        flash('Invalid billing period. Please select valid dates.', 'danger')
+        return redirect(url_for('admin_dashboard', tab='billing'))
+
+    # Save file
     filename = secure_filename(soa_file.filename)
     save_path = os.path.join(app.config['SOA_FOLDER'], filename)
     soa_file.save(save_path)
 
-    new_soa = SOA(cx_id=user.id, filename=filename)
+    # Create new SOA record
+    new_soa = SOA(
+        cx_id=user.id,
+        filename=filename,
+        billing_from=billing_from_date,
+        billing_to=billing_to_date
+    )
     db.session.add(new_soa)
     db.session.commit()
 
     flash(f'SOA uploaded for {user.name or user.email}', 'success')
     return redirect(url_for('admin_dashboard', tab='billing'))
+
 
 
 

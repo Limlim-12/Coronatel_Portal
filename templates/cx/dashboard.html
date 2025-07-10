@@ -1,249 +1,123 @@
 {% extends "base.html" %}
 {% block content %}
 
-<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-<button id="sidebarToggle" class="toggle-btn">☰</button>
-<div class="sidebar-overlay" id="sidebar-overlay"></div>
-
-<div class="main" id="main">
-    <div class="sidebar collapsed" id="sidebar">
-
-        <div class="sidebar-header">
-            <img src="{{ url_for('static', filename='uploads/' + (current_user.avatar or 'logo.jpg')) }}" alt="User Avatar" class="sidebar-avatar">
-            <h3 class="sidebar-user-name">{{ current_user.name }}</h3>
-            <p class="sidebar-account-number">Account No: {{ current_user.account_number or 'N/A' }}</p>
+<div class="tab-wrapper">
+    {% if active_tab == 'profile' %}
+    {% include 'cx/profile_tab.html' %}
+    {% elif active_tab == 'billing' %}
+    {% include 'cx/billing_tab.html' %}
+    {% else %}
+    <div class="profile-summary">
+        <div class="profile-header">
+            <div class="user-info">
+                <h2 class="greeting-text"><span id="time-greeting"></span>, {{ current_user.first_name or '' }}!</h2>
+            </div>
         </div>
-
-        <nav class="sidebar-nav">
-            <ul class="nav-links">
-                <li>
-                    <a href="{{ url_for('cx_dashboard') }}" class="sidebar-link {% if active_tab == 'dashboard' %}active{% endif %}">
-                        <i class="icon-dashboard"></i>
-                        <span>Dashboard</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ url_for('cx_dashboard', tab='profile') }}" class="sidebar-link {% if active_tab == 'profile' %}active{% endif %}">
-                        <i class="icon-profile"></i>
-                        <span>Profile</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ url_for('cx_dashboard', tab='billing') }}" class="sidebar-link {% if active_tab == 'billing' %}active{% endif %}">
-                        <i class="icon-billing"></i>
-                        <span>Billing & Payment</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ url_for('logout') }}" class="sidebar-link logout-link">
-                        <i class="icon-logout"></i>
-                        <span>Logout</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
     </div>
 
-    <div class="tab-wrapper">
-        {% if active_tab == 'profile' %}
-            {% include 'cx/profile_tab.html' %}
-        {% elif active_tab == 'billing' %}
-            {% include 'cx/billing_tab.html' %}
-        {% else %}
-
-            <div class="profile-summary">
-                <div class="profile-header">
-                    <div class="user-info">
-                    <h2 class="greeting-text"><span id="time-greeting"></span>, {{ current_user.first_name or '' }}!</h2>
+    <div class="dashboard-widgets-grid">
+        <div class="dashboard-card notifications-card">
+            <h2>Latest Notifications</h2>
+            {% if all_notifications %}
+            <ul class="notif-list">
+                {% for note in all_notifications[:5] %}
+                <li class="notif-box status-{{ note.status|lower }} type-{{ note.notif_type|lower }}">
+                    <div class="notif-main-content">
+                        <div class="notif-summary">
+                            <p class="notif-line">Type: <span class="notif-value">{{ note.notif_type.capitalize()
+                                    }}</span></p>
+                            <p class="notif-line">Status: <span class="notif-value">{{ note.status }}</span></p>
+                            <p class="notif-line">Date: <span class="notif-value">{{ note.created_at.strftime('%b %d,
+                                    %Y') if note.created_at else 'Unknown' }}</span></p>
+                            <button type="button" class="expand-toggle" onclick="toggleNotifDetail(this)">(click to
+                                expand)</button>
+                        </div>
+                        <div class="notif-detail hidden">
+                            <p class="detail-message">{{ note.message | safe }}</p>
+                        </div>
                     </div>
-                </div>
-            </div>
+                    <form method="POST" action="{{ url_for('delete_notification', note_id=note.id) }}"
+                        class="delete-form">
+                        <button type="submit" class="delete-btn" title="Delete Notification">🗑️</button>
+                    </form>
+                </li>
+                {% endfor %}
+            </ul>
 
-            <div class="dashboard-widgets-grid">
-               <div class="dashboard-card notifications-card">
-    <h2>Latest Notifications</h2>
-    
-    {% if payment_notifications %}
-      <ul class="notif-list">
-        {% for note in payment_notifications[:5] %}
-        <li class="notif-box status-{{ note.status|lower }}">
-            <div class="notif-main-content">
-                <div class="notif-summary">
-                    <p class="notif-line">
-                        Invoice #: <span class="notif-value">{{ note.invoice_number or note.id }}</span>
-                    </p>
-                    <p class="notif-line">
-                        Date of Payment: <span class="notif-value">{{ note.date if note.date else 'N/A' }}</span>
-                    </p>
-                    <p class="notif-line">
-                        Payment Status: <span class="notif-value">{{ note.status or 'N/A' }}</span>
-                    </p>
-                    <button type="button" class="expand-toggle" onclick="toggleNotifDetail(this)">
-                        (click to expand)
-                    </button>
-                </div>
-                <div class="notif-detail hidden">
-                    <p class="detail-message">
-                        {% if note.message %}
-                            {{ note.message | safe }}
-                        {% else %}
-                            Payment of ₱{{ note.amount or 'N/A' }} paid on {{ note.date.strftime('%B %d, %Y') if note.date else 'N/A' }} has been **{{ note.status or 'N/A' }}**.
-                            {% if note.reason %}<br>Reason: {{ note.reason }}{% endif %}
-                        {% endif %}
-                    </p>
-                </div>
-            </div>
-            <form method="POST" action="{{ url_for('delete_notification', note_id=note.id) }}" class="delete-form">
-                <button type="submit" class="delete-btn" title="Delete Notification">🗑️</button>
-            </form>
-        </li>
-        {% endfor %}
-      </ul>
+            {% if all_notifications|length > 5 %}
+            <button id="expandNotifBtn" onclick="toggleNotifications()">🔽 Show All</button>
+            <ul class="notif-list hidden notifications-dropdown" id="allNotifications">
+                {% for note in all_notifications[5:] %}
+                <li class="notif-box status-{{ note.status|lower }} type-{{ note.notif_type|lower }}">
+                    <div class="notif-main-content">
+                        <div class="notif-summary">
+                            <p class="notif-line">Type: <span class="notif-value">{{ note.notif_type.capitalize()
+                                    }}</span></p>
+                            <p class="notif-line">Status: <span class="notif-value">{{ note.status }}</span></p>
+                            <p class="notif-line">Date: <span class="notif-value">{{ note.created_at.strftime('%b %d,
+                                    %Y') if note.created_at else 'Unknown' }}</span></p>
+                            <button type="button" class="expand-toggle" onclick="toggleNotifDetail(this)">(click to
+                                expand)</button>
+                        </div>
+                        <div class="notif-detail hidden">
+                            <p class="detail-message">{{ note.message | safe }}</p>
+                        </div>
+                    </div>
+                    <form method="POST" action="{{ url_for('delete_notification', note_id=note.id) }}"
+                        class="delete-form">
+                        <button type="submit" class="delete-btn" title="Delete Notification">🗑️</button>
+                    </form>
+                </li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+            {% else %}
+            <p>No new notifications at this time.</p>
+            {% endif %}
+        </div>
 
-      {% if payment_notifications|length > 5 %}
-      <button id="expandNotifBtn" onclick="toggleNotifications()">🔽 Show All</button>
-      <ul class="notif-list hidden notifications-dropdown" id="allNotifications"> {# Added notifications-dropdown class here #}
-        {% for note in payment_notifications[5:] %}
-        <li class="notif-box status-{{ note.status|lower }}">
-            <div class="notif-main-content">
-                <div class="notif-summary">
-                    <p class="notif-line">
-                        Invoice #: <span class="notif-value">{{ note.invoice_number or note.id }}</span>
-                    </p>
-                    <p class="notif-line">
-                        Date of Payment: <span class="notif-value">{{ note.timestamp.strftime('%B %d, %Y') if note.timestamp else 'N/A' }}</span>                    </p>
-                    <p class="notif-line">
-                        Payment Status: <span class="notif-value">{{ note.status or 'N/A' }}</span>
-                    </p>
-                    <button type="button" class="expand-toggle" onclick="toggleNotifDetail(this)">
-                        (click to expand)
-                    </button>
-                </div>
-                <div class="notif-detail hidden">
-                    <p class="detail-message">
-                        {% if note.message %}
-                            {{ note.message | safe }}
-                        {% else %}
-                            Payment of ₱{{ note.amount or 'N/A' }} paid on {{ note.timestamp.strftime('%B %d, %Y') if note.timestamp else 'N/A' }} has been **{{ note.status or 'N/A' }}**.
-                            {% if note.reason %}<br>Reason: {{ note.reason }}{% endif %}
-                        {% endif %}
-                    </p>
-                </div>
+        <div class="dashboard-card status-usage-card">
+            <h2>Account Status</h2>
+            <p><strong>Status:</strong> Active</p>
+            <p><strong>Billing Cycle:</strong> 01/07/2025 - 31/07/2025</p>
+            <p><strong>Due Date:</strong> 25/07/2025</p>
+
+            <h2 class="mt-4">Internet Usage</h2>
+            <p><strong>Data Used:</strong> 150 GB / 500 GB</p>
+            <div class="progress-bar-container">
+                <div class="progress-bar" style="width: 30%;"></div>
             </div>
-            <form method="POST" action="{{ url_for('delete_notification', note_id=note.id) }}" class="delete-form">
-                <button type="submit" class="delete-btn" title="Delete Notification">🗑️</button>
-            </form>
-        </li>
-        {% endfor %}
-      </ul>
-      {% endif %}
-      
-    {% else %}
-      <p>No new notifications at this time.</p>
+            <p><small>Next reset: in 15 days</small></p>
+        </div>
+    </div>
+
+    <div class="dashboard-card about-us-container">
+        <h2>ABOUT CORONA TELECOM</h2>
+        <p>Welcome to Corona Telecom! We are committed to providing reliable internet services and exceptional customer
+            support to keep you connected.</p>
+        <p>Learn more about our services and values on our <a href="#">About Us page</a>.</p>
+    </div>
     {% endif %}
 </div>
 
-                <div class="dashboard-card status-usage-card">
-                    <h2>Account Status</h2>
-                    <p><strong>Status:</strong> Active</p>
-                    <p><strong>Billing Cycle:</strong> 01/07/2025 - 31/07/2025</p>
-                    <p><strong>Due Date:</strong> 25/07/2025</p>
-
-                    <h2 class="mt-4">Internet Usage</h2>
-                    <p><strong>Data Used:</strong> 150 GB / 500 GB</p>
-                    <div class="progress-bar-container">
-                      <div class="progress-bar" style="width: 30%;"></div> {# Example: 30% usage. Adjust 'width' dynamically with Jinja if needed #}
-                    </div>
-                    <p><small>Next reset: in 15 days</small></p>
-                </div>
-            </div>
-
-            <div class="dashboard-card about-us-container">
-                <h2>ABOUT CORONA TELECOM</h2>
-                <p>Welcome to Corona Telecom! We are committed to providing reliable internet services and exceptional customer support to keep you connected. Our mission is to empower communities through seamless digital experiences.</p>
-                <p>Learn more about our services and values on our <a href="#">About Us page</a>.</p>
-            </div>
-        {% endif %} {# <-- THIS IS THE CRUCIAL {% endif %} THAT CLOSES THE 'if active_tab' BLOCK #}
-    </div> {# Closes .tab-wrapper #}
-</div> {# Closes .main #}
-
-
 {% if verified == 'true' %}
 <script>
-Swal.fire({
-    title: 'Payment Verified!',
-    text: 'Your uploaded proof of payment has been marked as VERIFIED.',
-    icon: 'success',
-    confirmButtonColor: '#1a7f37'
-});
+    Swal.fire({
+        title: 'Payment Verified!',
+        text: 'Your uploaded proof of payment has been marked as VERIFIED.',
+        icon: 'success',
+        confirmButtonColor: '#1a7f37'
+    });
 </script>
 {% endif %}
 
-{# -- CX Dashboard Notification (Triggered from verified param or session) -- #}
 {% if user_notification %}
 <script>
-Swal.fire({
-  title: 'Payment Update!',
-  text: "{{ user_notification }}",
-  icon: 'info',
-  confirmButtonColor: '#FF325C'
-});
-</script>
-{% endif %}
-
-
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-  const sidebar = document.getElementById('sidebar');
-  const main = document.getElementById('main'); // 'main' is now the id
-  const toggleBtn = document.getElementById('sidebarToggle');
-  const overlay = document.getElementById('sidebar-overlay');
-
-  // Ensure all necessary elements exist before adding event listeners
-  if (!sidebar || !main || !toggleBtn || !overlay) {
-      console.error("One or more essential sidebar elements not found in the DOM.");
-      return;
-  }
-
-  // Event listener for the toggle button
-  toggleBtn.addEventListener('click', function (e) {
-    e.stopPropagation(); // Prevents click from propagating to overlay/document
-    sidebar.classList.toggle('active');
-    sidebar.classList.toggle('collapsed'); // Correctly toggle 'collapsed' too
-    overlay.classList.toggle('active');
-    document.body.classList.toggle('sidebar-open'); // For body styling (e.g., preventing scroll)
-  });
-
-  // Event listeners for sidebar links (to close sidebar on mobile navigation)
-  document.querySelectorAll('.sidebar-link').forEach(link => {
-    link.addEventListener('click', function () {
-      if (window.innerWidth <= 768) { // Only close on smaller screens
-        sidebar.classList.remove('active');
-        sidebar.classList.add('collapsed'); // Ensure it goes back to collapsed state
-        overlay.classList.remove('active'); // Hide the overlay
-        document.body.classList.remove('sidebar-open');
-      }
-    });
-  });
-
-  // Event listener for clicking the overlay (to close sidebar)
-  overlay.addEventListener('click', function () {
-    sidebar.classList.remove('active');
-    sidebar.classList.add('collapsed'); // Ensure it goes back to collapsed state
-    overlay.classList.remove('active'); // Hide the overlay
-    document.body.classList.remove('sidebar-open');
-  });
-});
-</script>
-
-
-{% if request.args.get('uploaded') == 'true' %}
-<script>
     Swal.fire({
-      title: 'Upload Successful!',
-      text: 'Your proof of payment was uploaded successfully.',
-      icon: 'success',
-      confirmButtonColor: '#FF325C'
+        title: 'Payment Update!',
+        text: "{{ user_notification }}",
+        icon: 'info',
+        confirmButtonColor: '#FF325C'
     });
 </script>
 {% endif %}
@@ -252,53 +126,30 @@ document.addEventListener('DOMContentLoaded', function () {
     function setGreeting() {
         const greetingElement = document.getElementById('time-greeting');
         if (!greetingElement) return;
-
         const now = new Date();
         const hour = now.getHours();
         let greeting = '';
-
-        if (hour >= 5 && hour < 12) {
-            greeting = 'Good Morning';
-        } else if (hour >= 12 && hour < 18) {
-            greeting = 'Good Afternoon';
-        } else {
-            greeting = 'Good Evening';
-        }
-
+        if (hour >= 5 && hour < 12) greeting = 'Good Morning';
+        else if (hour >= 12 && hour < 18) greeting = 'Good Afternoon';
+        else greeting = 'Good Evening';
         greetingElement.textContent = greeting;
     }
 
     document.addEventListener('DOMContentLoaded', setGreeting);
-</script>
 
-<script>
-// --- New JavaScript for individual notification expand/collapse ---
-function toggleNotifDetail(button) {
-    const notifBox = button.closest('.notif-box'); // Finds the nearest parent with class 'notif-box'
-    const detailContent = notifBox.querySelector('.notif-detail'); // Finds the hidden detail div within that box
-
-    if (detailContent.classList.contains('hidden')) {
-        detailContent.classList.remove('hidden');
-        button.textContent = '(click to hide)'; // Change button text
-    } else {
-        detailContent.classList.add('hidden');
-        button.textContent = '(click to expand)'; // Change button text back
+    function toggleNotifDetail(button) {
+        const notifBox = button.closest('.notif-box');
+        const detail = notifBox.querySelector('.notif-detail');
+        detail.classList.toggle('hidden');
+        button.textContent = detail.classList.contains('hidden') ? '(click to expand)' : '(click to hide)';
     }
-}
 
-  function toggleNotifications() {
-    const allNotifs = document.getElementById("allNotifications");
-    const button = document.getElementById("expandNotifBtn");
-
-    if (allNotifs.classList.contains("hidden")) {
-      allNotifs.classList.remove("hidden");
-      button.innerHTML = "🔼 Show Less";
-    } else {
-      allNotifs.classList.add("hidden");
-      button.innerHTML = "🔽 Show All";
+    function toggleNotifications() {
+        const all = document.getElementById("allNotifications");
+        const btn = document.getElementById("expandNotifBtn");
+        all.classList.toggle("hidden");
+        btn.innerHTML = all.classList.contains("hidden") ? "🔽 Show All" : "🔼 Show Less";
     }
-  }
 </script>
-
 
 {% endblock %}

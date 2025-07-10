@@ -4,6 +4,11 @@ from extensions import db
 from flask_login import UserMixin
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
+from pytz import timezone
+
+def now_manila():
+    return datetime.now(timezone('Asia/Manila'))
+
 
 # Customer/User model
 class Cx(db.Model, UserMixin):
@@ -51,7 +56,7 @@ class PaymentProof(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     filename = db.Column(db.String(255))
     cx_id = db.Column(db.Integer, db.ForeignKey('cx.id'))
-    uploaded_at = db.Column(db.DateTime, default=datetime.utcnow)
+    uploaded_at = db.Column(db.DateTime, default=now_manila)
     reference_number = db.Column(db.String(100))
     payment_date = db.Column(db.Date)
     amount = db.Column(db.Float)
@@ -74,8 +79,8 @@ class CxRequest(db.Model):
     billing_to = db.Column(db.Date)
     amount = db.Column(db.Float)
     soa_filename = db.Column(db.String(255))
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    uploaded_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=now_manila)
+    uploaded_at = db.Column(db.DateTime, default=now_manila)
     status = db.Column(db.String(20), default='PENDING')
     admin_note = db.Column(db.Text)  # Admin feedback
     response_note = db.Column(db.Text)  # Customer reply
@@ -87,19 +92,31 @@ class CxRequest(db.Model):
 class SOA(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     cx_id = db.Column(db.Integer, db.ForeignKey('cx.id'), nullable=False)
-    filename = db.Column(db.String(255), nullable=False)
-    uploaded_at = db.Column(db.DateTime, default=datetime.utcnow)
+    filename = db.Column(db.String(255))
+    uploaded_at = db.Column(db.DateTime, default=datetime.now)
+    billing_from = db.Column(db.Date)
+    billing_to = db.Column(db.Date)
 
     cx = db.relationship('Cx', backref='soa_files')
     
 class Notification(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    
+    # Link to customer
     cx_id = db.Column(db.Integer, db.ForeignKey('cx.id'), nullable=False)
+    
+    # Core content
     message = db.Column(db.Text, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=now_manila)
+
+    # Optional metadata (for filtering or sorting)
+    notif_type = db.Column(db.String(50))  # e.g., 'payment', 'rebate', 'overcharge'
+    status = db.Column(db.String(50))      # e.g., 'VERIFIED', 'APPROVED', etc.
+    amount = db.Column(db.Float)           # Optional amount reference
+    reference_id = db.Column(db.String(100))  # Ref No or Invoice, optional
 
     def __repr__(self):
-        return f"<Notification for Cx {self.cx_id} - {self.message[:30]}...>"
+        return f"<Notification cx_id={self.cx_id}, type={self.notif_type}, status={self.status}>"
     
 
 class AdminUser(db.Model, UserMixin):

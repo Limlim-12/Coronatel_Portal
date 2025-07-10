@@ -1,141 +1,64 @@
 {% extends "base.html" %}
 {% block content %}
 
-<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-<button id="sidebarToggle" class="toggle-btn">☰</button>
-<div class="sidebar-overlay" id="sidebar-overlay"></div>
-
-<div class="main" id="main">
-  <div class="sidebar collapsed" id="sidebar">
-    <!-- Sidebar remains the same -->
-    <div class="sidebar-header">
-      <img src="{{ url_for('static', filename='images/' + (current_user.avatar or 'admin.png')) }}" alt="Admin Avatar" class="sidebar-avatar">
-      <h3 class="sidebar-user-name">{{ current_user.name }}</h3>
-      <p class="sidebar-account-number">Role: Admin</p>
+<div class="tab-wrapper">
+  {% if active_tab == 'billing' %}
+  {% include 'admin/billing_tab.html' %}
+  {% elif active_tab == 'users' %}
+  {% include 'admin/users_tab.html' %}
+  {% else %}
+  <!-- Default Dashboard Overview -->
+  <div class="profile-summary">
+    <div class="profile-header">
+      <div class="user-info">
+        <h2 class="greeting-text"><span id="time-greeting"></span>, Admin {{ current_user.name or '' }}!</h2>
+        <p>Here’s an overview of recent activity on Corona Telecom.</p>
+      </div>
     </div>
-    <nav class="sidebar-nav">
-      <ul class="nav-links">
-        <li>
-          <a href="{{ url_for('admin_dashboard') }}" class="sidebar-link {% if active_tab == 'overview' %}active{% endif %}">
-            <i class="icon-dashboard"></i><span>Dashboard</span>
-          </a>
-        </li>
-        <li>
-          <a href="{{ url_for('admin_dashboard', tab='users') }}" class="sidebar-link {% if active_tab == 'users' %}active{% endif %}">
-            <i class="icon-users"></i><span>Manage Users</span>
-          </a>
-        </li>
-        <li>
-          <a href="{{ url_for('admin_dashboard', tab='billing') }}" class="sidebar-link {% if active_tab == 'billing' %}active{% endif %}">
-            <i class="icon-billing"></i><span>Billing & Payment</span>
-          </a>
-        </li>
-      </ul>
-    </nav>
   </div>
 
-  <!-- This wrapper shows the correct tab OR the default dashboard -->
-  <div class="tab-wrapper">
-    {% if active_tab == 'billing' %}
-      {% include 'admin/billing_tab.html' %}
-    {% elif active_tab == 'users' %}
-      {% include 'admin/users_tab.html' %}
-    {% else %}
-      <!-- Default Dashboard Overview -->
-      <div class="profile-summary">
-        <div class="profile-header">
-          <div class="user-info">
-            <h2 class="greeting-text"><span id="time-greeting"></span>, Admin {{ current_user.name or '' }}!</h2>
-            <p>Here’s an overview of recent activity on Corona Telecom.</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="dashboard-widgets-grid">
-        <div class="dashboard-card notifications-card">
-          <h2>Pending Requests</h2>
-          <p>No new customer requests at this time.</p>
-        </div>
-        <div class="dashboard-card status-usage-card">
-          <h2>System Summary</h2>
-          <p><strong>Total Customers:</strong> 1245</p>
-          <p><strong>Active Requests:</strong> 12</p>
-          <p><strong>Open Tickets:</strong> 4</p>
-          <p><strong>Recent Logins:</strong> 38 today</p>
-        </div>
-      </div>
-
-      <div class="dashboard-card about-us-container">
-        <h2>ADMIN PANEL - CORONA TELECOM</h2>
-        <p>This admin panel lets you monitor system activity, assist customers, and manage data and requests.</p>
-      </div>
-    {% endif %}
+  <div class="dashboard-widgets-grid">
+    <div class="dashboard-card notifications-card">
+      <h2>Pending Requests</h2>
+      <p>No new customer requests at this time.</p>
+    </div>
+    <div class="dashboard-card status-usage-card">
+      <h2>System Summary</h2>
+      <p><strong>Total Customers:</strong> 1245</p>
+      <p><strong>Active Requests:</strong> 12</p>
+      <p><strong>Open Tickets:</strong> 4</p>
+      <p><strong>Recent Logins:</strong> 38 today</p>
+    </div>
   </div>
+
+  <div class="dashboard-card about-us-container">
+    <h2>ADMIN PANEL - CORONA TELECOM</h2>
+    <p>This admin panel lets you monitor system activity, assist customers, and manage data and requests.</p>
+  </div>
+  {% endif %}
 </div>
 
-
-
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-  const sidebar = document.getElementById('sidebar');
-  const main = document.getElementById('main');
-  const toggleBtn = document.getElementById('sidebarToggle');
-  const overlay = document.getElementById('sidebar-overlay');
+  function setGreeting() {
+    const greetingElement = document.getElementById('time-greeting');
+    if (!greetingElement) return;
 
-  if (!sidebar || !main || !toggleBtn || !overlay) {
-    console.error("Missing admin sidebar elements.");
-    return;
-  }
+    const now = new Date();
+    const hour = now.getHours();
+    let greeting = '';
 
-  toggleBtn.addEventListener('click', function (e) {
-    e.stopPropagation();
-    sidebar.classList.toggle('active');
-    sidebar.classList.toggle('collapsed');
-    overlay.classList.toggle('active');
-    document.body.classList.toggle('sidebar-open');
-  });
-
-  overlay.addEventListener('click', function () {
-    sidebar.classList.remove('active');
-    sidebar.classList.add('collapsed');
-    overlay.classList.remove('active');
-    document.body.classList.remove('sidebar-open');
-  });
-
-  document.querySelectorAll('.sidebar-link').forEach(link => {
-    link.addEventListener('click', function () {
-      if (window.innerWidth <= 768) {
-        sidebar.classList.remove('active');
-        sidebar.classList.add('collapsed');
-        overlay.classList.remove('active');
-        document.body.classList.remove('sidebar-open');
-      }
-    });
-  });
-});
-</script>
-
-<script>
-    function setGreeting() {
-        const greetingElement = document.getElementById('time-greeting');
-        if (!greetingElement) return;
-
-        const now = new Date();
-        const hour = now.getHours();
-        let greeting = '';
-
-        if (hour >= 5 && hour < 12) {
-            greeting = 'Good Morning';
-        } else if (hour >= 12 && hour < 18) {
-            greeting = 'Good Afternoon';
-        } else {
-            greeting = 'Good Evening';
-        }
-
-        greetingElement.textContent = greeting;
+    if (hour >= 5 && hour < 12) {
+      greeting = 'Good Morning';
+    } else if (hour >= 12 && hour < 18) {
+      greeting = 'Good Afternoon';
+    } else {
+      greeting = 'Good Evening';
     }
 
-    document.addEventListener('DOMContentLoaded', setGreeting);
+    greetingElement.textContent = greeting;
+  }
+
+  document.addEventListener('DOMContentLoaded', setGreeting);
 </script>
 
 {% endblock %}

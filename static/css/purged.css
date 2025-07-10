@@ -794,7 +794,7 @@ h1, p {
 
 
 /* --- Buttons --- */
-.btn, button, .toggle-btn {
+.btn, button {
     background-color: #FF325C;
     color: white;
     border: none;

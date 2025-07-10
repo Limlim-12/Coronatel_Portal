@@ -69,3 +69,81 @@ billing@coronatel.com
     # Use Flask-Mail to send
     msg = Message(subject=subject, recipients=[email], body=body)
     mail.send(msg)
+
+
+
+def send_request_status_email(name, email, account_number, req_type, status, billing_from, billing_to, amount):
+    req_type_clean = req_type.capitalize()
+    subject = f"[Corona Telecom] {req_type_clean} Request {status}"
+
+    if status == 'APPROVED':
+        body = f"""
+Hi {name},
+
+Good day!
+
+We are pleased to inform you that your recent {req_type} request has been approved.
+
+Here are the details of your request:
+
+Request Type: {req_type_clean}  
+Billing Period: {billing_from} to {billing_to}  
+Approved Amount: Php {amount}  
+Account Number: {account_number}
+
+The approved amount will be reflected in your upcoming billing cycle.
+
+Should you have any questions or require further assistance, feel free to reply to this email.
+
+Thank you for being a valued customer of Corona Telecom.
+
+Best regards,  
+Billing Team  
+billing@coronatel.com
+"""
+    elif status == 'REJECTED':
+        body = f"""
+Hi {name},
+
+Good day.
+
+We’re writing to inform you that after reviewing your recent {req_type} request, we are unable to approve it at this time.
+
+Here are the request details:
+
+Request Type: {req_type_clean}  
+Billing Period: {billing_from} to {billing_to}  
+Requested Amount: Php {amount}  
+Account Number: {account_number}
+
+If you believe this decision was made in error or you have more documents or clarification to provide, please feel free to reply to this email so we may reevaluate your request.
+
+We appreciate your understanding.
+
+Best regards,  
+Billing Team  
+billing@coronatel.com
+"""
+    else:
+        return  # Only send email for APPROVED or REJECTED
+
+    msg = Message(subject=subject, recipients=[email], body=body)
+    mail.send(msg)
+    subject = f"[Corona Telecom] Your {req_type.capitalize()} Request was {status.capitalize()}"
+    status_icon = "✅" if status.upper() == "APPROVED" else "❌"
+
+    html = f"""
+    <h3>{status_icon} Hello, {name}!</h3>
+    <p>This is to inform you that your <strong>{req_type}</strong> request has been <strong>{status}</strong>.</p>
+    <ul>
+        <li><strong>Account No:</strong> {account_number}</li>
+        <li><strong>Billing Period:</strong> {billing_from} to {billing_to}</li>
+        <li><strong>Amount:</strong> ₱{amount}</li>
+    </ul>
+    <p>If you have further concerns, feel free to reply to this email or reach out to customer support.</p>
+    <br>
+    <p>Thank you for choosing Corona Telecom.</p>
+    """
+
+    msg = Message(subject, recipients=[email], html=html)
+    mail.send(msg)

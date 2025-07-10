@@ -1,4 +1,10 @@
 <div class="billing-section">
+    <div class="billing-search-container">
+        <input type="text" id="billing-global-search" class="billing-search-input" placeholder="🔍 Search..."
+            oninput="filterByTab()">
+    </div>
+      
+      
     <!-- 🔄 Replaced tab buttons with feature grid -->
     <div class="features-grid billing-features">
     <div class="feature-card billing-feature-card active" onclick="showTab('upload', this)" data-tab="upload">
@@ -284,73 +290,131 @@
 </div>
 
     
-    
-    <div id="soa" class="tab-content">
-  <h3>Statements of Account</h3>
+<div id="soa" class="tab-content">
+    <div class="cx_soa">
+        <h3 class="tab-section-title">Statements of Account</h3>
 
-  {% if soa_files %}
-    <div class="soa-history">
-      {% for soa in soa_files %}
-        <div class="soa-card">
-          <div class="soa-card-header-line">
-            <div class="soa-main-info">
-              <span>{{ current_user.location_region or 'N/A' }}</span>
-              <span class="separator">|</span>
-              <span>{{ current_user.name or 'N/A' }}</span>
-              <span class="separator">|</span>
-              <span>{{ current_user.account_number or 'N/A' }}</span>
+        {% if soa_files %}
+        <div class="soa-history">
+            {% for soa in soa_files %}
+            <div class="soa-card minimal">
+                <div class="soa-card-header">
+                    <div class="soa-user-meta">
+                        <span>{{ current_user.location_region or 'N/A' }}</span>
+                        <span class="dot-separator"></span>
+                        <span>{{ current_user.name or 'N/A' }}</span>
+                        <span class="dot-separator"></span>  
+                        <span>{{ current_user.account_number or 'N/A' }}</span>
+                    </div>
+                    <div class="soa-upload-meta">
+                        <span class="upload-date">
+                            {{ soa.uploaded_at.strftime('%b %d, %Y %I:%M %p') if soa.uploaded_at else 'N/A' }}
+                        </span>
+                        <a href="{{ url_for('static', filename='soa/' + soa.filename) }}" class="soa-download-link"
+                            download>
+                            📥 Download
+                        </a>
+                    </div>
+                </div>
+
+                <div class="soa-card-body">
+                    {% if soa.billing_from and soa.billing_to %}
+                    <div class="soa-billing-period">
+                        <label>Billing Period:</label>
+                        <span>{{ soa.billing_from.strftime('%b %d, %Y') }} – {{ soa.billing_to.strftime('%b %d, %Y')
+                            }}</span>
+                    </div>
+                    {% endif %}
+
+                    <div class="soa-file-name">
+                        <label>File:</label>
+                        <span>{{ soa.filename }}</span>
+                    </div>
+                </div>
             </div>
-            <div class="soa-secondary-info">
-              <span class="soa-posted-date">
-                <strong>Posted:</strong>
-                {{ soa.uploaded_at.strftime('%b %d, %Y %I:%M %p') if soa.uploaded_at else 'N/A' }}
-              </span>
-              <a class="view-proof-link" href="{{ url_for('static', filename='soa/' + soa.filename) }}" download>
-                📥 Download SOA
-              </a>
-            </div>
-          </div>
-          <div class="soa-card-details">
-            <p><strong>Filename:</strong> {{ soa.filename }}</p>
-          </div>
+            {% endfor %}
         </div>
-      {% endfor %}
+        {% else %}
+        <p class="soa-empty-message">No statements available at the moment.</p>
+        {% endif %}
     </div>
-  {% else %}
-    <p>No statements available at the moment.</p>
-  {% endif %}
 </div>
+  
+  
+  
 
     
     
     
     
+<script>
+    function filterByTab() {
+        const query = document.getElementById('billing-global-search').value.toLowerCase();
+        const activeTab = document.querySelector('.tab-content.active');
+        if (!activeTab) return;
+
+        // Payment Verification Tab
+        if (activeTab.id === 'upload') {
+            document.querySelectorAll('.proof-card').forEach(card => {
+                const ref = card.querySelector('p strong')?.nextSibling?.textContent?.toLowerCase() || '';
+                const date = card.querySelector('.proof-card-details p:nth-child(3)')?.textContent.toLowerCase() || '';
+                const status = card.querySelector('.proof-status')?.textContent.toLowerCase() || '';
+
+                if (ref.includes(query) || date.includes(query) || status.includes(query)) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Rebate Tab
+        else if (activeTab.id === 'rebate') {
+            document.querySelectorAll('.rebate-card').forEach(card => {
+                const cycle = card.querySelector('.rebate-card-details p:nth-child(1)')?.textContent.toLowerCase() || '';
+                const amount = card.querySelector('.rebate-card-details p:nth-child(2)')?.textContent.toLowerCase() || '';
+                const status = card.querySelector('.rebate-status')?.textContent.toLowerCase() || '';
+
+                if (cycle.includes(query) || amount.includes(query) || status.includes(query)) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Overcharge Tab
+        else if (activeTab.id === 'overcharge') {
+            document.querySelectorAll('.overcharge-card').forEach(card => {
+                const cycle = card.querySelector('.overcharge-card-details p:nth-child(1)')?.textContent.toLowerCase() || '';
+                const status = card.querySelector('.overcharge-status')?.textContent.toLowerCase() || '';
+
+                if (cycle.includes(query) || status.includes(query)) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // SOA Tab
+        else if (activeTab.id === 'soa') {
+            document.querySelectorAll('.soa-card').forEach(card => {
+                const file = card.querySelector('.soa-file-name span')?.textContent.toLowerCase() || '';
+                const cycle = card.querySelector('.soa-billing-period span')?.textContent.toLowerCase() || '';
+
+                if (file.includes(query) || cycle.includes(query)) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+    }
+</script>
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+  
+   
   <script>
     function showTab(tabId, clickedElement) {
         // Remove 'active' from all feature cards
@@ -409,4 +473,25 @@
     document.getElementById("soa_file_overcharge").addEventListener("change", function () {
         document.getElementById("soa-file-name-overcharge").textContent = this.files[0]?.name || "No file chosen";
     });
+
+    const searchInput = document.getElementById('billing-global-search');
+        if (searchInput) {
+            switch (tabId) {
+                case 'upload':
+                    searchInput.placeholder = '🔍 Search by Reference No, Date, or Status';
+                    break;
+                case 'rebate':
+                    searchInput.placeholder = '🔍 Search by Rebate Amount, Billing Cycle, or Status';
+                    break;
+                case 'overcharge':
+                    searchInput.placeholder = '🔍 Search by Billing Cycle or Status';
+                    break;
+                case 'soa':
+                    searchInput.placeholder = '🔍 Search by File Name or Billing Cycle';
+                    break;
+                default:
+                    searchInput.placeholder = '🔍 Search...';
+            }
+        }
+
 </script>

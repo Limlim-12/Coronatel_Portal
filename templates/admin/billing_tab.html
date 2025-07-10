@@ -3,21 +3,26 @@
 {% block content %}
 <div class="billing-section">
   <div class="billing-tabs-container">
-    <button class="tab-btn active" onclick="showAdminTab('payments', this)">📤 Payment Verifications</button>
-    <button class="tab-btn" onclick="showAdminTab('requests', this)">🧾 Rebate & Overcharge</button>
-    <button class="tab-btn" onclick="showAdminTab('soa-tab', this)">📁 SOA Management</button>
+    <button class="tab-btn {% if inner_tab == 'payments' %}active{% endif %}" onclick="showAdminTab('payments', this)">📤 Payment Verifications</button>
+    <button class="tab-btn {% if inner_tab == 'requests' %}active{% endif %}" onclick="showAdminTab('requests', this)">🧾 Rebate & Overcharge</button>
+    <button class="tab-btn {% if inner_tab == 'soa-tab' %}active{% endif %}" onclick="showAdminTab('soa-tab', this)">📁 SOA Management</button>
   </div>
 
-  <!-- PAYMENT VERIFICATION TAB -->
-  <div id="payments" class="tab-content active">
-    <h3>Customer Payment Proofs</h3>
-    {% for proof in payment_proofs %}
-    <div class="admin-proof-card">
-      <p><strong>Customer:</strong> {{ proof.customer.name }} ({{ proof.customer.account_number }})</p>
-      <p><strong>Reference:</strong> {{ proof.reference_number }}</p>
-      <p><strong>Amount:</strong> ₱{{ proof.amount }}</p>
-      <p><strong>Date:</strong> {{ proof.payment_date.strftime('%b %d, %Y') }}</p>
-      <p><strong>Status:</strong>
+ <!-- PAYMENT VERIFICATION TAB -->
+<div id="payments" class="tab-content {% if inner_tab == 'payments' %}active{% endif %}">
+  <h3 class="payment-review-title">Customer Payment Proofs</h3>
+
+  {% for proof in payment_proofs %}
+  <div class="payment-review-card">
+    <div class="payment-review-details">
+      <div>
+        <p><strong>Customer:</strong> {{ proof.customer.name }} ({{ proof.customer.account_number }})</p>
+        <p><strong>Reference:</strong> {{ proof.reference_number }}</p>
+        <p><strong>Amount:</strong> ₱{{ proof.amount }}</p>
+        <p><strong>Date:</strong> {{ proof.payment_date.strftime('%b %d, %Y') }}</p>
+      </div>
+      <div class="payment-review-proof">
+        <a href="{{ url_for('static', filename='uploads/' + proof.filename) }}" target="_blank" class="payment-review-link">🔗 View Proof</a>
         <span class="proof-status status-{{ proof.status | lower }}">
           {% if proof.status == 'VERIFIED' %}
             ✅ Verified
@@ -29,54 +34,84 @@
             {{ proof.status }}
           {% endif %}
         </span>
-      </p>
-      <p>
-        <a href="{{ url_for('static', filename='uploads/' + proof.filename) }}" target="_blank">🔗 View Proof</a>
-      </p>
-      <form method="POST" action="{{ url_for('admin_update_payment_status', proof_id=proof.id) }}" class="mt-2">
-        <label for="status_{{ proof.id }}"><strong>Update Status:</strong></label>
-        <select name="status" id="status_{{ proof.id }}" required>
-          <option value="" disabled selected>-- Choose Status --</option>
-          <option value="PENDING" {% if proof.status == 'PENDING' %}selected{% endif %}>⏳ Pending</option>
-          <option value="VERIFIED" {% if proof.status == 'VERIFIED' %}selected{% endif %}>✅ Verified</option>
-          <option value="REJECTED" {% if proof.status == 'REJECTED' %}selected{% endif %}>❌ Rejected</option>
-        </select>
-        <button type="submit" class="action-btn">💾 Update</button>
-      </form>
+        <form method="POST" action="{{ url_for('admin_delete_payment', proof_id=proof.id) }}" class="delete-form">
+           <button type="submit" class="delete-btn" title="Delete Payment">🗑️</button>
+        </form>
+      </div>
     </div>
-    {% else %}
-      <p>No payment proofs submitted yet.</p>
-    {% endfor %}
+
+    <form method="POST" action="{{ url_for('admin_update_payment_status', proof_id=proof.id) }}" class="payment-review-form">
+      <label for="status_{{ proof.id }}"><strong>Status:</strong></label>
+      <select name="status" id="status_{{ proof.id }}" required>
+        <option value="" disabled selected>-- Choose --</option>
+        <option value="PENDING" {% if proof.status == 'PENDING' %}selected{% endif %}>⏳ Pending</option>
+        <option value="VERIFIED" {% if proof.status == 'VERIFIED' %}selected{% endif %}>✅ Verified</option>
+        <option value="REJECTED" {% if proof.status == 'REJECTED' %}selected{% endif %}>❌ Rejected</option>
+      </select>
+      <button type="submit" class="payment-review-btn">💾 Update</button>
+    </form>
   </div>
+  {% else %}
+    <p class="payment-review-empty">No payment proofs submitted yet.</p>
+  {% endfor %}
+</div>
+
 
   <!-- REQUESTS TAB -->
-  <div id="requests" class="tab-content">
-    <h3>Customer Rebate & Overcharge Requests</h3>
-    {% for req in customer_requests %}
-    <div class="admin-request-card">
-      <p><strong>Customer:</strong> {{ req.customer.name }} ({{ req.customer.account_number }})</p>
-      <p><strong>Type:</strong> {{ req.type|capitalize }}</p>
-      <p><strong>Amount:</strong> ₱{{ req.amount }}</p>
-      <p><strong>Billing Period:</strong> {{ req.billing_from }} to {{ req.billing_to }}</p>
-      <p><strong>Reason:</strong> {{ req.reason }}</p>
-      <p><a href="{{ url_for('static', filename='uploads/' + req.soa_filename) }}" target="_blank">📄 View SOA</a></p>
+<div id="requests" class="tab-content {% if inner_tab == 'requests' %}active{% endif %}">
+  <h3 class="request-review-title">Customer Rebate & Overcharge Requests</h3>
 
-      <form method="POST" action="{{ url_for('admin_update_request_status', request_id=req.id) }}">
-        <select name="new_status" required>
-          <option disabled selected>Update Status</option>
-          <option value="APPROVED">✅ Approve</option>
-          <option value="REJECTED">❌ Reject</option>
-        </select>
-        <button type="submit" class="status-btn">Update</button>
-      </form>
+  {% for req in customer_requests %}
+  <div class="request-review-card">
+    <div class="request-review-details">
+      <div>
+        <p><strong>Customer:</strong> {{ req.customer.name }} ({{ req.customer.account_number }})</p>
+        <p><strong>Type:</strong> {{ req.type|capitalize }}</p>
+        <p><strong>Amount:</strong> ₱{{ req.amount }}</p>
+        <p><strong>Billing Period:</strong> {{ req.billing_from }} to {{ req.billing_to }}</p>
+        <p><strong>Reason:</strong> {{ req.reason }}</p>
+      </div>
+
+      <div class="request-review-soa">
+        <a href="{{ url_for('static', filename='uploads/' + req.soa_filename) }}" target="_blank"
+          class="request-review-link">📄 View SOA</a>
+        <span class="request-status status-{{ req.status | lower }}">
+          {% if req.status == 'APPROVED' %}
+          ✅ Approved
+          {% elif req.status == 'PENDING' %}
+          ⏳ Pending
+          {% elif req.status == 'REJECTED' %}
+          ❌ Rejected
+          {% else %}
+          {{ req.status }}
+          {% endif %}
+        </span>
+        <form method="POST" action="{{ url_for('admin_delete_request', req_id=req.id) }}" class="delete-form">
+          <button type="submit" class="delete-btn" title="Delete Request">🗑️</button>
+        </form>
+      </div>
+      
+
+
     </div>
-    {% else %}
-    <p>No rebate or overcharge requests submitted yet.</p>
-    {% endfor %}
+
+    <form method="POST" action="{{ url_for('admin_update_request_status', request_id=req.id) }}" class="request-review-form">
+      <select name="new_status" required>
+        <option disabled selected>Update Status</option>
+        <option value="APPROVED">✅ Approve</option>
+        <option value="REJECTED">❌ Reject</option>
+      </select>
+      <button type="submit" class="request-review-btn">Update</button>
+    </form>
   </div>
+  {% else %}
+  <p class="request-review-empty">No rebate or overcharge requests submitted yet.</p>
+  {% endfor %}
+</div>
+
 
   <!-- SOA MANAGEMENT TAB -->
-  <div id="soa-tab" class="tab-content">
+ <div id="soa-tab" class="tab-content {% if inner_tab == 'soa-tab' %}active{% endif %}">
     <h3>Customer SOA Management</h3>
 
     <div class="soa-management-container">
@@ -88,7 +123,18 @@
 
           <form method="POST" action="{{ url_for('admin_upload_soa') }}" enctype="multipart/form-data">
             <input type="hidden" name="account_number" value="{{ customer.account_number }}">
-
+          
+            <!-- 📅 Billing cycle fields -->
+            <div class="form-group">
+              <label for="billing_from_{{ customer.id }}"><strong>Billing From:</strong></label>
+              <input type="date" name="billing_from" id="billing_from_{{ customer.id }}" required>
+            </div>
+            <div class="form-group">
+              <label for="billing_to_{{ customer.id }}"><strong>Billing To:</strong></label>
+              <input type="date" name="billing_to" id="billing_to_{{ customer.id }}" required>
+            </div>
+          
+            <!-- 📄 File upload -->
             <div class="form-group custom-file-upload-group">
               <label for="soa_file_{{ customer.id }}" class="upload-label">
                 <span class="upload-button"><i class="fas fa-cloud-upload-alt"></i> Upload SOA PDF</span>
@@ -96,16 +142,20 @@
               </label>
               <input type="file" name="soa_file" id="soa_file_{{ customer.id }}" accept=".pdf" class="hidden-file-input" required>
             </div>
-
+          
             <button type="submit" class="action-btn">📁 Upload</button>
           </form>
+          
+
         </div>
 
         <div class="soa-management-right">
           {% set latest_soa = customer.soa_files[-1] if customer.soa_files else None %}
           {% if latest_soa %}
             <p><strong>Last Uploaded:</strong> {{ latest_soa.uploaded_at.strftime('%b %d, %Y %I:%M %p') }}</p>
-            <a href="{{ url_for('static', filename='soa/' + latest_soa.filename) }}" target="_blank" class="view-proof-link">📄 View Latest SOA</a>
+            <a href="{{ url_for('static', filename='soa/' + latest_soa.filename) }}" target="_blank" class="view-proof-link">📄 View Latest SOA <form method="POST" action="{{ url_for('admin_delete_soa', soa_id=latest_soa.id) }}" class="delete-form">
+               <button type="submit" class="delete-btn" title="Delete SOA">🗑️</button>
+            </form></a>
           {% else %}
             <p><em>No SOA uploaded yet.</em></p>
           {% endif %}
