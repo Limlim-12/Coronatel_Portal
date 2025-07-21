@@ -2,62 +2,122 @@
 {% block content %}
 
 <div class="tab-wrapper">
+
   {% if active_tab == 'billing' %}
-  {% include 'admin/billing_tab.html' %}
+    {% include 'admin/billing_tab.html' %}
+
   {% elif active_tab == 'users' %}
-  {% include 'admin/users_tab.html' %}
+    {% include 'admin/account_tab.html' %}
+
+  {% elif active_tab == 'tickets' %}
+    {% include 'admin/support.html' %}
+
   {% else %}
-  <!-- Default Dashboard Overview -->
-  <div class="profile-summary">
-    <div class="profile-header">
-      <div class="user-info">
-        <h2 class="greeting-text"><span id="time-greeting"></span>, Admin {{ current_user.name or '' }}!</h2>
-        <p>Here’s an overview of recent activity on Corona Telecom.</p>
+    <!-- Admin Home Dashboard -->
+    <div class="profile-summary">
+      <div class="profile-header">
+        <div class="user-info">
+          <h2 class="greeting-text"><span id="time-greeting"></span>, Admin {{ current_user.name or '' }}!</h2>
+          <p>Here’s an overview of recent activity on Corona Telecom.</p>
+        </div>
       </div>
     </div>
-  </div>
 
-  <div class="dashboard-widgets-grid">
-    <div class="dashboard-card notifications-card">
-      <h2>Pending Requests</h2>
-      <p>No new customer requests at this time.</p>
-    </div>
-    <div class="dashboard-card status-usage-card">
-      <h2>System Summary</h2>
-      <p><strong>Total Customers:</strong> 1245</p>
-      <p><strong>Active Requests:</strong> 12</p>
-      <p><strong>Open Tickets:</strong> 4</p>
-      <p><strong>Recent Logins:</strong> 38 today</p>
-    </div>
-  </div>
+    <div class="dashboard-widgets-grid">
+      <!-- Pending Requests -->
+      <a href="{{ url_for('admin_dashboard', tab='billing') }}" class="dashboard-card-link">
+        <div class="dashboard-card notifications-card">
+          <h2>Pending Requests</h2>
+          {% if pending_proofs or pending_requests %}
+            <ul class="pending-request-list">
+              {% for proof in pending_proofs %}
+              <li class="pending-request-item">
+                <span class="type-label type-payment">PAYMENT</span>
+                <div><strong>{{ proof.cx.name }}</strong> | {{ proof.cx.account_number }}</div>
+                <div><strong>Reference #:</strong> {{ proof.reference_number }}</div>
+                <div><strong>Amount:</strong> ₱{{ '%.2f'|format(proof.amount or 0) }}</div>
+                <div><strong>Status:</strong> {{ proof.status }}</div>
+                <div><strong>Transaction Date:</strong> {{ proof.uploaded_at.strftime('%b %d, %Y') }}</div>
+              </li>
+              {% endfor %}
 
-  <div class="dashboard-card about-us-container">
-    <h2>ADMIN PANEL - CORONA TELECOM</h2>
-    <p>This admin panel lets you monitor system activity, assist customers, and manage data and requests.</p>
-  </div>
+              {% for req in pending_requests %}
+              <li class="pending-request-item">
+                <span class="type-label type-{{ req.type|lower }}">{{ req.type|upper }}</span>
+                <div><strong>{{ req.cx.name }}</strong> | {{ req.cx.account_number }}</div>
+                <div><strong>Amount:</strong> ₱{{ '%.2f'|format(req.amount or 0) }}</div>
+                <div>
+                  <strong>Billing Cycle:</strong>
+                  {% if req.billing_from and req.billing_to %}
+                    {{ req.billing_from.strftime('%b %d, %Y') }} – {{ req.billing_to.strftime('%b %d, %Y') }}
+                  {% else %}
+                    N/A
+                  {% endif %}
+                </div>
+                <div><strong>Status:</strong> {{ req.status or 'Pending' }}</div>
+                <div><strong>Submitted:</strong> {{ req.uploaded_at.strftime('%b %d, %Y') }}</div>
+              </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p>No new customer requests at this time.</p>
+          {% endif %}
+        </div>
+      </a>
+
+      <!-- System Summary -->
+      <div class="dashboard-card status-usage-card">
+        <h2>System Summary</h2>
+        <p><strong>Total Customers:</strong> {{ customers|length }}</p>
+        <p><strong>Active Requests:</strong> {{ completed_requests_count }}</p>
+        <p><strong>Open Tickets:</strong> <em>Coming soon</em></p>
+        <p><strong>Recent Logins:</strong></p>
+        <ul>
+          {% for log in recent_logins %}
+            <li>{{ log.cx.account_number }} - {{ log.cx.name }}</li>
+          {% endfor %}
+        </ul>
+        <p><strong>Logins Today:</strong> {{ login_count_today }}</p>
+      </div>
+
+      <!-- Reactivation Requests -->
+      <a href="{{ url_for('admin_dashboard', tab='users') }}" class="dashboard-card-link">
+        <div class="dashboard-card notifications-card">
+          <h2>Reactivation Requests</h2>
+          {% if reactivation_requests %}
+            <ul class="pending-request-list">
+              {% for req in reactivation_requests %}
+              <li class="pending-request-item">
+                <span class="type-label type-reactivation">Reactivation</span>
+                {{ req.cx.name }} — {{ req.cx.account_number }}
+                <small class="submitted-date">({{ req.requested_at.strftime('%b %d, %Y') }})</small>
+              </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p>No reactivation requests.</p>
+          {% endif %}
+        </div>
+      </a>
+
+      <!-- About Section -->
+      <div class="dashboard-card about-us-container">
+        <h2>ADMIN PANEL – CORONA TELECOM</h2>
+        <p>This admin panel lets you monitor system activity, assist customers, and manage data and requests.</p>
+      </div>
+    </div> <!-- end .dashboard-widgets-grid -->
+
   {% endif %}
 </div>
 
 <script>
   function setGreeting() {
-    const greetingElement = document.getElementById('time-greeting');
-    if (!greetingElement) return;
-
-    const now = new Date();
-    const hour = now.getHours();
-    let greeting = '';
-
-    if (hour >= 5 && hour < 12) {
-      greeting = 'Good Morning';
-    } else if (hour >= 12 && hour < 18) {
-      greeting = 'Good Afternoon';
-    } else {
-      greeting = 'Good Evening';
-    }
-
-    greetingElement.textContent = greeting;
+    const el = document.getElementById('time-greeting');
+    if (!el) return;
+    const h = new Date().getHours(),
+      g = h < 12 ? 'Good Morning' : (h < 18 ? 'Good Afternoon' : 'Good Evening');
+    el.textContent = g;
   }
-
   document.addEventListener('DOMContentLoaded', setGreeting);
 </script>
 

@@ -6,7 +6,10 @@
     {% include 'cx/profile_tab.html' %}
     {% elif active_tab == 'billing' %}
     {% include 'cx/billing_tab.html' %}
+    {% elif active_tab == 'support' %}
+    {% include 'cx/support.html' %}
     {% else %}
+
     <div class="profile-summary">
         <div class="profile-header">
             <div class="user-info">
@@ -16,6 +19,7 @@
     </div>
 
     <div class="dashboard-widgets-grid">
+        <!-- Notifications -->
         <div class="dashboard-card notifications-card">
             <h2>Latest Notifications</h2>
             {% if all_notifications %}
@@ -76,9 +80,37 @@
             {% endif %}
         </div>
 
+        <!-- ✅ Admin Messages -->
+        {% if messages %}
+        <div class="admin-messages-card">
+            <h2>Messages from Admin</h2>
+            <ul class="admin-message-list">
+                {% for msg in messages %}
+                <li class="admin-message-item">
+                    <form method="POST" action="{{ url_for('delete_admin_message', msg_id=msg.id) }}"
+                        class="admin-message-delete-form">
+                        <button type="submit" class="admin-message-delete-btn" title="Delete Message">×</button>
+                    </form>
+        
+                    <div class="admin-message-body">
+                        <p class="admin-message-preview">{{ msg.body[:100] }}{% if msg.body|length > 100 %}...{% endif %}</p>
+                        <p class="admin-message-full hidden">{{ msg.body }}</p>
+                        {% if msg.body|length > 100 %}
+                        <button type="button" class="admin-message-expand" onclick="toggleMessage(this)">Read more</button>
+                        {% endif %}
+                        <small class="admin-message-timestamp">Sent on {{ msg.sent_at.strftime('%B %d, %Y %I:%M %p') }}</small>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+
+        <!-- Usage & Billing -->
         <div class="dashboard-card status-usage-card">
-            <h2>Account Status</h2>
-            <p><strong>Status:</strong> Active</p>
+            <h2>Internet Status</h2>
+            <p><strong>Status:</strong> {{ current_user.internet_status or 'Unknown' }}</p>
             <p><strong>Billing Cycle:</strong> 01/07/2025 - 31/07/2025</p>
             <p><strong>Due Date:</strong> 25/07/2025</p>
 
@@ -91,6 +123,7 @@
         </div>
     </div>
 
+    <!-- About -->
     <div class="dashboard-card about-us-container">
         <h2>ABOUT CORONA TELECOM</h2>
         <p>Welcome to Corona Telecom! We are committed to providing reliable internet services and exceptional customer
@@ -100,6 +133,7 @@
     {% endif %}
 </div>
 
+<!-- SweetAlert popups -->
 {% if verified == 'true' %}
 <script>
     Swal.fire({
@@ -110,6 +144,25 @@
     });
 </script>
 {% endif %}
+
+<script>
+    function toggleMessage(button) {
+        const preview = button.previousElementSibling.previousElementSibling;
+        const full = button.previousElementSibling;
+        const isHidden = full.classList.contains('hidden');
+
+        if (isHidden) {
+            preview.style.display = 'none';
+            full.classList.remove('hidden');
+            button.textContent = 'Show less';
+        } else {
+            preview.style.display = 'block';
+            full.classList.add('hidden');
+            button.textContent = 'Read more';
+        }
+    }
+</script>
+
 
 {% if user_notification %}
 <script>
@@ -122,6 +175,7 @@
 </script>
 {% endif %}
 
+<!-- Dashboard Scripts -->
 <script>
     function setGreeting() {
         const greetingElement = document.getElementById('time-greeting');

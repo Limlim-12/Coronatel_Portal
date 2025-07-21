@@ -13,7 +13,7 @@ Hi {name},
 
 Good day!
 
-Thank you for your payment. We’re writing to confirm that we have successfully verified your recent payment with the following details:
+Thank you for your payment. We have successfully verified your recent payment with the following details:
 
 Transaction Reference Number: {reference_number}
 
@@ -147,3 +147,26 @@ billing@coronatel.com
 
     msg = Message(subject, recipients=[email], html=html)
     mail.send(msg)
+
+
+
+
+def send_account_verification_email(name, email, account_number):
+    subject = "[Corona Telecom] Your Account is Now Verified"
+    body = f"""Hi {name},
+
+Good news!
+
+Your Corona Telecom account has been verified. You can now log in to the customer portal using your registered credentials.
+
+Verified Account Number: {account_number}
+
+Thank you for choosing Corona Telecom.
+
+Best regards,  
+Support Team  
+billing@coronatel.com
+"""
+    msg = Message(subject=subject, recipients=[email], body=body)
+    mail.send(msg)
+

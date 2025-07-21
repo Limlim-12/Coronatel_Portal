@@ -1,0 +1,110 @@
+<div class="admin-account-section">
+  <h2>Manage Customer Accounts</h2>
+
+  <div class="admin-account-controls">
+    <input type="text" id="search-input" placeholder="Search accounts..." aria-label="Search accounts" />
+    <select id="filter-status" aria-label="Filter by status">
+      <option value="">All Statuses</option>
+      <option value="Active">Active</option>
+      <option value="Inactive">Inactive</option>
+    </select>
+    <select id="filter-verified" aria-label="Filter by verification">
+      <option value="">All Verification</option>
+      <option value="1">Verified</option>
+      <option value="0">Not Verified</option>
+    </select>
+  </div>
+
+<div class="admin-account-cards" id="account-cards-container">
+  {% for cx in customers %}
+  <div class="admin-account-card" role="region" aria-labelledby="account-{{ cx.id }}" data-name="{{ cx.name|lower }}"
+    data-status="{{ cx.account_status }}" data-verified="{{ cx.is_verified }}">
+
+  <div class="account-header">
+    <div class="account-left">
+      <h3 id="account-{{ cx.id }}" class="account-name">{{ cx.name }}</h3>
+    </div>
+  
+    <div class="account-right">
+      <div class="account-status-label {{ cx.account_status | lower }}">
+        {{ cx.account_status }}
+      </div>
+  
+      <div class="account-actions">
+        {% if cx.account_status != 'TERMINATE' %}
+        <form method="POST" action="{{ url_for('delete_account', cx_id=cx.id) }}" class="inline-form"
+          aria-label="Terminate {{ cx.name }} account">
+          <button type="submit" class="delete-btn" title="Terminate Account">
+            🛑 <small>Terminate</small>
+          </button>
+        </form>
+        {% endif %}
+  
+        {% if cx.account_status == 'TERMINATE' %}
+        <form method="POST" action="{{ url_for('restore_account', cx_id=cx.id) }}" class="inline-form"
+          aria-label="Restore {{ cx.name }} account">
+          <button type="submit" class="restore-btn" title="Restore Account">
+            ♻️ <small>Restore</small>
+          </button>
+        </form>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+
+    <hr class="account-divider" />
+
+
+
+
+
+      <form method="POST" action="{{ url_for('update_account_info', cx_id=cx.id) }}" class="account-update-form"
+        aria-label="Update account info for {{ cx.name }}">
+        <div class="account-field">
+          <label for="account_number_{{ cx.id }}">Account #</label>
+          <input id="account_number_{{ cx.id }}" type="text" name="account_number"
+            value="{{ cx.account_number or '' }}" />
+        </div>
+        <div class="account-field">
+          <label>Email</label>
+          <input type="text" name="email" value="{{ cx.email or '' }}" />
+        </div>
+        <div class="account-field">
+          <label>Internet Status</label>
+          <select name="internet_status" aria-label="Internet status">
+            <option value="ACTIVE" {% if cx.internet_status=='ACTIVE' %}selected{% endif %}>ACTIVE</option>
+            <option value="ON HOLD" {% if cx.internet_status=='ON HOLD' %}selected{% endif %}>ON HOLD</option>
+            <option value="DISCONNECTED" {% if cx.internet_status=='DISCONNECTED' %}selected{% endif %}>DISCONNECTED
+            </option>
+          </select>
+        </div>
+        <div class="account-field">
+          <label>Plan</label>
+          <input type="text" name="internet_plan" value="{{ cx.internet_plan or '' }}" />
+        </div>
+        <div class="account-field">
+          <label>Verified?</label>
+          <select name="is_verified" aria-label="Verified status">
+            <option value="1" {% if cx.is_verified %}selected{% endif %}>Yes</option>
+            <option value="0" {% if not cx.is_verified %}selected{% endif %}>No</option>
+          </select>
+        </div>
+        <button class="admin-account-btn-update" type="submit">Update</button>
+      </form>
+
+      <form class="admin-account-message-form" method="POST" action="{{ url_for('send_admin_message', cx_id=cx.id) }}"
+        aria-label="Send message to {{ cx.name }}">
+        <textarea name="message" placeholder="Send message to {{ cx.name }}"></textarea>
+        <button class="admin-account-btn-send" type="submit">Send</button>
+      </form>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="admin-account-pagination" id="pagination-controls">
+    <button id="prev-page" disabled aria-label="Previous page">Previous</button>
+    <span id="page-info">Page 1</span>
+    <button id="next-page" aria-label="Next page">Next</button>
+  </div>
+</div>

@@ -4,17 +4,18 @@
 
 from flask import Flask, render_template, redirect, url_for, request, flash, get_flashed_messages, abort, session
 from flask_mail import Mail
-from mailer import send_payment_status_email  # If your file is named `email.py`
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_migrate import Migrate
 from flask_login import login_user, login_required, logout_user, current_user # Removed LoginManager here
 from datetime import datetime, date
 from pytz import timezone
+from functools import wraps
 from extensions import db, login_manager, mail # Keep this import
-from mailer import send_request_status_email  # Make sure this is imported at the top
+from mailer import send_payment_status_email , send_request_status_email, send_account_verification_email # Make sure this is imported at the top
 import pytz
 import os
+import random
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key_here'
@@ -27,6 +28,7 @@ app.config['ADMIN_ACCESS_KEY'] = 'admin123coronatel'
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 app.config['SOA_FOLDER'] = 'static/soa'
 app.config['ENV_MODE'] = os.getenv('FLASK_ENV', 'development')
+
 
 # Example Mail Configuration
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
@@ -62,7 +64,7 @@ migrate = Migrate(app, db) # This should come after db.init_app(app)
 
 
 # Import models after db is ready
-from models import Cx, PaymentProof, CxRequest, Notification, AdminUser, SOA
+from models import Cx, PaymentProof, CxRequest, Notification, AdminUser, SOA, CxLoginLog, PrivateMessage, AdminMessage, ReactivationRequest, SupportTicket
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -82,18 +84,41 @@ def cx_login():
 
         user = Cx.query.filter_by(email=email).first()
 
-        if user and check_password_hash(user.password, password):
-            session['user_type'] = 'cx'
-            login_user(user)
-            flash('Logged in successfully!', 'success')
+        if user:
+            if not user.is_verified:
+                flash('Your account is not yet verified by admin. Please wait for confirmation.', 'warning')
+                return render_template('cx/login.html', is_cx_login=True)
 
-            if user.role == 'admin':
-                return redirect(url_for('admin_dashboard'))
-            else:
-                return redirect(url_for('cx_dashboard'))
-        else:
-            flash('Invalid credentials', 'danger')
-            return render_template('cx/login.html', is_cx_login=True)
+            if user.account_status == 'Inactive':
+                flash('Your account has been deactivated by admin. Please contact support for assistance.', 'danger')
+                return render_template('cx/login.html', is_cx_login=True)
+
+            if user.account_status == 'TERMINATE':
+                flash('Your account has been terminated and cannot be accessed.', 'danger')
+                return render_template('cx/login.html', is_cx_login=True)
+
+            if check_password_hash(user.password, password):
+                session['user_type'] = 'cx'
+                login_user(user)
+                # Set account_status to ACTIVE on successful login
+                if user.account_status != 'ACTIVE':
+                    user.account_status = 'ACTIVE'
+                    db.session.commit()
+                flash('Logged in successfully!', 'success')
+
+              
+              
+                login_entry = CxLoginLog(cx_id=user.id, timestamp=datetime.now(philippines_tz))
+                db.session.add(login_entry)
+                db.session.commit()
+
+                if user.role == 'admin':
+                    return redirect(url_for('admin_dashboard'))
+                else:
+                    return redirect(url_for('cx_dashboard'))
+
+        flash('Invalid credentials', 'danger')
+        return render_template('cx/login.html', is_cx_login=True)
 
     return render_template('cx/login.html', is_cx_login=True)
 
@@ -124,8 +149,18 @@ def cx_register():
         # Check if email already exists
         existing_user = Cx.query.filter_by(email=email).first()
         if existing_user:
+            if existing_user.account_status == 'TERMINATE':
+                flash('This email is associated with a terminated account and cannot be used.', 'danger')
+                return render_template('cx/register.html')
             flash('Email already exists.', 'warning')
             return render_template('cx/register.html')
+
+        # Check if account number already exists and is terminated
+        existing_account = Cx.query.filter_by(account_number=account_number).first()
+        if existing_account:
+            if existing_account.account_status == 'TERMINATE':
+                flash('This account number is associated with a terminated account and cannot be used.', 'danger')
+                return render_template('cx/register.html')
 
         # Create full name for 'name' attribute
         # Using middle_initial for middle_name in the display name as per user's previous preference
@@ -183,11 +218,22 @@ def cx_dashboard():
     previous_rebates = [r for r in requests if r.type == 'rebate']
     previous_overcharges = [r for r in requests if r.type == 'overcharge']
     soa_files = SOA.query.filter_by(cx_id=current_user.id).order_by(SOA.uploaded_at.desc()).all()
-
+    messages = AdminMessage.query.filter_by(cx_id=current_user.id).order_by(AdminMessage.sent_at.desc()).all()  # ✅ NEW
 
   # Load all notifications from the Notification table
     all_notifications = Notification.query.filter_by(cx_id=current_user.id).order_by(Notification.created_at.desc()).all()
 
+    # Check if account is inactive and force logout
+    if current_user.account_status == 'Inactive':
+        flash('Your account has been deactivated by admin. Please contact support for assistance.', 'danger')
+        logout_user()
+        return redirect(url_for('cx_login'))
+
+    # Check if account is terminated and force logout
+    if current_user.account_status == 'TERMINATE':
+        flash('Your account has been terminated and cannot be accessed.', 'danger')
+        logout_user()
+        return redirect(url_for('cx_login'))
 
     return render_template(
         'cx/dashboard.html',
@@ -202,7 +248,9 @@ def cx_dashboard():
         now=datetime.now(),
         previous_rebates=previous_rebates,             
         previous_overcharges=previous_overcharges,
-        soa_files=soa_files     
+        soa_files=soa_files,
+        account_status=current_user.account_status,
+        messages=messages  # ✅ Include admin messages  
     )
 
 
@@ -307,9 +355,6 @@ def rebate_request():
 
 
 
-
-
-
 @app.route('/update_profile', methods=['POST'])
 @login_required
 def update_profile():
@@ -379,15 +424,49 @@ def download_soa():
 
 
 
-
-
-
-
 @app.route('/logout')
 @login_required
 def logout():
+    if isinstance(current_user, Cx):
+        current_user.account_status = 'INACTIVE'
+        db.session.commit()
     logout_user()
+    flash("You have been logged out.", "info")
     return redirect(url_for('cx_login'))
+
+
+from models import Cx, ReactivationRequest
+from extensions import db
+from flask import request, flash, redirect, url_for, render_template, abort
+from flask_login import current_user, login_required
+from datetime import datetime
+import pytz
+
+@app.route('/cx/account_termination_request', methods=['POST'])
+def account_termination_request():
+    email = request.form.get('email')
+    reason = request.form.get('reason')
+
+    if email and reason:
+        cx = Cx.query.filter_by(email=email).first()
+        if cx:
+            new_request = ReactivationRequest(cx_id=cx.id, message=reason, status='PENDING', requested_at=datetime.now(pytz.timezone('Asia/Manila')))
+            db.session.add(new_request)
+            db.session.commit()
+            flash('Your request has been submitted. Administrator will contact you soon.', 'success')
+        else:
+            flash('Email not found in our records.', 'warning')
+    else:
+        flash('Please fill out all fields.', 'warning')
+
+    return redirect(url_for('cx_login'))
+
+@app.route('/cx/support')
+@login_required
+def cx_support():
+    return render_template('cx/support.html')
+
+
 
 
 
@@ -395,20 +474,26 @@ def logout():
 @app.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
     if request.method == 'POST':
-        email = request.form['email']
-        password = request.form['password']
-        admin = AdminUser .query.filter_by(email=email).first()
-        # Check if admin exists and password is correct
+        password = request.form.get('password')
+
+        # Always use the fixed email and pick the most recently created admin
+        admin = (
+            AdminUser.query
+            .filter_by(email='admin@coronatel.ph')
+            .order_by(AdminUser.id.desc())
+            .first()
+        )
+
         if admin and admin.check_password(password):
-            session['user_type'] = 'admin'  # Set session variable for admin
-            login_user(admin)  # Log the user in
+            session['user_type'] = 'admin'
+            login_user(admin)
             flash('Logged in successfully!', 'success')
-            return redirect(url_for('admin_dashboard'))  # Redirect to admin dashboard
+            return redirect(url_for('admin_dashboard'))
         else:
-            flash('Invalid credentials', 'danger')  # Show error message
-    return render_template('cx/login.html', is_admin_login=True)  # Render login page
+            flash('Invalid credentials', 'danger')
 
-
+    # reuse your CX login template, but switch to admin mode
+    return render_template('cx/login.html', is_admin_login=True)
 
 
 
@@ -427,41 +512,58 @@ def load_user(user_id):
 
 
 
-
 @app.route('/admin/register', methods=['GET', 'POST'])
 def register_admin():
     if request.method == 'POST':
-        name = request.form.get('name')
-        password = request.form.get('password')
+        name       = request.form.get('name')
+        password   = request.form.get('password')
         access_key = request.form.get('access_key')
 
-        # Check access key
+        # Verify the access key
         if access_key != app.config['ADMIN_ACCESS_KEY']:
             flash('Invalid admin access key', 'error')
             return redirect(url_for('register_admin'))
 
-        # Check if password already used
-        existing_admins = AdminUser.query.filter_by(email='admin@coronatel.ph').all()
-        for admin in existing_admins:
-            if admin.check_password(password):
-                flash('Password already used by another admin', 'error')
-                return redirect(url_for('register_admin'))
-
-        # Create new admin
-        new_admin = AdminUser(email='admin@coronatel.ph', name=name)
+        # Create new admin with fixed email
+        new_admin = AdminUser(
+            email='admin@coronatel.ph',
+            name=name,
+        )
         new_admin.set_password(password)
-        db.session.add(new_admin)
-        db.session.commit()
 
-        flash('Admin account created successfully!', 'success')
-        return redirect(url_for('cx_login'))
+        try:
+            db.session.add(new_admin)
+            db.session.commit()
+            flash('Admin account created successfully!', 'success')
+            return redirect(url_for('admin_login'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error creating admin account: {e}', 'danger')
 
     return render_template('admin/register.html')
 
 
 
 
+@app.route('/admin/dashboard/summary-data')
+@login_required
+def get_dashboard_summary_data():
+    if not isinstance(current_user, AdminUser):
+        abort(403)
 
+    total_customers = Cx.query.count()
+    active_requests = CxRequest.query.filter_by(status='PENDING').count()
+    open_tickets = ReactivationRequest.query.filter_by(status='PENDING').count()
+    recent_logins = CxLoginLog.query.filter(
+        CxLoginLog.timestamp >= datetime.now().date()
+    ).count()
+
+    return {
+        'total_customers': total_customers,
+        'active_requests': active_requests,
+        'open_tickets': open_tickets,
+        'recent_logins': recent_logins
+    }
 
 @app.route('/admin/dashboard')
 @login_required
@@ -473,20 +575,52 @@ def admin_dashboard():
     inner_tab = request.args.get('inner_tab', 'payments')
 
     customers = Cx.query.all()
-    payment_proofs = PaymentProof.query.order_by(PaymentProof.uploaded_at.desc()).all()
-    customer_requests = CxRequest.query.order_by(CxRequest.created_at.desc()).all()
+    manila_today = datetime.now(timezone('Asia/Manila')).date()
 
-    # 🧠 Dynamically choose the correct template
-    template = 'admin/billing_tab.html' if tab == 'billing' else 'admin/dashboard.html'
+    context = {
+        'active_tab': tab,
+        'inner_tab': inner_tab,
+        'customers': customers,
+    }
 
-    return render_template(
-        template,
-        active_tab=tab,
-        inner_tab=inner_tab,
-        customers=customers,
-        payment_proofs=payment_proofs,
-        customer_requests=customer_requests
-    )
+    if tab == 'billing':
+        context.update({
+            'payment_proofs': PaymentProof.query.order_by(PaymentProof.uploaded_at.desc()).all(),
+            'pending_proofs': PaymentProof.query.filter_by(status='PENDING').order_by(PaymentProof.uploaded_at.desc()).all(),
+            'customer_requests': CxRequest.query.order_by(CxRequest.created_at.desc()).all(),
+            'pending_requests': CxRequest.query.filter_by(status='PENDING').order_by(CxRequest.created_at.desc()).all(),
+            'completed_requests_count': CxRequest.query.filter(CxRequest.status.in_(['APPROVED', 'REJECTED'])).count()
+        })
+
+    elif tab == 'overview':
+        context.update({
+            'recent_logins': CxLoginLog.query.order_by(CxLoginLog.timestamp.desc()).limit(3).all(),
+            'login_count_today': CxLoginLog.query.filter(
+                CxLoginLog.timestamp >= manila_today
+            ).count(),
+            'reactivation_requests': ReactivationRequest.query.filter_by(status='PENDING').order_by(ReactivationRequest.requested_at.desc()).all(),
+            'pending_proofs': PaymentProof.query.filter_by(status='PENDING').order_by(PaymentProof.uploaded_at.desc()).all(),
+            'pending_requests': CxRequest.query.filter_by(status='PENDING').order_by(CxRequest.created_at.desc()).all()
+        })
+
+    elif tab == 'accounts':
+        return render_template('admin/account_tab.html', **context)
+
+    elif tab == 'tickets':
+        context.update({
+            'support_tickets': SupportTicket.query.order_by(SupportTicket.created_at.desc()).all()
+        })
+
+    template_map = {
+        'overview': 'admin/dashboard.html',
+        'billing': 'admin/billing_tab.html',
+        'accounts': 'admin/account_tab.html',
+        'tickets': 'admin/support.html'  # ✅ Correct template
+    }
+
+    selected_template = template_map.get(tab, 'admin/dashboard.html')
+    return render_template(selected_template, **context)
+
 
 
 
@@ -536,9 +670,9 @@ def admin_update_payment_status(proof_id):
 
 
 
+
     flash(f'Payment marked as {new_status} and customer has been notified.', 'success')
     return redirect(url_for('admin_dashboard', tab='billing', inner_tab='payments'))
-
 
 
 
@@ -584,9 +718,17 @@ def admin_delete_soa(soa_id):
     flash('SOA deleted.', 'success')
     return redirect(url_for('admin_dashboard', tab='billing', inner_tab='soa-tab'))
 
-
-
-
+@app.route('/cx/delete_admin_message/<int:msg_id>', methods=['POST'])
+@login_required
+def delete_admin_message(msg_id):
+    msg = AdminMessage.query.get_or_404(msg_id)
+    # Ensure the current user owns the message
+    if msg.cx_id != current_user.id:
+        abort(403)
+    db.session.delete(msg)
+    db.session.commit()
+    flash('Message deleted successfully.', 'success')
+    return redirect(url_for('cx_dashboard'))
 
 
 
@@ -601,11 +743,11 @@ def admin_update_request_status(request_id):
         db.session.commit()
 
         # ✅ Email notification (only if email exists)
-        if req.customer and req.customer.email:
+        if req.cx and req.cx.email:
             send_request_status_email(
-                name=req.customer.name,
-                email=req.customer.email,
-                account_number=req.customer.account_number,
+                name=req.cx.name,
+                email=req.cx.email,
+                account_number=req.cx.account_number,
                 req_type=req.type,
                 status=new_status,
                 billing_from=req.billing_from.strftime('%b %d, %Y') if req.billing_from else 'N/A',
@@ -627,7 +769,7 @@ def admin_update_request_status(request_id):
 
         # ✅ Create dashboard notification
         notif = Notification(
-            cx_id=req.customer.id,
+            cx_id=req.cx.id,
             notif_type=req.type.lower(),
             status=new_status,
             amount=req.amount,
@@ -644,10 +786,6 @@ def admin_update_request_status(request_id):
     return redirect(url_for('admin_dashboard', tab='billing'))
 
 
-
-
-
-from datetime import datetime
 
 @app.route('/admin/upload_soa', methods=['POST'])
 @login_required
@@ -695,7 +833,339 @@ def admin_upload_soa():
     return redirect(url_for('admin_dashboard', tab='billing'))
 
 
+@app.route('/admin/manage_accounts')
+@login_required
+def manage_accounts():
+    if not isinstance(current_user, AdminUser):
+        abort(403)
 
+    customers = Cx.query.order_by(Cx.created_at.desc()).all()  # if `created_at` exists, else just `.all()`
+    return render_template('admin/manage_accounts.html', customers=customers)
+
+
+
+
+@app.route('/admin/update_account_info/<int:cx_id>', methods=['POST'])
+@login_required
+def update_account_info(cx_id):
+    if not isinstance(current_user, AdminUser):
+        abort(403)
+
+    from mailer import send_account_verification_email  # ✅ Import centralized mailer
+
+    cx = Cx.query.get_or_404(cx_id)
+    was_unverified = not cx.is_verified
+
+    # Safely update only allowed fields
+    cx.account_number = request.form.get('account_number') or cx.account_number
+    cx.email = request.form.get('email') or cx.email
+    cx.internet_status = request.form.get('internet_status') or cx.internet_status
+    cx.internet_plan = request.form.get('internet_plan') or cx.internet_plan
+
+    # ✅ Prevent overwriting account_status
+    # ❌ cx.account_status = request.form.get('account_status')
+
+    # ✅ Update is_verified safely
+    is_verified_str = request.form.get('is_verified')
+    if is_verified_str is not None:
+        cx.is_verified = bool(int(is_verified_str))
+
+    db.session.commit()
+
+    if was_unverified and cx.is_verified:
+        try:
+            send_account_verification_email(cx.first_name or cx.name, cx.email, cx.account_number)
+            flash('Account updated and email notification sent.', 'success')
+        except Exception as e:
+            flash(f'Account updated but failed to send email: {e}', 'warning')
+    else:
+        flash(f"Updated account for {cx.email}", 'success')
+
+    return redirect(url_for('admin_dashboard', tab='users'))
+
+
+
+@app.route('/admin/delete_account/<int:cx_id>', methods=['POST'])
+@login_required
+def delete_account(cx_id):
+    if not isinstance(current_user, AdminUser):
+        abort(403)
+
+    cx = Cx.query.get_or_404(cx_id)
+    cx.account_status = 'TERMINATE'  # Use consistent TERMINATE label
+    db.session.commit()
+    flash(f"Account for {cx.name} has been terminated.", "success")
+    return redirect(url_for('admin_dashboard', tab='users'))
+
+@app.route('/admin/restore_account/<int:cx_id>', methods=['POST'])
+@login_required
+def restore_account(cx_id):
+    if not isinstance(current_user, AdminUser):
+        abort(403)
+
+    cx = Cx.query.get_or_404(cx_id)
+    cx.account_status = 'ACTIVE'
+
+    # Approve the latest pending reactivation request (if any)
+    reactivation_request = ReactivationRequest.query.filter_by(cx_id=cx_id, status='PENDING').first()
+    if reactivation_request:
+        reactivation_request.status = 'APPROVED'
+        reactivation_request.resolved_at = datetime.now()
+
+    db.session.commit()
+    flash(f"Account for {cx.name} has been reactivated.", "success")
+    return redirect(url_for('admin_dashboard', tab='overview'))
+
+
+
+
+
+@app.route('/admin/send_message/<int:cx_id>', methods=['POST'])
+@login_required
+def send_admin_message(cx_id):
+    if not isinstance(current_user, AdminUser):
+        abort(403)
+
+    from models import Cx  # Fix: import Cx model here
+
+    cx = Cx.query.get_or_404(cx_id)
+
+    message = request.form.get('message', '').strip()
+    if message:
+        new_msg = AdminMessage(
+            cx_id=cx.id,
+            sender_id=current_user.id,
+            subject='Admin Message',
+            body=message,
+            sent_at=datetime.now(timezone('Asia/Manila'))
+        )
+        db.session.add(new_msg)
+        db.session.commit()
+        flash(f'Message sent to {cx.name}.', 'success')
+    else:
+        flash('Message cannot be empty.', 'warning')
+
+    return redirect(url_for('admin_dashboard', tab='users'))
+
+
+@app.route('/request-reactivation', methods=['POST'])
+def request_reactivation():
+    cx_id = request.form.get('cx_id')
+    email = request.form.get('email').strip().lower()
+    message = request.form.get('message')
+
+    # Validate required fields
+    if not email or not message:
+        flash('All fields are required to request reactivation.', 'danger')
+        return redirect(url_for('cx_login'))
+
+    # 🛡 Fallback: If cx_id is missing, try to get customer by email
+    if not cx_id:
+        customer = Cx.query.filter_by(email=email).first()
+        if not customer:
+            flash('No customer found with that email address.', 'danger')
+            return redirect(url_for('cx_login'))
+        cx_id = customer.id
+    else:
+        customer = Cx.query.get(cx_id)
+        if not customer:
+            flash('Invalid customer account.', 'danger')
+            return redirect(url_for('cx_login'))
+
+    # 🔒 Prevent duplicate reactivation request by email
+    existing_email_request = ReactivationRequest.query.filter_by(email=email, status='PENDING').first()
+    if existing_email_request:
+        flash('A pending reactivation request already exists for this email.', 'warning')
+        return redirect(url_for('cx_login'))
+
+    # 🔒 Optional: Prevent duplicate by cx_id
+    existing_cx_request = ReactivationRequest.query.filter_by(cx_id=cx_id, status='PENDING').first()
+    if existing_cx_request:
+        flash('You already have a pending reactivation request.', 'warning')
+        return redirect(url_for('cx_login'))
+
+    # ✅ Save new request
+    new_request = ReactivationRequest(
+        cx_id=cx_id,
+        email=email,
+        message=message,
+        status='PENDING',
+        requested_at=datetime.now(pytz.timezone('Asia/Manila'))
+    )
+    db.session.add(new_request)
+    db.session.commit()
+
+    flash('Your request for reactivation has been submitted.', 'success')
+    return redirect(url_for('cx_login'))
+
+
+
+def generate_ticket_number():
+    from random import randint
+    return f"CT-{randint(100, 999)}-{randint(100, 999)}"
+
+
+@app.route('/submit-support', methods=['POST'])
+@login_required
+def submit_support():
+    from random import randint
+
+    def generate_ticket_number():
+        return f"CT-{randint(100, 999)}-{randint(100, 999)}"
+
+    ticket_number = generate_ticket_number()
+
+    # Determine ticket type based on form input
+    raw_form_type = request.form.get('form_type')
+    ticket_type = 'repair' if raw_form_type == 'repair' else 'account' if raw_form_type == 'account' else None
+
+    if not ticket_type:
+        flash("Please select a valid ticket type.", "danger")
+        return redirect(url_for('cx_support'))
+
+    # Common fields
+    account_type = request.form.get('account_type')
+    contact_person = request.form.get('contact_person')
+    contact_number = request.form.get('contact_number')
+    service_address = request.form.get('service_address')
+
+    # Repair-specific fields
+    issue_type = request.form.get('issue_type') if ticket_type == 'repair' else None
+    other_issue_detail = request.form.get('other_issue_detail') if ticket_type == 'repair' and issue_type == 'Others' else None
+    request_service = request.form.get('request_service') if ticket_type == 'repair' else None
+    repair_note = request.form.get('repair_note') if ticket_type == 'repair' else None
+
+    # Account-specific fields
+    account_request = request.form.get('account_request') if ticket_type == 'account' else None
+    new_plan = request.form.get('new_plan') if ticket_type == 'account' and account_request == 'Change Internet Plan' else None
+    account_note = request.form.get('account_note') if ticket_type == 'account' else None
+
+    # Create the SupportTicket object
+    ticket = SupportTicket(
+        ticket_number=ticket_number,
+        cx_id=current_user.id,
+        ticket_type=ticket_type,
+        account_type=account_type,
+        contact_person=contact_person,
+        contact_number=contact_number,
+        service_address=service_address,
+        issue_type=issue_type,
+        other_issue_detail=other_issue_detail,
+        request_service=request_service,
+        repair_note=repair_note,
+        account_request=account_request,
+        new_plan=new_plan,
+        account_note=account_note
+    )
+
+    db.session.add(ticket)
+    db.session.commit()
+
+    # Debug: flash ticket id after commit
+    # flash(f"Debug: Ticket created with ID {ticket.id}", "info")
+
+    flash(f"Support ticket submitted! Ticket No: {ticket_number}", "success")
+    return redirect(url_for('cx_support'))
+
+
+
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not (current_user.is_authenticated and getattr(current_user, 'email', None) == 'admin@coronatel.ph'):
+            abort(403)
+        return f(*args, **kwargs)
+    return decorated_function
+
+@app.route('/admin/support')
+@login_required
+@admin_required
+def admin_support():
+    status = request.args.get('status')
+    detail_id = request.args.get('detail_id', type=int)
+
+    # Fetch ticket list
+    if status:
+        tickets = SupportTicket.query.filter_by(status=status).order_by(SupportTicket.created_at.desc()).all()
+    else:
+        tickets = SupportTicket.query.order_by(SupportTicket.created_at.desc()).all()
+
+    # Load selected ticket for popup detail view
+    ticket_detail = None
+    if detail_id:
+        ticket_detail = SupportTicket.query.get(detail_id)
+        if ticket_detail:
+            # force load cx if not already loaded
+            _ = ticket_detail.cx  
+
+    return render_template('admin/support.html', tickets=tickets, ticket_detail=ticket_detail)
+
+
+
+@app.route('/admin/support/<int:ticket_id>')
+@login_required
+@admin_required
+def view_ticket_detail(ticket_id):
+    # Since the user wants to integrate ticket detail inside admin/support.html,
+    # redirect to admin_support with detail_id query param instead of separate template
+    return redirect(url_for('admin_support', detail_id=ticket_id))
+
+
+
+
+
+
+@app.route('/admin/support/<int:ticket_id>/status', methods=['POST'])
+@login_required
+@admin_required
+def update_ticket_status(ticket_id):
+    ticket = SupportTicket.query.get_or_404(ticket_id)
+    ticket.status = request.form['status']
+    db.session.commit()
+    return redirect(url_for('admin_support'))
+
+@app.route('/admin/support/delete/<int:ticket_id>', methods=['POST'])
+@login_required
+@admin_required
+def delete_ticket(ticket_id):
+    ticket = SupportTicket.query.get_or_404(ticket_id)
+    db.session.delete(ticket)
+    db.session.commit()
+    flash(f'Ticket #{ticket.ticket_number} has been successfully deleted.', 'success')
+    return redirect(url_for('admin_support'))
+
+@app.route('/admin/support/bulk-delete', methods=['POST'])
+@login_required
+@admin_required
+def bulk_delete_tickets():
+    ticket_ids = request.form.getlist('ticket_ids[]')  # Get selected IDs
+    if not ticket_ids:
+        flash('No tickets selected for deletion.', 'info')
+        return redirect(url_for('admin_support'))
+
+    deleted_count = 0
+    for tid in ticket_ids:
+        ticket = SupportTicket.query.get(tid)
+        if ticket:
+            db.session.delete(ticket)
+            deleted_count += 1
+
+    db.session.commit()
+    flash(f'{deleted_count} support ticket(s) deleted.', 'success')
+    return redirect(url_for('admin_support'))
+
+
+
+@app.route('/admin/support/assign/<int:ticket_id>', methods=['POST'])
+@login_required
+def assign_admin_ticket(ticket_id):
+    # Example logic:
+    if current_user.role != 'admin':
+        abort(403)
+    ticket = SupportTicket.query.get_or_404(ticket_id)
+    # You could add a field like `assigned_admin_id = db.Column(...)` and set it here
+    flash(f"Ticket #{ticket.ticket_number} assigned to you.", "info")
+    return redirect(url_for('admin_support'))
 
 
 

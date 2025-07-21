@@ -1,4 +1,4 @@
-/* Base */
+   /* Base */
 *, *::before, *::after {
   box-sizing: border-box; /* Universal sizing */
 }
@@ -24,6 +24,74 @@ html, body {
     --hover-bg: rgba(255, 255, 255, 0.15); /* IMPROVED: Slightly more opaque hover background */
     --active-shadow: rgba(255, 50, 92, 0.4);
     --header-height: 70px;
+    --cx-bg: #ffffff;
+    --cx-text: #424242;
+    --cx-accent: #FF325C;
+    --cx-accent-light: rgba(255,50,92,0.1);
+    --cx-border: rgba(0,0,0,0.1);
+    --cx-nav-top: 80px; /* adjust to match header height */
+    --cx-nav-height: 70px; /* nav row height */
+    --cx-border: #e0e0e0;
+    --header-bg: rgba(255, 255, 255, 0.9);
+    --text-color: #222;
+    --subtext-color: #666;
+    --border-color: #e0e0e0;
+    --accent-color: #FF325C;
+     --header-bg: #ffffff;
+    --text-color: #333;
+    --subtext-color: #777;
+
+    --bg-light: #fcfcfc; /* Light background for message items */
+    --text-dark: #333; /* Dark text color for message content */
+    --bg-faded: #f8f8f8; /* Slightly faded background for hover states */
+    --primary-dark: #d6284a; /* Darker shade of brand color for hover */
+    --danger-color: #FF325C; /* Color for delete actions, often same as primary */
+   
+    --success-color: #4CAF50; /* Material green */
+    --success-light-bg: rgba(40, 167, 69, 0.1); /* Light green tint for hover */
+
+
+
+    --alert-success-bg: #EBF8ED; /* Very light green */
+    --alert-success-text: #28a745; /* Standard green */
+    --alert-success-border: #B2D8BB; /* Muted green border */
+
+    --alert-info-bg: #E8F6FF; /* Very light blue */
+    --alert-info-text: #007bff; /* Standard blue */
+    --alert-info-border: #A6D9F7; /* Muted blue border */
+
+    --alert-warning-bg: #FFF8E6; /* Very light yellow-orange */
+    --alert-warning-text: #ffc107; /* Standard orange/yellow */
+    --alert-warning-border: #FFE5B2; /* Muted orange/yellow border */
+
+    --alert-danger-bg: #FEECEF; /* Very light pink/red */
+    --alert-danger-text: var(--primary-color, #FF325C); /* Your primary brand color */
+    --alert-danger-border: #FCCED7; /* Muted pink/red border */
+
+
+    /* Status: Active (Green) */
+    --status-active-bg: #EBF8ED;   /* Very light green background */
+    --status-active-text: #1E7145; /* Darker, rich green text */
+    --status-active-border: #92CD9B; /* Muted green border */
+
+    /* Status: Inactive / Terminated (Red - tied to primary brand color) */
+    --status-inactive-bg: #FEECEF;  /* Very light pink/red background */
+    --status-inactive-text: var(--primary-color, #FF325C); /* Your primary brand color for text */
+    --status-inactive-border: #FCCED7; /* Muted pink/red border */
+
+    --admin-primary-color: #4CAF50; /* A modern green for primary actions (e.g., View) */
+    --admin-danger-color: #F44336; /* A clear red for danger actions (e.g., Delete) */
+    --admin-text-color-dark: #333; /* Darker text for main content */
+    --admin-text-color-light: #666; /* Lighter text for secondary info */
+    --admin-bg-light: #fdfefe; /* Very light background for interactive elements */
+    --admin-border-color: #e0e0e0; /* Soft border color */
+    --admin-shadow-sm: 0 1px 3px rgba(0,0,0,0.08); /* Small, soft shadow for subtle elevation */
+    --admin-shadow-md: 0 4px 12px rgba(0,0,0,0.08); /* Medium shadow for deeper elevation */
+    --admin-header-bg: #e6f3e6; /* Light green-ish background for table header */
+    --admin-row-hover-bg: #f5fff5; /* Very light green for table row hover */
+    --admin-focus-ring-color: rgba(76, 175, 80, 0.2); /* Focus ring based on primary color */
+    
+  
 }
 
 
@@ -35,10 +103,20 @@ body {
     line-height: 1.6; /* Added for general readability */
 }
 
+body.dark-mode {
+    --header-bg: rgba(30, 30, 30, 0.95);
+    --text-color: #f0f0f0;
+    --subtext-color: #aaa;
+    --border-color: #444;
+    --accent-color: #FF5F7A;
+  }
+  
+
 
 main {
   padding-top: 0; /* remove global padding */
   margin-top: 70px; /* add space once below fixed header */
+ 
 }
 
 
@@ -212,6 +290,29 @@ main {
 .delete-btn:hover {
     color: var(--danger-color);
 }
+
+.restore-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 0.7rem; /* Match the delete icon size */
+    color: var(--text-muted);
+    padding: 0;
+    transition: color 0.2s ease-in-out;
+    line-height: 1;
+    flex-shrink: 0;
+    white-space: nowrap;
+    min-width: 0;
+    min-height: 0;
+    display: block;
+}
+
+.restore-btn:hover {
+    color: var(--success-color); /* Use green or success tone */
+}
+
+
+
 /* Scoped Delete Form inside .billing-section */
 .billing-section .delete-form {
   margin-left: 0.5rem;
@@ -270,6 +371,88 @@ main {
     }
 }
 
+
+/* Container for account action buttons */
+.account-actions {
+    display: flex;
+    gap: 0.5rem; /* Space between action buttons */
+    align-items: flex-end;
+    flex-direction: column;
+}
+
+/* Ensures forms within the flex container don't break layout */
+.account-actions .inline-form {
+    display: contents; /* Makes the form itself not a flex item, but its content is */
+}
+
+.inline-form {
+  margin: 0;
+  display: inline;
+}
+
+/* Base style for both delete and restore buttons */
+.account-actions .delete-btn,
+.account-actions .restore-btn {
+    background: none; /* No background color by default */
+    border: none; /* No border */
+    cursor: pointer; /* Indicates interactivity */
+    font-size: 1.2rem; /* Size for emoji icons (adjust as needed for specific emojis) */
+    color: var(--text-muted); /* Default muted text color */
+    padding: 0.4rem 0.6rem; /* Padding for click/tap target */
+    border-radius: 6px; /* Consistent rounded corners */
+    transition: color 0.2s ease, background-color 0.2s ease, transform 0.1s ease;
+    display: flex; /* Use flex to perfectly center the emoji */
+    align-items: center;
+    justify-content: center;
+}
+
+/* Delete Button Specific Styles */
+.account-actions .delete-btn:hover {
+    color: var(--primary-color); /* Highlight with primary-color on hover (red for danger) */
+    background-color: rgba(255, 50, 92, 0.1); /* Light tint of primary-color on hover */
+    transform: translateY(-1px); /* Subtle lift effect */
+}
+
+.account-actions .delete-btn:active {
+    transform: translateY(0); /* Press-down effect on click */
+    background-color: rgba(255, 50, 92, 0.15); /* Slightly darker tint when active */
+}
+
+/* Restore Button Specific Styles */
+.account-actions .restore-btn:hover {
+    color: var(--success-color); /* Green for restore action on hover */
+    background-color: var(--success-light-bg); /* Light green tint on hover */
+    transform: translateY(-1px); /* Subtle lift effect */
+}
+
+.account-actions .restore-btn:active {
+    transform: translateY(0); /* Press-down effect on click */
+    background-color: rgba(40, 167, 69, 0.15); /* Slightly darker green tint when active */
+}
+
+/* Focus state for accessibility (for both buttons) */
+.account-actions .delete-btn:focus,
+.account-actions .restore-btn:focus {
+    outline: none; /* Remove default outline */
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25); /* Custom, subtle blue focus ring */
+}
+
+/* Responsive Adjustments for Mobile Screens */
+@media (max-width: 480px) {
+    .account-actions {
+        gap: 0.3rem; /* Reduce gap between buttons on smaller screens */
+    }
+    .account-actions .delete-btn,
+    .account-actions .restore-btn {
+        font-size: 1.5rem; /* Increase emoji size for easier tapping on mobile */
+        padding: 0.5rem; /* Increase padding for better touch target */
+    }
+}
+
+
+
+
+
 /* --- Header Styles --- */
 
 header {
@@ -309,6 +492,12 @@ header {
     background-color: #000;
     color: #fff;
     border-bottom: 1px solid #FF325C;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 150;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
 .dashboard-header .main-title-bold {
@@ -331,6 +520,13 @@ header {
 .compact-header {
     background-color: #F8F8F8; /* Light background for clear logo visibility */
     color: #333; /* Dark text for slogan for contrast */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 150;
+    background: #ffffff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
 /* Responsive Adjustments */
@@ -365,85 +561,197 @@ header {
 }
 
 
-/* Admin Header */
+/* =========================
+   ADMIN HEADER - CLEAN VERSION (PC & MOBILE)
+   ========================= */
+
 .admin-header {
-    background: rgba(255, 255, 255, 0.75);
-    backdrop-filter: blur(10px);
-    border-bottom: 1px solid #e0e0e0;
-    padding: 1rem 2rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    z-index: 1000;
-    position: sticky;
-    top: 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: var(--header-bg);
+  color: var(--text-color);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border-color);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  z-index: 100;
+  padding: 0.75rem 0; /* REMOVE horizontal padding from here */
+  display: flex;
+  justify-content: center; /* center the container */
+  align-items: center;
+  box-sizing: border-box;
+  font-family: 'Titillium Web', sans-serif;
+
 }
 
-.admin-header-content {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+.admin-main-title,
+.admin-subtitle,
+.admin-name,
+.admin-logout-btn {
+  color: var(--text-color);
 }
 
-.admin-title-group h1.admin-main-title {
-    font-size: 1.8rem;
-    font-weight: 600;
-    margin: 0;
-    color: #FF325C;
+.admin-header-container {
+  width: 100%;
+  padding: 0 1.25rem; /* APPLY horizontal padding inside the container */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+
+.admin-header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.admin-title-group {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.admin-main-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #FF325C;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0;
 }
 
 .admin-subtitle {
-    font-size: 0.9rem;
-    color: #666;
-    margin-top: 4px;
+  font-size: 0.85rem;
+  color: #666;
+  margin: 2px 0 0 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.admin-user-controls {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
+.admin-header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.admin-user-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .admin-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid #FF325C;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #FF325C;
 }
 
 .admin-user-info {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .admin-name {
-    font-weight: 500;
-    font-size: 0.95rem;
-    color: #333;
+  font-weight: 500;
+  font-size: 0.95rem;
+  color: #333;
 }
 
 .admin-logout-btn {
-    font-size: 0.85rem;
-    color: #FF325C;
-    text-decoration: none;
+  font-size: 0.85rem;
+  color: #FF325C;
+  text-decoration: none;
 }
 
 .admin-logout-btn:hover {
-    text-decoration: underline;
+  text-decoration: underline;
+}
+
+.mode-toggle {
+  font-size: 1.3rem;
+  border: none;
+  background: transparent;
+  color: #FF325C;
+  cursor: pointer;
+  padding: 0.15rem 0.35rem; /* reduced padding for smaller emoji */
+  border-radius: 6px;
+  transition: background 0.2s ease;
+}
+
+.mode-toggle:hover {
+  background-color: rgba(255, 50, 92, 0.08);
 }
 
 
-.admin-proof-card select {
-  padding: 6px 10px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  margin-top: 6px;
-  margin-bottom: 8px;
+
+/* --- Scoped Toggle Button Styling --- */
+.admin-header .toggle-btn {
+  font-size: 1.6rem;
+  background: transparent;
+  border: none;
+  color: #FF325C;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+  margin: 0;
+  min-width: auto;
+  box-shadow: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
+.admin-header .toggle-btn:hover {
+  background-color: rgba(255, 50, 92, 0.1);
+}
+
+
+
+/* =========================
+   Mobile Adjustments
+   ========================= */
+@media (max-width: 640px) {
+  .admin-header-container {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .admin-header-left,
+  .admin-header-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .admin-title-group {
+    flex: 1;
+    text-align: left;
+  }
+
+  .admin-user-wrap {
+    justify-content: flex-end;
+  }
+
+  .admin-name {
+    font-size: 0.9rem;
+  }
+
+  .admin-subtitle {
+    font-size: 0.75rem;
+  }
+}
 
 
 
@@ -597,6 +905,22 @@ h1, p {
     margin-top: 1.5rem;
 }
 
+
+.dashboard-card-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  transition: transform 0.2s ease;
+}
+
+.dashboard-card-link:hover .dashboard-card {
+  transform: scale(1.02);
+  box-shadow: 0 0 12px rgba(255, 50, 92, 0.2);
+  cursor: pointer;
+}
+
+
+
 /* Progress Bar for Internet Usage (existing) */
 .progress-bar-container {
     width: 100%;
@@ -662,28 +986,31 @@ body.sidebar-open {
 .sidebar {
     position: fixed;
     top: 0;
-    left: 0;
-    width: 280px; /* Your defined width */
+    left: -260px;
+    width: 260px; /* Your defined width */
     height: 100vh;
     background-color: var(--secondary-color); /* Your defined color */
     color: var(--text-light);
     padding: 2.5rem 1.8rem;
     overflow-y: auto;
-    z-index: 1000; /* Above content, below toggle button */
+    z-index: 1050; /* Above content, below toggle button */
     display: flex;
     flex-direction: column;
-    box-shadow: 2px 0 20px var(--shadow-light);
+    box-shadow: 2px 0 6px var(--shadow-light);
+    transition: left 0.3s ease;
     transform: translateX(-100%); /* Hidden by default */
     transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1); /* Smooth slide transition */
 }
 .sidebar.active {
     transform: translateX(0%); /* Slide into view */
     box-shadow: 2px 0 35px var(--shadow-strong);
+    left: 0;
 }
 
 .sidebar.collapsed {
-    transform: translateX(-100%),
+    transform: translateX(-100%);
   }
+  
 
 
 /* Sidebar Header */
@@ -807,7 +1134,7 @@ body.sidebar-open {
     width: 100vw;
     height: 100vh;
     background-color: rgba(0, 0, 0, 0.6);
-    z-index: 999; /* Below sidebar, above content */
+    z-index: 1000; /* Below sidebar, above content */
     opacity: 0;
     transition: opacity 0.3s ease;
 }
@@ -858,27 +1185,7 @@ body.sidebar-open {
 }
 
 
-/* --- Toggle Button Specific Styles (FIXED: Reinforcing positioning) --- */
-/* OVERRIDE GLOBAL BUTTON RULES FOR SIDEBAR TOGGLE BUTTON */
-.toggle-btn {
-    position: fixed;
-    top: 1rem;
-    left: 1rem;
-    z-index: 1001; /* Higher than sidebar and overlay */
-    font-size: 2.2rem;
-    color: #FF325C; /* Changed to primary color for visibility */
-    cursor: pointer;
-    background: transparent;
-    border: none;
-    padding: 0.5rem;
-    border-radius: 5px;
-    transition: background-color 0.2s ease, color 0.2s ease;
-}
-  
-.toggle-btn:hover {
-    background-color: rgba(255, 50, 92, 0.1); /* Light red tint on hover */
-}
-  
+
 
 
 /* Flash messages */
@@ -889,7 +1196,27 @@ body.sidebar-open {
     max-width: 1200px;
     margin: auto;
     box-sizing: border-box; /* Crucial for responsive padding */
+    margin-top: calc(var(--cx-nav-top, 82px) + var(--cx-nav-height, 78px));
 }
+
+@media (max-width: 1024px) {
+    .tab-wrapper {
+      margin-top: 140px; /* Tablet screens */
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .tab-wrapper {
+      margin-top: 125px; /* Small tablets / large phones */
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .tab-wrapper {
+      margin-top: auto; /* Mobile phones */
+    }
+  }
+  
 
 
 /* --- Login Page Layout --- */
@@ -897,69 +1224,71 @@ body.sidebar-open {
     display: flex;
     justify-content: center;
     align-items: center;
-    /* Adjust min-height to push card slightly up if header is large, or remove if body scroll */
-    min-height: calc(100vh - var(--header-height) - 2rem);
+    min-height: 100vh; /* Full height of the viewport */
     padding: 20px;
     background-color: var(--background-light);
-    box-sizing: border-box; /* Ensures padding is included in element's total width/height */
+    box-sizing: border-box;
+    position: relative;
+    top: 0;
 }
 
 .login-card {
     background-color: var(--background-card);
-    padding: 2.5rem; /* Increased padding for more breathing room */
-    border-radius: 14px; /* Slightly more rounded corners */
-    box-shadow: 0 10px 30px var(--shadow-light); /* More pronounced shadow */
-    width: 95%; /* More responsive on smaller screens */
+    padding: 2.5rem;
+    border-radius: 14px;
+    box-shadow: 0 10px 30px var(--shadow-light);
+    width: 100%;
     max-width: 450px;
     border: 1px solid #e0e0e0;
-    text-align: center; /* For centering text elements like titles directly within the card */
+    text-align: center;
 
-    /* CRITICAL FOR VERTICAL ALIGNMENT & SPACING OF DIRECT CHILDREN */
     display: flex;
     flex-direction: column;
-    align-items: center; /* Horizontally centers children like logo, header, and forms */
-    gap: 2rem; /* Increased space between major sections (logo, header, forms) */
+    align-items: center;
+    gap: 2rem;
 }
 
 /* --- Login Card Elements --- */
 .login-logo {
-    max-width: 160px; /* Slightly larger logo */
-    margin: 0; /* Ensures gap property on parent handles spacing */
-    display: block; /* Important for width and margin auto behavior */
+    max-width: 160px;
+    display: block;
+    margin: 0 auto;
 }
 
 #login-header {
-    margin: 0; /* Ensures gap property on parent handles spacing */
-    width: 100%; /* Important for text alignment within header */
-    /* Sticky header styles (if desired, from your original code) */
+    margin: 0;
+    width: 100%;
     background-color: var(--background-card);
     z-index: 10;
     padding-top: 0.5rem;
-    padding-bottom: 0.5rem; /* Adjusted padding */
+    padding-bottom: 0.5rem;
 }
 
 .login-title {
-    font-size: 2.2em; /* Slightly larger title */
+    font-size: 2.2em;
     color: var(--primary-color);
-    margin-bottom: 0.5rem; /* Maintain small gap between title and subtitle */
+    margin-bottom: 0.5rem;
+    margin-top: 0.5rem;
     font-weight: 700;
 }
 
 .login-subtitle {
     font-size: 1.1em;
     color: var(--text-color-medium);
-    margin-top: 0; /* Reset default margin */
+    margin-top: 0;
 }
 
 /* --- Toggle Buttons for Customer/Admin --- */
 .toggle-buttons {
     display: flex;
-    width: fit-content;
-    margin: 0 auto; /* Center the toggle buttons group */
+    justify-content: center;
+    width: 100%;
     border: 1px solid var(--border-color-light);
     border-radius: 10px;
     overflow: hidden;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    max-width: 350px;
+    margin: 0 auto;
 }
 
 .auth-toggle-btn {
@@ -973,7 +1302,6 @@ body.sidebar-open {
     cursor: pointer;
     transition: all 0.25s ease;
     white-space: nowrap;
-    position: static; /* Ensures it behaves normally within its parent */
     margin: 0;
     min-width: unset;
     width: auto;
@@ -999,27 +1327,44 @@ body.sidebar-open {
     background-color: #f0f0f0;
 }
 
-/* --- Media Query for Mobile Phones (to ensure responsiveness) --- */
-@media (max-width: 600px) {
-    .toggle-buttons {
-        width: 100%;
-        box-shadow: none;
-        border-radius: 8px;
+/* --- Mobile Responsiveness --- */
+@media (max-width: 768px) {
+    .login-card {
+        padding: 2rem;
+        gap: 1.5rem;
+        min-height: calc(100vh - 56px); /* subtracts assumed mobile header height */
+    }
+
+    .login-title {
+        font-size: 1.8em;
+    }
+
+    .login-subtitle {
+        font-size: 1em;
     }
 
     .auth-toggle-btn {
         padding: 10px 15px;
         font-size: 0.9em;
     }
+    .login-card {
+        padding: 1.5rem;
+        gap: 1.25rem;
+    }
 }
 
-/* Optional: Further reduction for very small phones */
-@media (max-width: 380px) {
+@media (max-width: 480px) {
+    .login-card {
+        padding: 1.5rem;
+        gap: 1rem;
+    }
+
     .auth-toggle-btn {
         padding: 8px 12px;
         font-size: 0.85em;
     }
 }
+
 
 /* --- Form Specific Styles --- */
 /* CRITICAL: Make the FORM elements Flex Containers to manage their children's spacing */
@@ -2656,6 +3001,7 @@ hr {
     width: 100%; /* Ensures it takes full width on smaller screens */
     max-width: 900px; /* Sets a maximum width for readability on larger screens */
     margin: 0 auto; /* Centers the section horizontally and sets top/bottom margin to 0 */
+    margin-top: 24px; /* Space above the billing section, adjusted for desktop */
 
     /* Order is important: Apply general padding first, then specific padding-top */
     padding: 3rem; /* General padding for a generous look (can be reduced if too much overall space) */
@@ -2670,12 +3016,14 @@ hr {
     animation: fadeIn 0.4s ease-in-out;
     box-sizing: border-box;
     min-height: 250px;
+
+    padding-top: 48px
 }
 
 /* Responsive adjustments for smaller screens (Merged and streamlined) */
 @media (max-width: 767px) {
     .billing-section {
-        margin-top: 0px; /* Explicitly ensure no top margin on mobile */
+        margin-top: 24px; /* Explicitly ensure no top margin on mobile */
         padding: 1.5rem; /* Adjusted padding for a better fit on mobile (was 1.2rem in one, 1.5rem in another) */
         /* Adjust '0.5rem' here to reduce space between the header's clearance and the content below it on mobile */
         padding-top: 24px; /* Reduced from 1rem. Keeps consistent top buffer with header on mobile. */
@@ -3786,96 +4134,2164 @@ form .action-btn {
 }
 
 
+/* CX NAV ROW */
+/* CX Header Nav - Enhanced Minimalist & Fixed on Scroll */
 
-/* CX SOA Section - Minimalist */
-.cx_soa .tab-section-title {
-    font-size: 1.5rem;
-    font-weight: 600;
-    margin-bottom: 1.5rem;
-    color: #333;
+.cx-nav-row {
+  position: fixed;
+  top: 83px;
+  left: 0;
+  right: 0;
+  width: 100%;
+  background-color: var(--cx-bg, #ffffff);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  z-index: 999;
+}
+  
+
+  .cx-nav-inner {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+
+  .content-area{
+    padding-top: 0px; /* or whatever value you need */
   }
   
-  .cx_soa .soa-history {
+  
+
+  
+  /* Constrain width on larger screens */
+  @media (min-width: 1654px) {
+    .cx-nav-row {
+        width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+        left: auto;
+        right: auto;
+      }
+      .cx-nav-inner {
+        max-width: 100%;
+      }
+  }
+
+  
+  .cx-user-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: nowrap;
+}
+
+  
+  .cx-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--cx-accent);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease;
+  }
+  .cx-avatar:hover {
+    transform: scale(1.05);
+  }
+  
+  .cx-user-details {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    font-family: 'Titillium Web', sans-serif;
+    gap: 0.2rem;
   }
   
-  .cx_soa .soa-card.minimal {
-    background: #fff;
-    border: 1px solid #e0e0e0;
-    border-radius: 12px;
-    padding: 1.2rem 1.5rem;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+  .cx-user-name {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--cx-text);
+  }
+  
+  .cx-account-number {
+    font-size: 0.8rem;
+    font-weight: 300;
+    color: #777;
+  }
+  
+ .cx-links {
+  display: flex;
+  gap: 2rem;
+}
+  
+  .cx-link {
+    font-family: 'Titillium Web', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--cx-text);
+    text-decoration: none;
+    padding: 0.5rem 0;
+    position: relative;
+    transition: color 0.2s ease;
+  }
+  
+  .cx-link::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: var(--cx-accent);
+    transition: width 0.3s ease;
+  }
+  
+  .cx-link:hover {
+    color: var(--cx-accent);
+  }
+  
+  .cx-link:hover::after,
+  .cx-link.active::after {
+    width: 100%;
+  }
+  
+  .cx-link.active {
+    color: var(--cx-accent);
+  }
+  
+  .logout-link {
+    font-weight: 600;
+    border-left: 1px solid var(--cx-border);
+    padding-left: 2rem;
+  }
+
+  .cx-nav-row.scrolled-down {
+    top: -83px; /* Move it up by its height to hide it completely */
+}
+
+.cx-nav-row.scrolled {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Stronger shadow when active/scrolled */
+}
+  
+ /* Tablet & small desktops - existing styles */
+@media (max-width: 1024px) {
+    .cx-nav-row {
+      padding: 0.75rem 1rem;
+      top: var(--cx-nav-top);
+    }
+    .cx-links {
+      gap: 1.2rem;
+    }
+    .cx-account-number {
+      display: none;
+    }
+  }
+  
+/* Mobile phones - Refined Layout */
+@media (max-width: 640px) {
+  .cx-nav-row {
+    position: fixed !important;
+    top: 83px;
+    left: 0;
+    right: 0;
+    width: 100%;
+    background-color: var(--cx-bg, #ffffff);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.75rem 1rem 0.5rem;
+    transition: top 0.3s ease-in-out, transform 0.3s ease-in-out;
+  }
+
+  .cx-nav-inner {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .cx-user-info {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.25rem;
+    text-align: center;
+  }
+
+  .cx-avatar {
+    width: 40px;
+    height: 40px;
+  }
+
+  .cx-user-name {
+    font-size: 0.9rem;
+  }
+
+  .cx-account-number {
+    display: none;
+  }
+
+  .cx-links {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+    border-top: 1px solid var(--cx-border);
+    padding-top: 0.5rem;
+  }
+
+  .cx-link {
+    flex: 1 1 auto;
+    min-width: 80px;
+    text-align: center;
+    padding: 0.5rem 0;
+    font-size: 0.85rem;
+  }
+
+  .cx-link::after {
+    bottom: -2px;
+  }
+
+  .logout-link {
+    border-left: none;
+    padding-left: 0;
+  }
+
+  .content-area {
+    padding-top: 160px; /* Make sure this accounts for the header + nav height */
+  }
+
+  .cx-nav-row.scrolled-down {
+    top: -83px;
+  }
+
+  .cx-nav-row.scrolled {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+}
+
+
+
+/* STATEMENTS OF ACCOUNT DISPLAY STYLES (for the cx_soa section) */
+
+/* Main container for the SOA section */
+.cx_soa {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    max-width: 1200px; /* Aligns with max-width from admin styles */
+    margin: 1.5rem auto; /* Centers the content */
+    padding: 0 1rem; /* Added some horizontal padding for smaller screens */
+}
+
+
+/* Container for the list of SOA cards */
+.soa-history {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem; /* Spacing between individual SOA cards */
+}
+
+/* SOA Card layout for each individual statement */
+.soa-card.minimal {
+    display: flex; /* Changed from grid as content is linear here */
+    flex-direction: column;
+    gap: 1rem; /* Gap between header and body */
+    padding: 1.5rem;
+    border-radius: 10px;
+    background-color: #ffffff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e6e6e6;
+    font-size: 0.95rem;
     transition: box-shadow 0.2s ease;
-  }
-  .cx_soa .soa-card.minimal:hover {
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-  }
-  
-  .cx_soa .soa-card-header {
+}
+
+.soa-card.minimal:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Slight hover effect */
+}
+
+/* Header section within each SOA card */
+.soa-card-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    flex-wrap: wrap;
+    flex-wrap: wrap; /* Allows meta sections to wrap on smaller screens */
     margin-bottom: 0.75rem;
-  }
-  
-  .cx_soa .soa-user-meta {
+    padding-bottom: 0.75rem;
+    border-bottom: 1px dashed #eee; /* Separator for header and body */
+}
+
+/* User metadata within the SOA card header */
+.soa-user-meta {
     font-size: 0.95rem;
     color: #444;
     display: flex;
     gap: 0.5rem;
     align-items: center;
     flex-wrap: wrap;
-  }
-  .cx_soa .dot-separator::before {
-    content: "|";
+}
+
+.soa-user-meta span {
+    margin: 0;
+    font-weight: 500;
+    color: #333;
+}
+
+/* Separator dot for user metadata */
+.dot-separator::before {
+    content: "•"; /* Changed from "|" for a softer look */
     margin: 0 0.3rem;
     color: #888;
-  }
-  
-  .cx_soa .soa-upload-meta {
+}
+
+/* Upload date and download link meta */
+.soa-upload-meta {
     font-size: 0.85rem;
     color: #777;
     display: flex;
     gap: 1rem;
     align-items: center;
-  }
-  
-  .cx_soa .soa-download-link {
-    color: #FF325C;
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    margin-top: 0.5rem; /* Space from user-meta on wrap */
+}
+
+.soa-upload-meta .upload-date {
+    font-weight: 400;
+}
+
+/* Download link style */
+.soa-download-link {
+    display: inline-flex; /* Use inline-flex for icon and text alignment */
+    align-items: center;
+    gap: 0.3rem;
+    color: var(--primary-color);
+    font-weight: 600;
     text-decoration: none;
-    font-weight: 500;
-  }
-  .cx_soa .soa-download-link:hover {
+    transition: color 0.2s ease;
+    padding: 0.3rem 0.6rem; /* Make it a bit more clickable */
+    border-radius: 4px;
+    background-color: rgba(var(--primary-color-rgb), 0.05); /* Subtle background */
+}
+
+.soa-download-link:hover {
+    color: var(--primary-dark);
     text-decoration: underline;
-  }
-  
-  .cx_soa .soa-card-body {
-    padding-top: 0.5rem;
+    background-color: rgba(var(--primary-color-rgb), 0.1);
+}
+
+/* Body section within each SOA card */
+.soa-card-body {
     display: flex;
     flex-direction: column;
-    gap: 0.3rem;
-  }
-  
-  .cx_soa .soa-billing-period label,
-  .cx_soa .soa-file-name label {
-    font-weight: 500;
+    gap: 0.8rem;
+}
+
+.soa-card-body div {
+    display: flex;
+    align-items: center; /* Align label and span */
+    gap: 0.5rem; /* Space between label and value */
+}
+
+.soa-card-body label {
+    font-weight: 600;
     color: #555;
-    margin-right: 0.5rem;
-  }
-  .cx_soa .soa-billing-period span,
-  .cx_soa .soa-file-name span {
-    font-size: 0.95rem;
+    min-width: 100px; /* Ensure labels align */
+}
+
+.soa-card-body span {
     color: #333;
-  }
-  
-  .cx_soa .soa-empty-message {
-    padding: 2rem;
+}
+
+/* Message when no statements are available */
+.soa-empty-message {
     text-align: center;
+    color: #777;
     font-style: italic;
-    color: #888;
-    font-size: 1rem;
-  }
+    padding: 2rem;
+    border: 1px dashed #ddd;
+    border-radius: 8px;
+    margin-top: 2rem;
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 768px) {
+    .cx_soa {
+        margin: 1rem auto;
+        gap: 1rem;
+        padding: 0 0.75rem;
+    }
+
   
+
+    .soa-history {
+        gap: 0.8rem;
+    }
+
+    .soa-card.minimal {
+        padding: 1rem;
+    }
+
+    .soa-card-header {
+        flex-direction: column; /* Stack user meta and upload meta */
+        align-items: flex-start;
+        gap: 0.5rem; /* Space between stacked meta sections */
+        margin-bottom: 0.5rem;
+        padding-bottom: 0.5rem;
+    }
+
+    .soa-user-meta {
+        width: 100%; /* Take full width when stacked */
+        justify-content: center; /* Center content when stacked */
+    }
+    
+    .soa-upload-meta {
+        width: 100%;
+        justify-content: center; /* Center content when stacked */
+        margin-top: 0; /* Adjust margin as gap is now on parent */
+    }
+
+    .soa-card-body div {
+        flex-direction: column; /* Stack label and value for better readability */
+        align-items: flex-start;
+        gap: 0.2rem;
+    }
+
+    .soa-card-body label {
+        min-width: unset; /* Remove fixed width when stacked */
+        font-size: 0.9rem;
+    }
+
+    .soa-card-body span {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .soa-user-meta,
+    .soa-upload-meta {
+        font-size: 0.85rem;
+    }
+    .soa-download-link {
+        font-size: 0.8rem;
+        padding: 0.25rem 0.5rem;
+    }
+}
+
+
+.pending-request-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.pending-request-item {
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-left: 4px solid #FF325C;
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+  color: #2c2c2c;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  transition: background 0.2s ease;
+}
+
+.pending-request-item:hover {
+  background: #fef3f4;
+}
+
+.pending-request-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  transition: transform 0.2s ease;
+}
+
+.pending-request-link:hover .pending-request-item {
+  background-color: #f9f9f9;
+  transform: scale(1.01);
+  box-shadow: 0 0 8px rgba(0,0,0,0.1);
+  border-radius: 8px;
+}
+
+
+.type-label {
+  align-self: flex-start;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 6px;
+  margin-bottom: 4px;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.type-payment {
+  background-color: #28a745; /* Green */
+}
+
+.type-rebate {
+  background-color: #007bff; /* Blue */
+}
+
+.type-overcharge {
+  background-color: #ffc107; /* Yellow */
+  color: #000;
+}
+
+.type-reactivation {
+  background-color: #FF325C; /* Red (same as your brand color) */
+  color: #fff;
+}
+
+.submitted-date {
+  font-size: 0.75rem;
+  color: #777;
+  margin-top: 4px;
+}
+
+/* Optional: improve spacing on small screens */
+@media (max-width: 600px) {
+  .pending-request-item {
+    font-size: 0.85rem;
+    padding: 0.7rem 0.85rem;
+  }
+
+  .type-label {
+    font-size: 0.65rem;
+    padding: 2px 8px;
+  }
+
+  .submitted-date {
+    font-size: 0.7rem;
+  }
+}
+
+
+
+/* ========================================
+   Admin Account Section - Enhanced Look
+   ======================================== */
+
+.admin-account-section {
+    padding: 2.5rem; /* Good padding for breathing room */
+    background: #ffffff;
+    border-radius: 18px; /* Soft, premium rounded corners */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04); /* **Softer, more diffused shadow** for a lighter feel */
+    margin-bottom: 3rem; /* Good space below the section */
+    font-family: 'Titillium Web', sans-serif, 'Segoe UI', Tahoma, Geneva, Verdana; /* Prioritize brand font */
+    color: #333; /* Soft text color */
+    overflow-x: auto; /* Ensures horizontal scrolling for wide content */
+}
+
+.admin-account-section h2 {
+    font-size: 1.85rem; /* Slightly larger heading */
+    color: #FF325C; /* Company primary color (brand consistency) */
+    margin-bottom: 2.2rem; /* Ample space below heading */
+    font-weight: 700;
+    border-bottom: 2px solid rgba(255, 50, 92, 0.1); /* **Even lighter border** for increased minimalism */
+    padding-bottom: 0.6rem;
+    letter-spacing: 0.02em; /* Reduced letter-spacing for cleaner look */
+}
+
+/* --- Account Cards Layout --- */
+.admin-account-cards {
+    padding-top: 30px;
+    padding-bottom: 30px;
+    display: grid;
+    /* Responsive grid: minimum 300px per column, fills available space */
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem; /* Increased gap between cards for clear separation */
+}
+
+.admin-account-card {
+    background: #ffffff; /* White background for cards */
+    border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04); /* **Lighter, very subtle shadow** for cards */
+    padding: 2rem; /* Generous internal padding for card content */
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem; /* Gap between form sections within the card */
+    transition: box-shadow 0.3s ease-in-out, transform 0.2s ease-in-out; /* Smooth hover effect */
+    border: 1px solid #eee; /* Very subtle border for definition */
+}
+
+.admin-account-card:hover {
+    box-shadow: 0 12px 40px rgba(255, 50, 92, 0.15); /* Brand-colored, prominent shadow on hover */
+    transform: translateY(-3px); /* Subtle lift effect */
+}
+
+
+.account-update-form,
+.admin-account-message-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem; /* Consistent spacing within forms */
+}
+
+.account-field {
+    display: flex;
+    flex-direction: column;
+}
+
+.account-field label {
+    font-weight: 600;
+    font-size: 0.95rem; /* Slightly larger label font */
+    margin-bottom: 0.5rem; /* More space between label and input */
+    color: #555; /* Softer label color */
+}
+
+/* --- Input Field Styling (Text, Select, Textarea) --- */
+.account-field input[type="text"],
+.account-field select,
+.admin-account-message-form textarea {
+    padding: 14px 18px; /* Generous input padding */
+    font-size: 1rem; /* Good font size for readability */
+    font-weight: 500;
+    border: 1px solid #ddd; /* Subtle border */
+    border-radius: 12px; /* Softer rounded corners */
+    background-color: #fcfcfc; /* Very light off-white background */
+    color: #212121; /* Dark text for contrast */
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.04); /* Very subtle inner shadow */
+    transition: border 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+    min-height: 52px; /* Increased min-height for better tap target and visual balance */
+    box-sizing: border-box;
+
+    /* For non-wrapping text (specific to inputs/selects in this card design) */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* Shows ellipsis for long single-line text */
+    word-break: normal;
+}
+
+.account-field input[type="text"]::placeholder,
+.admin-account-message-form textarea::placeholder {
+    color: #aab; /* Slightly more distinct placeholder color */
+    opacity: 0.8; /* Slight transparency for placeholder */
+}
+
+.account-field input[type="text"]:focus,
+.account-field select:focus,
+.admin-account-message-form textarea:focus {
+    border-color: #FF325C;
+    background-color: #fff;
+    box-shadow: 0 0 0 4px rgba(255, 50, 92, 0.15);
+    outline: none;
+}
+
+.account-field select {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1.2rem center;
+    background-size: 1.1rem;
+    padding-right: 3.5rem;
+    line-height: 1;
+    text-align: left;
+
+    &:hover {
+        border-color: #c0c0c0;
+        background-color: #f5f5f5;
+    }
+}
+
+.account-field select option {
+    color: #212121;
+    background-color: #fff;
+    font-size: 0.95rem;
+}
+
+/* --- Textarea Specific Styling --- */
+.admin-account-message-form textarea {
+    resize: vertical; /* Allow vertical resizing only */
+    height: 70px; /* Default height for message textarea */
+    min-width: unset; /* Let it expand with 100% width of its container */
+    margin-bottom: 0; /* Remove bottom margin if gap is handled by flex container */
+    white-space: normal; /* Allow text to wrap for multi-line input */
+    overflow: auto; /* Show scrollbar if content overflows */
+    text-overflow: unset; /* No ellipsis for textarea, show all text via scrolling */
+    word-break: break-word; /* Allow long words to break */
+}
+
+
+/* --- Button Styling --- */
+.admin-account-btn-update,
+.admin-account-btn-send {
+    background-color: #FF325C; /* Brand primary color */
+    color: white;
+    border: none;
+    padding: 12px 22px; /* Generous padding for buttons */
+    font-size: 0.95rem; /* Slightly larger button text */
+    font-weight: 600;
+    border-radius: 10px; /* Softer rounded corners for buttons */
+    cursor: pointer;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+    display: inline-block;
+    align-self: flex-start; /* Aligns button to the left within its flex container */
+    box-shadow: 0 5px 15px rgba(255, 50, 92, 0.25); /* Subtle brand-colored shadow */
+    letter-spacing: 0.05em; /* **Increased letter-spacing** for uppercase crispness */
+    text-transform: uppercase; /* **Uppercase text** for a professional, crisp button label */
+}
+
+.admin-account-btn-update:hover,
+.admin-account-btn-send:hover {
+    background-color: #e02a4d; /* Slightly darker brand color on hover */
+    box-shadow: 0 8px 25px rgba(214, 40, 74, 0.4); /* More prominent shadow on hover */
+    transform: translateY(-2px); /* Subtle lift effect on hover */
+}
+
+.admin-account-btn-update:focus,
+.admin-account-btn-send:focus {
+    outline: 3px solid rgba(255, 50, 92, 0.35); /* Soft, brand-colored focus outline */
+    outline-offset: 3px;
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 992px) {
+    .admin-account-section {
+        padding: 2rem;
+    }
+    .admin-account-cards {
+        gap: 1.5rem;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Adjust min card width */
+    }
+    .admin-account-card {
+        padding: 1.5rem;
+    }
+    .account-name {
+        font-size: 1.2rem;
+    }
+    .account-field label {
+        font-size: 0.9rem;
+    }
+    .account-field input[type="text"],
+    .account-field select,
+    .admin-account-message-form textarea {
+        padding: 12px 16px;
+        font-size: 0.9rem;
+        min-height: 48px;
+    }
+    .admin-account-message-form textarea {
+        height: 65px;
+    }
+    .admin-account-btn-update,
+    .admin-account-btn-send {
+        padding: 10px 18px;
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .admin-account-section {
+        padding: 1.5rem;
+    }
+    .admin-account-section h2 {
+        font-size: 1.6rem;
+        margin-bottom: 1.8rem;
+    }
+    .admin-account-cards {
+        grid-template-columns: 1fr; /* Stack cards vertically on smaller screens */
+        gap: 1.5rem;
+    }
+    .admin-account-card {
+        padding: 1.2rem;
+        gap: 1rem;
+    }
+    .account-name {
+        font-size: 1.15rem;
+    }
+    .account-field input[type="text"],
+    .account-field select,
+    .admin-account-message-form textarea {
+        padding: 10px 14px;
+        font-size: 0.9rem;
+        min-height: 44px;
+    }
+    .admin-account-message-form textarea {
+        height: 60px;
+    }
+    .admin-account-btn-update,
+    .admin-account-btn-send {
+        width: 100%; /* Buttons take full width on mobile */
+        align-self: stretch;
+        padding: 10px 16px;
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .admin-account-section {
+        padding: 1rem;
+    }
+    .admin-account-section h2 {
+        font-size: 1.4rem;
+        margin-bottom: 1.5rem;
+    }
+    .admin-account-card {
+        padding: 1rem;
+    }
+    .account-name {
+        font-size: 1.1rem;
+    }
+}
+
+.account-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    background: #fff;
+    gap: 1rem;
+    flex-wrap: nowrap; /* Force both sections to stay side by side */
+}
+
+.account-left {
+    flex: 1 1 auto;
+    padding-right: 1rem;
+    overflow: visible; /* Allow full display */
+    white-space: normal; /* Allow wrapping */
+    max-width: 60%; /* Limit max width on desktop */
+}
+
+.account-name {
+    font-weight: 700;
+    color: var(--primary-color);
+    line-height: 1.3;
+    white-space: normal; /* Allow wrapping */
+    overflow: visible; /* Allow full display */
+    text-overflow: clip; /* Remove ellipsis */
+    font-size: 1.35rem; /* Slightly larger name */
+    color: #FF325C; /* Brand color for names */
+    margin-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 50, 92, 0.1); /* **Even lighter border** for the name */
+    padding-bottom: 0.5rem;
+    word-break: normal; /* Normal word break */
+}
+
+.account-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.5rem;
+    text-align: right;
+    flex: 0 0 auto;
+    min-width: fit-content;
+    max-width: 35%; /* Limit max width on desktop */
+}
+
+.account-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+/* Base Style for Account Status Label */
+.account-status-label {
+    font-weight: bold;
+    padding: 6px 18px;
+    border-radius: 50px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    min-width: 100px;
+    font-size: 0.85rem;
+    line-height: 1;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+    transition: all 0.2s ease-in-out;
+    border: 1px solid transparent;
+}
+
+/* Status Colors */
+.account-status-label.active {
+    background-color: var(--status-active-bg);
+    color: var(--status-active-text);
+    border-color: var(--status-active-border);
+}
+
+.account-status-label.inactive,
+.account-status-label.terminated,
+.account-status-label.terminate {
+    background-color: var(--status-inactive-bg);
+    color: var(--status-inactive-text);
+    border-color: var(--status-inactive-border);
+}
+
+.account-status-label:not(.active):not(.inactive):not(.terminated):not(.terminate) {
+    background-color: #e9ecef;
+    color: #495057;
+    border-color: #dee2e6;
+}
+
+.account-divider {
+    margin: 0.25rem 0;
+    border: none;
+    border-top: 1px solid #ccc;
+}
+
+/* Responsive Layout for Mobile */
+@media (max-width: 768px) {
+    .account-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .account-left, .account-right {
+        max-width: 100%;
+        white-space: normal;
+        overflow: visible;
+    }
+
+    .account-name {
+        white-space: normal;
+        overflow: visible;
+        text-overflow: unset;
+    }
+
+    .account-actions {
+        justify-content: flex-start;
+    }
+}
+
+
+
+
+
+
+.admin-messages-card {
+    background: #ffffff;
+    border-radius: 18px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+    padding: 2.2rem;
+    margin-top: 2.5rem;
+    margin-bottom: 2.5rem;
+    border: 1px solid #eee;
+}
+
+.admin-messages-card h2 {
+    font-size: 1.85rem;
+    color: var(--primary-color); /* Using variable for consistency */
+    margin-bottom: 2rem;
+    font-weight: 700;
+    border-bottom: 2px solid rgba(255, 50, 92, 0.2);
+    padding-bottom: 0.6rem;
+    letter-spacing: 0.02em;
+}
+
+.admin-message-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 450px;
+    overflow-y: auto; /* Enable vertical scrolling for the list of messages */
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem; /* Reduced gap between messages, similar to notif-box margin */
+    padding-right: 8px; /* Space for scrollbar */
+}
+
+/* Custom Scrollbar Styles for Webkit Browsers */
+.admin-message-list::-webkit-scrollbar {
+    width: 8px;
+}
+.admin-message-list::-webkit-scrollbar-track {
+    background: #f0f0f0;
+    border-radius: 4px;
+}
+.admin-message-list::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    border-radius: 4px;
+    border: 2px solid #f0f0f0;
+}
+.admin-message-list::-webkit-scrollbar-thumb:hover {
+    background-color: #a0a0a0;
+}
+
+.admin-message-item {
+    position: relative;
+    background: var(--bg-light); /* Using variable for background */
+    border: 1px solid var(--border-color); /* Using variable for border */
+    border-left: 4px solid var(--primary-color); /* Status indicator like notif-box */
+    border-radius: 6px; /* Smaller border-radius like notif-box */
+    padding: 12px 14px; /* Reduced padding */
+    transition: all 0.2s ease-in-out; /* Smoother transition */
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04); /* Subtle shadow like notif-box */
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem; /* Smaller gap within item */
+    min-width: 0; /* Ensures proper shrinking in flex containers */
+}
+
+.admin-message-item:hover {
+    background-color: var(--bg-faded); /* Using variable for hover background */
+    border-color: #d0d0d0; /* Adjusted border color on hover */
+    transform: translateY(-1px); /* Subtle lift on hover */
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08); /* More prominent shadow on hover */
+}
+
+.admin-message-delete-form {
+    position: absolute;
+    top: 8px; /* Adjusted top positioning */
+    right: 8px; /* Adjusted right positioning */
+    z-index: 10;
+}
+
+.admin-message-delete-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 0.9rem; /* Adjusted font size for delete button */
+    color: var(--text-muted); /* Using variable for color */
+    padding: 0.2rem 0.4rem; /* Added padding for easier tap target */
+    border-radius: 4px; /* Rounded corners for tap target */
+    line-height: 1;
+    transition: color 0.2s ease, background-color 0.2s ease; /* Added background transition */
+    flex-shrink: 0;
+    white-space: nowrap;
+    min-width: 0;
+    min-height: 0;
+    display: block;
+}
+
+.admin-message-delete-btn:hover {
+    color: var(--danger-color); /* Using variable for hover color */
+    background-color: rgba(255, 50, 92, 0.1); /* Light red tint on hover */
+    transform: none; /* Remove previous rotation effect */
+}
+
+.admin-message-body {
+    padding-right: 35px; /* Ensures space for the delete button */
+    font-size: 0.85rem; /* Slightly smaller font size */
+    color: var(--text-dark); /* Using variable for text color */
+    line-height: 1.4; /* Tighter line height */
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+    flex-grow: 1;
+}
+
+.admin-message-preview,
+.admin-message-full {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+}
+
+.admin-message-full.hidden {
+    display: none;
+}
+
+.admin-message-expand {
+    background: none;
+    border: none;
+    color: var(--primary-color); /* Using variable for color */
+    cursor: pointer;
+    font-size: 0.75rem; /* Smaller font for expand toggle */
+    text-align: left;
+    padding: 3px 0; /* Reduced padding */
+    margin-top: 3px; /* Reduced margin */
+    display: block;
+    width: fit-content;
+    text-decoration: none; /* No underline by default */
+    transition: color 0.2s ease, text-decoration 0.2s ease;
+}
+
+.admin-message-expand:hover {
+    color: var(--primary-dark); /* Using variable for hover color */
+    text-decoration: underline;
+}
+
+.admin-message-expand:focus {
+    outline: 3px solid rgba(255, 50, 92, 0.2);
+    outline-offset: 2px;
+}
+
+.admin-message-timestamp {
+    font-size: 0.72rem; /* Adjusted font size */
+    color: #777;
+    align-self: flex-end;
+    margin-top: 0;
+    white-space: nowrap;
+}
+
+
+/* ========================================
+   Responsive Adjustments for PC and Phone
+   ======================================== */
+
+/* Tablets and larger phones (landscape) */
+@media (max-width: 992px) {
+    .admin-messages-card {
+        padding: 1.8rem;
+    }
+    .admin-messages-card h2 {
+        font-size: 1.7rem;
+        margin-bottom: 1.6rem;
+    }
+    .admin-message-list {
+        max-height: 400px;
+        gap: 0.7rem; /* Adjusted gap */
+    }
+    .admin-message-item {
+        padding: 10px 12px; /* Adjusted padding */
+    }
+    .admin-message-delete-form {
+        top: 6px; /* Adjusted positioning */
+        right: 6px;
+    }
+    .admin-message-delete-btn {
+        font-size: 0.85rem; /* Adjusted font size */
+    }
+    .admin-message-body {
+        padding-right: 30px;
+        font-size: 0.8rem; /* Adjusted font size */
+    }
+    .admin-message-expand {
+        font-size: 0.7rem; /* Adjusted font size */
+    }
+    .admin-message-timestamp {
+        font-size: 0.68rem; /* Adjusted font size */
+    }
+}
+
+/* Mobile phones (portrait) */
+@media (max-width: 768px) {
+    .admin-messages-card {
+        padding: 1.2rem;
+        border-radius: 14px;
+        margin-top: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    .admin-messages-card h2 {
+        font-size: 1.5rem;
+        margin-bottom: 1.2rem;
+        padding-bottom: 0.4rem;
+    }
+    .admin-message-list {
+        max-height: 350px;
+        gap: 0.6rem; /* Adjusted gap */
+        padding-right: 6px;
+    }
+    .admin-message-list::-webkit-scrollbar {
+        width: 6px;
+    }
+    .admin-message-item {
+        padding: 8px 10px; /* Adjusted padding */
+        border-radius: 6px; /* Consistency in smaller border-radius */
+    }
+    .admin-message-delete-form {
+        top: 4px; /* Adjusted positioning */
+        right: 4px;
+    }
+    .admin-message-delete-btn {
+        font-size: 0.8rem; /* Adjusted font size */
+        padding: 0.15rem 0.3rem; /* Adjusted padding */
+    }
+    .admin-message-body {
+        padding-right: 25px;
+        font-size: 0.78rem; /* Adjusted font size */
+        line-height: 1.3; /* Tighter line height */
+    }
+    .admin-message-expand {
+        font-size: 0.65rem; /* Adjusted font size */
+        padding: 2px 0;
+    }
+    .admin-message-timestamp {
+        font-size: 0.65rem; /* Adjusted font size */
+    }
+}
+
+/* Smaller mobile phones */
+@media (max-width: 480px) {
+    .admin-messages-card {
+        padding: 1rem;
+    }
+    .admin-messages-card h2 {
+        font-size: 1.3rem;
+        margin-bottom: 1rem;
+    }
+    .admin-message-list {
+        max-height: 300px;
+    }
+    .admin-message-item {
+        padding: 6px 8px; /* Further reduced padding */
+    }
+    .admin-message-delete-btn {
+        font-size: 0.75rem; /* Smallest font size for delete button */
+    }
+    .admin-message-body {
+        font-size: 0.75rem; /* Smallest font size for body */
+    }
+    .admin-message-expand {
+        font-size: 0.6rem; /* Smallest font size for expand */
+    }
+    .admin-message-timestamp {
+        font-size: 0.6rem; /* Smallest font size for timestamp */
+    }
+}
+
+
+
+.admin-account-controls {
+    display: flex;
+    flex-wrap: wrap; /* Allows items to wrap onto the next line on smaller screens */
+    gap: 1.2rem; /* Consistent spacing between controls */
+    margin-top: 1.5rem; /* Space from the content above */
+    justify-content: flex-end; /* Align controls to the right by default */
+    align-items: center; /* Vertically align items in the flex container */
+}
+
+/* Base styles for text input and select dropdowns */
+.admin-account-controls input[type="text"],
+.admin-account-controls select {
+    padding: 0.8rem 1rem;
+    border: 1px solid var(--border-color); /* Consistent border style */
+    border-radius: 8px; /* Consistent with other UI elements */
+    background-color: var(--bg-light); /* Light background */
+    color: var(--text-dark); /* Dark text for readability */
+    font-size: 0.95rem; /* Readable font size */
+    transition: all 0.2s ease;
+    flex-grow: 1; /* Allows elements to grow and fill space */
+    min-width: 140px; /* Minimum width before wrapping */
+}
+
+/* Placeholder color for search input */
+.admin-account-controls input[type="text"]::placeholder {
+    color: var(--text-muted);
+}
+
+/* Custom styling for select dropdown arrows */
+.admin-account-controls select {
+    /* Remove default arrow */
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    /* Custom SVG arrow */
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23444444%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200%20-24.8%200L146.2%20185.6%2030.8%2069.4a17.6%2017.6%200%200%200%20-24.8%2024.8l130.6%20130.6c6.8%206.8%2017.7%206.8%2024.5%200l130.6%20-130.6a17.6%2017.6%200%200%0A0%200%20-24.8z%22%2F%3E%3C%2Fsvg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.7rem top 50%; /* Position the arrow */
+    background-size: 0.65em auto; /* Size the arrow */
+    padding-right: 2.2rem; /* Ensure space for the custom arrow */
+}
+
+/* Focus states for input and select */
+.admin-account-controls input[type="text"]:focus,
+.admin-account-controls select:focus {
+    outline: none; /* Remove default outline */
+    border-color: var(--primary-color); /* Highlight border with brand color */
+    box-shadow: 0 0 0 3px rgba(255, 50, 92, 0.2); /* Soft, branded focus ring */
+}
+
+/* Specific styling for control buttons (copied from previous turn for completeness) */
+.admin-account-controls .control-button {
+    background-color: var(--primary-color);
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    padding: 0.8rem 1.6rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+    box-shadow: 0 4px 12px rgba(255, 50, 92, 0.2);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+}
+
+.admin-account-controls .control-button:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(255, 50, 92, 0.3);
+}
+
+.admin-account-controls .control-button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(255, 50, 92, 0.15);
+}
+
+.admin-account-controls .control-button:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(255, 50, 92, 0.3);
+}
+
+.admin-account-controls .control-button.secondary {
+    background-color: transparent;
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+    box-shadow: none;
+}
+
+.admin-account-controls .control-button.secondary:hover {
+    background-color: rgba(255, 50, 92, 0.08);
+    color: var(--primary-dark);
+    transform: none;
+    box-shadow: none;
+}
+
+.admin-account-controls .control-button.secondary:active {
+    background-color: rgba(255, 50, 92, 0.15);
+}
+
+.admin-account-controls .control-button.secondary:focus {
+    box-shadow: 0 0 0 3px rgba(255, 50, 92, 0.3);
+}
+
+.admin-account-controls .control-button.danger {
+    background-color: #dc3545;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.2);
+}
+
+.admin-account-controls .control-button.danger:hover {
+    background-color: #c82333;
+    box-shadow: 0 6px 16px rgba(220, 53, 69, 0.3);
+}
+
+.admin-account-controls .control-button.danger:focus {
+    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.3);
+}
+
+
+/* ========================================
+   Responsive Adjustments for .admin-account-controls
+   ======================================== */
+
+/* Tablets and larger phones (landscape) */
+@media (max-width: 992px) {
+    .admin-account-controls {
+        gap: 1rem;
+        margin-top: 1.2rem;
+        justify-content: center; /* Center controls on tablets if they wrap */
+    }
+    .admin-account-controls input[type="text"],
+    .admin-account-controls select {
+        padding: 0.7rem 0.9rem;
+        font-size: 0.9rem;
+        min-width: 100px; /* Adjusted min-width for smaller screens */
+    }
+    .admin-account-controls select {
+        background-position: right 0.6rem top 50%;
+        background-size: 0.6em auto;
+        padding-right: 1.8rem;
+    }
+    .admin-account-controls .control-button {
+        padding: 0.7rem 1.4rem;
+        font-size: 0.9rem;
+    }
+}
+
+/* Mobile phones (portrait) */
+@media (max-width: 768px) {
+    .admin-account-controls {
+        flex-direction: column; /* Stack elements vertically on small screens */
+        align-items: stretch; /* Make elements take full width */
+        gap: 0.8rem; /* Reduced gap for stacked elements */
+        margin-top: 1rem;
+    }
+    .admin-account-controls input[type="text"],
+    .admin-account-controls select {
+        width: 100%; /* Full width for better tap experience */
+        min-width: unset; /* Remove min-width when full width */
+        margin-bottom: 0; /* Managed by parent gap */
+    }
+    .admin-account-controls select {
+        background-position: right 0.7rem top 50%; /* Re-adjust arrow for full width */
+        background-size: 0.65em auto;
+        padding-right: 2.2rem;
+    }
+    .admin-account-controls .control-button {
+        width: 100%; /* Full width for better tap experience */
+        padding: 0.8rem 1rem; /* Slightly more vertical padding when full width */
+        font-size: 0.95rem; /* Keep a good readable size for tap targets */
+    }
+}
+
+/* Smaller mobile phones */
+@media (max-width: 480px) {
+    .admin-account-controls {
+        gap: 0.6rem;
+    }
+    .admin-account-controls input[type="text"],
+    .admin-account-controls select {
+        font-size: 0.9rem; /* Slightly smaller on very small screens */
+        padding: 0.7rem 0.9rem;
+    }
+    .admin-account-controls select {
+        background-position: right 0.6rem top 50%;
+        background-size: 0.6em auto;
+        padding-right: 1.8rem;
+    }
+    .admin-account-controls .control-button {
+        font-size: 0.9rem;
+    }
+}
+
+
+/* ========================================
+   Flash & Alert Styles - Unified & Minimalist
+   ======================================== */
+
+.flash-container {
+    position: fixed;
+    top: 1.25rem;
+    right: 1.25rem;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    max-width: 360px;
+    pointer-events: none;
+}
+
+/* Base alert style shared across all types */
+.flash,
+.alert {
+    padding: 0.95rem 1.2rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInSlideUp 0.35s ease-out forwards;
+    pointer-events: auto;
+}
+
+/* Color-coded variants */
+.flash.success,
+.alert-success {
+    background-color: var(--alert-success-bg, #e6f4ea);
+    color: var(--alert-success-text, #276749);
+    border: 1px solid var(--alert-success-border, #c6e6c4);
+}
+
+.flash.error,
+.alert-danger {
+    background-color: var(--alert-danger-bg, #fbeaea);
+    color: var(--alert-danger-text, #b91c1c);
+    border: 1px solid var(--alert-danger-border, #f5c2c7);
+}
+
+.alert-warning {
+    background-color: var(--alert-warning-bg, #fff4e5);
+    color: var(--alert-warning-text, #9f6000);
+    border: 1px solid var(--alert-warning-border, #ffd59e);
+}
+
+.alert-info {
+    background-color: var(--alert-info-bg, #e7f3fe);
+    color: var(--alert-info-text, #0c5460);
+    border: 1px solid var(--alert-info-border, #bee5eb);
+}
+
+/* Fade-in animation */
+@keyframes fadeInSlideUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Fade-out state (used via JS or timeout) */
+.flash.fade-out,
+.alert.fade-out {
+    opacity: 0 !important;
+    max-height: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+    transition: opacity 0.6s ease, max-height 0.6s ease, padding 0.4s ease, margin 0.4s ease;
+}
+
+/* Dismiss button */
+.alert-close-btn {
+    margin-left: 1rem;
+    cursor: pointer;
+    font-size: 0.8rem;
+    background: transparent;
+    border: none;
+    color: inherit;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+    padding: 0.2rem;
+    border-radius: 4px;
+}
+
+.alert-close-btn:hover {
+    transform: scale(1.15);
+    opacity: 0.75;
+}
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+    .flash-container {
+        top: 1rem;
+        right: 0.5rem;
+        left: 0.5rem;
+        max-width: unset;
+        gap: 0.6rem;
+    }
+
+    .flash,
+    .alert {
+        font-size: 0.85rem;
+        padding: 0.8rem 1rem;
+        border-radius: 6px;
+    }
+
+    .alert-close-btn {
+        font-size: 0.75rem;
+        margin-left: 0.75rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .flash-container {
+        top: 0.75rem;
+        gap: 0.5rem;
+    }
+
+    .flash,
+    .alert {
+        padding: 0.7rem 0.8rem;
+        font-size: 0.8rem;
+    }
+}
+
+
+
+/* ========================================
+   TERMINATION ACCOUNT REQUEST - Enhanced
+   ======================================== */
+
+.termination-warning {
+  color: #d63031;
+  font-weight: 600;
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.termination-warning a {
+  color: #d63031;
+  text-decoration: underline;
+  font-weight: 700;
+  transition: color 0.3s ease;
+}
+
+.termination-warning a:hover {
+  color: #c0392b;
+}
+
+.hidden-form {
+  display: none;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  margin-top: 1.5rem;
+}
+
+.hidden-form.show {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+#reactivation-form {
+  background: #fdfdfd;
+  border: 1px solid #ddd;
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+#reactivation-form h3 {
+  color: #d63031;
+  font-size: 1.3rem;
+  text-align: center;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+/* Optional: Style inputs inside the form if needed */
+#reactivation-form input,
+#reactivation-form textarea {
+  width: 100%;
+  padding: 0.6rem;
+  border: 1px solid #ccc;
+  border-radius: 0.4rem;
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+}
+
+#reactivation-form button {
+  width: 100%;
+  padding: 0.6rem;
+  border: none;
+  border-radius: 0.4rem;
+  background-color: #d63031;
+  color: #fff;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+#reactivation-form button:hover {
+  background-color: #c0392b;
+}
+
+/* Responsive tweaks */
+@media (max-width: 600px) {
+  #reactivation-form {
+    padding: 1rem;
+    border-radius: 0.5rem;
+  }
+
+  #reactivation-form h3 {
+    font-size: 1.1rem;
+  }
+
+  #reactivation-form button {
+    font-size: 0.95rem;
+  }
+}
+
+
+/* ========================================
+   Support Page (Billing Section Inspired)
+   ======================================== */
+
+.support-page {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 1.5rem;
+  background: #ffffff;
+  border-radius: 18px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* Page Header */
+.support-page h2 {
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: #1e3a5f;
+  border-bottom: 2px solid #e5e7eb;
+  padding-bottom: 0.5rem;
+}
+
+/* Toggle Buttons */
+.support-page .toggle-options {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.support-page .toggle-options button {
+  background-color: #1d4ed8;
+  color: #fff;
+  border: none;
+  padding: 0.6rem 1.4rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease;
+}
+
+.support-page .toggle-options button:hover {
+  background-color: #2563eb;
+}
+
+/* Form Wrapper (shared) */
+.support-page form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+/* Form Groups */
+.support-page .form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.support-page label {
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+  color: #334155;
+}
+
+.support-page input[type="text"],
+.support-page input[type="number"],
+.support-page select,
+.support-page textarea {
+  padding: 0.65rem 0.9rem;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  font-size: 0.95rem;
+  background-color: #f9fafb;
+  transition: border-color 0.2s ease;
+}
+
+.support-page input:focus,
+.support-page select:focus,
+.support-page textarea:focus {
+  border-color: #3b82f6;
+  outline: none;
+  background-color: #fff;
+}
+
+/* Textarea Styling */
+.support-page textarea {
+    display: block;
+    margin: 5px auto;
+    width: 100%;
+    max-width: 100%;
+    resize: vertical;
+    min-height: 5px;
+    white-space: pre-wrap;
+    padding: 10px;
+    font-size: 14px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    background-color: #fdfdfd;
+    line-height: 1;
+}
+
+
+
+
+/* Conditional Sections */
+.support-page #repair-form,
+.support-page #account-form,
+.support-page #plan-options,
+.support-page #other-issue-box {
+  display: none;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Submit Button */
+.support-page .submit-btn {
+  background-color: #047857;
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 0.9rem;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 3px 6px rgba(4, 120, 87, 0.2);
+  transition: background-color 0.3s ease;
+  margin-top: 1rem;
+}
+
+.support-page .submit-btn:hover {
+  background-color: #059669;
+}
+
+/* Responsive (Optional) */
+@media (max-width: 600px) {
+  .support-page {
+    padding: 1rem;
+  }
+
+  .support-page .toggle-options {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .support-page .toggle-options button {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+
+
+/* ─────────────────────────────────────────────── */
+/* ADMIN SUPPORT PAGE - SCOPED            */
+/* Minimalist + Responsive (PC & Mobile)  */
+/* ─────────────────────────────────────────────────── */
+
+.admin-support-page {
+    padding: 2.5rem; /* Copied padding from admin-account-section */
+    font-family: 'Titillium Web', sans-serif, 'Segoe UI', Tahoma, Geneva, Verdana; /* Prioritize brand font */
+    color: var(--admin-text-color-dark);
+    background-color: #ffffff; /* Explicitly clean white background */
+    border-radius: 18px; /* Copied border-radius from admin-account-section */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04); /* Copied box-shadow from admin-account-section */
+    margin-bottom: 3rem; /* Copied margin-bottom from admin-account-section */
+    overflow-x: auto; /* Copied overflow-x from admin-account-section */
+}
+
+/* ─────────── Title ─────────── */
+.admin-support-page .support-title {
+    font-size: 2rem; /* Slightly larger for prominence */
+    font-weight: 700; /* Bolder for impact */
+    margin-bottom: 1.8rem; /* More space below title */
+    color: var(--primary-color, #FF325C); /* Use primary color, fallback to brand color */
+    text-align: center; /* Center align title for a cleaner look */
+    padding-bottom: 0.8rem; /* More padding for the border */
+    border-bottom: 2px solid rgba(255, 50, 92, 0.1); /* Even lighter border for increased minimalism */
+    letter-spacing: 0.03em; /* Slightly increased letter-spacing for title clarity */
+}
+
+/* ─────────── Filter Bar ─────────── */
+.admin-support-page .filter-bar {
+    margin-bottom: 2rem; /* More space below filter bar */
+    display: flex; /* Use flexbox for alignment */
+    justify-content: flex-end; /* Align filter to the right */
+    gap: 1.2rem; /* Increased space between filter elements */
+    align-items: center; /* Vertically align items */
+}
+
+.admin-support-page .filter-select {
+    padding: 0.75rem 1.2rem; /* Increased padding for better touch area and visual weight */
+    border: 1px solid var(--admin-border-color, #e0e0e0); /* Soft border */
+    border-radius: 8px; /* Softer rounded corners */
+    background-color: var(--admin-bg-light, #f8f8f8); /* Light background */
+    font-size: 0.95rem;
+    color: var(--admin-text-color-dark, #424242);
+    transition: all 0.2s ease; /* Smoother transitions for all properties */
+    cursor: pointer;
+    appearance: none; /* Hide default arrow */
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); /* Slightly darker arrow */
+    background-repeat: no-repeat;
+    background-position: right 1rem center; /* Adjusted position */
+    background-size: 0.9rem; /* Slightly smaller arrow */
+    padding-right: 2.8rem; /* More space for the custom arrow */
+}
+
+.admin-support-page .filter-select:hover {
+    border-color: var(--primary-color, #FF325C); /* Highlight border on hover */
+    box-shadow: 0 0 0 2px rgba(255, 50, 92, 0.1); /* Subtle ring on hover */
+}
+
+.admin-support-page .filter-select:focus {
+    border-color: var(--admin-primary-color, #FF325C);
+    box-shadow: 0 0 0 3px var(--admin-focus-ring-color, rgba(255, 50, 92, 0.3)); /* Clearer focus ring */
+    outline: none;
+}
+
+/* ─────────── Table Container ─────────── */
+.admin-support-page .table-container {
+    overflow-x: auto; /* Allows horizontal scrolling for table on small screens */
+    border-radius: 12px; /* Consistent rounded corners */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); /* Lighter shadow for table elevation */
+    border: 1px solid var(--admin-border-color, #eee); /* Very subtle border around the table */
+}
+
+/* ─────────── Tickets Table ─────────── */
+.admin-support-page .support-tickets-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 900px; /* Ensures table is wide enough for columns on desktop */
+    background: #fff;
+    border-radius: 12px; /* Redundant if container has it, but good for internal consistency */
+    overflow: hidden; /* Ensures border-radius applies to content */
+}
+
+.admin-support-page .support-tickets-table thead {
+    background-color: var(--admin-header-bg, #f4f7f9); /* Slightly different header background */
+    color: var(--admin-text-color-dark, #333);
+}
+
+.admin-support-page .support-tickets-table th,
+.admin-support-page .support-tickets-table td {
+    padding: 1.2rem 1.5rem; /* Increased padding for even more breathing room */
+    text-align: left;
+    font-size: 0.9rem; /* Slightly smaller for table readability */
+    border-bottom: 1px solid var(--admin-border-color, #ebebeb); /* Softer border color */
+}
+
+.admin-support-page .support-tickets-table th {
+    font-weight: 600;
+    color: var(--admin-text-color-dark, #424242);
+    white-space: nowrap; /* Prevent headers from wrapping */
+    text-transform: uppercase; /* Uppercase headers for admin look */
+    font-size: 0.8rem; /* Smaller, clearer header text */
+    letter-spacing: 0.05em; /* Add letter spacing to headers */
+}
+
+.admin-support-page .support-tickets-table tbody tr:nth-child(even) {
+    background-color: var(--admin-bg-light, #fafafa); /* Lighter zebra striping */
+}
+
+.admin-support-page .support-tickets-table tbody tr:hover {
+    background-color: var(--admin-row-hover-bg, #f0f0f0); /* More noticeable but still subtle hover effect */
+    transition: background-color 0.2s ease-in-out;
+}
+
+/* ─────────── Customer Info Cell ─────────── */
+.admin-support-page .customer-cell strong {
+    display: block;
+    color: var(--admin-text-color-dark, #333);
+    font-weight: 600; /* Make name slightly bolder */
+    margin-bottom: 0.2rem; /* Small space between name and email */
+}
+
+.admin-support-page .customer-cell small {
+    color: var(--admin-text-color-light, #777); /* Lighter color for secondary info */
+    font-size: 0.8rem; /* Slightly smaller for secondary info */
+    line-height: 1.3; /* Ensure spacing for small text */
+}
+
+/* ─────────── Status Dropdown ─────────── */
+.admin-support-page .status-select {
+    padding: 0.5rem 1rem; /* Consistent padding */
+    border-radius: 6px;
+    border: 1px solid var(--admin-border-color, #e0e0e0);
+    font-size: 0.9rem;
+    background-color: var(--admin-bg-light, #f8f8f8);
+    color: var(--admin-text-color-dark, #424242);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    appearance: none; /* Hide default arrow */
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.8rem center;
+    background-size: 0.8rem;
+    padding-right: 2.2rem; /* Space for the custom arrow */
+}
+
+.admin-support-page .status-select:hover {
+    border-color: var(--primary-color, #FF325C);
+}
+
+.admin-support-page .status-select:focus {
+    border-color: var(--admin-primary-color, #FF325C);
+    box-shadow: 0 0 0 3px var(--admin-focus-ring-color, rgba(255, 50, 92, 0.3));
+    outline: none;
+}
+
+/* ─────────── Buttons ─────────── */
+.admin-support-page .btn-view,
+.admin-support-page .btn-delete {
+    display: inline-flex; /* Use flex for vertical alignment of text */
+    align-items: center; /* Center text vertically */
+    justify-content: center; /* Center text horizontally */
+    padding: 0.6rem 1.2rem; /* Increased padding */
+    font-size: 0.88rem; /* Slightly larger font */
+    font-weight: 500; /* Medium weight */
+    border-radius: 8px; /* Softer rounded corners */
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    border: none;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08); /* Subtle initial shadow for elevation */
+}
+
+.admin-support-page .btn-view {
+    background-color: var(--admin-primary-color, #FF325C);
+    color: white;
+    margin-right: 10px; /* More space between buttons */
+}
+
+.admin-support-page .btn-view:hover {
+    background-color: color-mix(in srgb, var(--admin-primary-color, #FF325C) 90%, black); /* Slightly darker */
+    transform: translateY(-3px); /* More noticeable lift effect */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.18); /* More prominent shadow on hover */
+}
+
+.admin-support-page .btn-delete {
+    background-color: var(--admin-danger-color, #dc3545);
+    color: white;
+}
+
+.admin-support-page .btn-delete:hover {
+    background-color: color-mix(in srgb, var(--admin-danger-color, #dc3545) 90%, black); /* Slightly darker */
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.18);
+}
+
+/* ─────────── No Tickets Row ─────────── */
+.admin-support-page .no-tickets {
+    text-align: center;
+    padding: 3rem; /* More padding for emptiness */
+    font-style: italic;
+    color: var(--admin-text-color-light, #888);
+    font-size: 1.1rem; /* Slightly larger for clarity */
+    background-color: var(--admin-bg-light, #fdfdfd); /* Light background for the message area */
+    border-radius: 8px;
+    margin-top: 1.5rem;
+}
+
+/* ─────────── Ticket Detail Popup ─────────── */
+.ticket-detail-popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.6); /* Slightly darker overlay */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(4px); /* Subtle blur effect on background */
+}
+
+.detail-content {
+    background: #fff;
+    padding: 2.5rem; /* Increased padding */
+    border-radius: 12px;
+    max-width: 550px; /* Slightly larger max-width for content */
+    width: 90%;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25); /* More prominent shadow for popup */
+    position: relative; /* For close button positioning */
+}
+
+.btn-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none; /* No background for close button */
+    border: none;
+    font-size: 1.5rem; /* Larger close icon */
+    color: var(--admin-text-color-light, #888); /* Subtle color */
+    cursor: pointer;
+    transition: color 0.2s ease, transform 0.2s ease;
+    padding: 0.5rem;
+    border-radius: 50%; /* Circular hit area */
+}
+
+.btn-close:hover {
+    color: var(--admin-danger-color, #dc3545); /* Red on hover */
+    transform: rotate(90deg); /* Spin effect on hover */
+}  /* ✅ This was missing */
+
+
+@media (max-width: 768px) {
+
+
+    .admin-support-page {
+        padding: 1rem; /* Adjusted padding for mobile */
+        box-shadow: none; /* Remove shadow on mobile for full width */
+        border-radius: 0; /* Make it full width on mobile */
+        margin-bottom: 1rem; /* Reduced margin */
+    }
+
+    .admin-support-page .support-title {
+        font-size: 1.6rem; /* Adjusted title size for mobile */
+        margin-bottom: 1.2rem; /* Reduced margin for mobile */
+        padding-bottom: 0.5rem;
+        letter-spacing: normal; /* Reset letter spacing for mobile titles */
+    }
+
+    .admin-support-page .filter-bar {
+        flex-direction: column; /* Stack filter elements */
+        align-items: stretch; /* Stretch to full width */
+        gap: 0.8rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .admin-support-page .filter-select {
+        width: 100%;
+        max-width: none; /* Allow full width on mobile */
+        font-size: 0.9rem;
+        padding: 0.6rem 1rem;
+        padding-right: 2.5rem; /* Maintain space for arrow */
+    }
+
+    .admin-support-page .table-container {
+        box-shadow: none; /* Remove table container shadow on mobile */
+        border-radius: 0; /* No border-radius for full width tables */
+        border: none; /* No border on mobile */
+    }
+
+    .admin-support-page .support-tickets-table {
+        min-width: auto; /* Allow table to shrink */
+        font-size: 0.8rem; /* Slightly smaller overall font for table on mobile */
+        border-radius: 0; /* Ensure no border radius on table itself */
+    }
+
+    .admin-support-page .support-tickets-table th,
+    .admin-support-page .support-tickets-table td {
+        padding: 0.6rem 0.8rem; /* Reduced padding for mobile table cells */
+        font-size: 0.8rem; /* Consistent font size for cells */
+        white-space: normal; /* Allow text to wrap within cells */
+        word-break: break-word; /* Ensure long words break */
+    }
+
+    .admin-support-page .support-tickets-table th {
+        font-size: 0.7rem; /* Smaller header font on mobile */
+        letter-spacing: 0.03em; /* Adjusted letter spacing for mobile headers */
+    }
+
+    .admin-support-page .btn-view,
+    .admin-support-page .btn-delete {
+        display: block; /* Make buttons full width */
+        width: 100%;
+        margin-bottom: 10px; /* Space between stacked buttons */
+        margin-right: 0; /* Remove right margin when stacked */
+        font-size: 0.85rem;
+        padding: 0.7rem 0.8rem;
+        text-align: center;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08); /* Keep subtle shadow on mobile buttons */
+        transform: none; /* Remove lift effect on mobile for better touch */
+    }
+
+    .admin-support-page .btn-delete {
+        margin-bottom: 0; /* No margin on the last button */
+    }
+
+    .admin-support-page .no-tickets {
+        padding: 1.5rem; /* Reduced padding on mobile */
+        font-size: 0.9rem;
+        margin-top: 1rem;
+    }
+
+    .detail-content {
+        padding: 1.5rem; /* Reduced padding for popup on mobile */
+        width: 95%; /* Make popup slightly wider on mobile */
+    }
+
+    .btn-close {
+        font-size: 1.2rem; /* Smaller close icon on mobile */
+        top: 0.5rem;
+        right: 0.5rem;
+        padding: 0.3rem;
+    }
+}

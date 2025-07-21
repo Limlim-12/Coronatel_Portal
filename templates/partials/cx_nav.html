@@ -1,0 +1,25 @@
+<!-- partials/cx_header_nav.html -->
+<div class="cx-nav-row">
+    <div class="cx-nav-inner">
+        <div class="cx-user-info">
+            <img src="{{ url_for('static', filename='uploads/' + (current_user.avatar or 'logo.jpg')) }}"
+                alt="User Avatar" class="cx-avatar">
+            <div class="cx-user-details">
+                <span class="cx-user-name">{{ current_user.name }}</span>
+                <span class="cx-account-number">Account No: {{ current_user.account_number or 'N/A' }}</span>
+            </div>
+        </div>
+        <nav class="cx-links">
+            <a href="{{ url_for('cx_dashboard') }}"
+                class="cx-link {% if active_tab == 'dashboard' %}active{% endif %}">Dashboard</a>
+            <a href="{{ url_for('cx_dashboard', tab='profile') }}"
+                class="cx-link {% if active_tab == 'profile' %}active{% endif %}">Profile</a>
+            <a href="{{ url_for('cx_dashboard', tab='billing') }}"
+                class="cx-link {% if active_tab == 'billing' %}active{% endif %}">Billing & Payment</a>
+            <a href="{{ url_for('cx_dashboard', tab='support') }}"
+                class="cx-link {% if active_tab == 'support' %}active{% endif %}">Support</a>
+            <a href="{{ url_for('logout') }}" class="cx-link logout-link">Logout</a>
+        </nav>
+    </div>
+</div>
+  

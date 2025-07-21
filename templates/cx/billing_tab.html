@@ -291,8 +291,8 @@
 
     
 <div id="soa" class="tab-content">
+    <h3>Statements of Account</h3>
     <div class="cx_soa">
-        <h3 class="tab-section-title">Statements of Account</h3>
 
         {% if soa_files %}
         <div class="soa-history">
@@ -303,7 +303,7 @@
                         <span>{{ current_user.location_region or 'N/A' }}</span>
                         <span class="dot-separator"></span>
                         <span>{{ current_user.name or 'N/A' }}</span>
-                        <span class="dot-separator"></span>  
+                        <span class="dot-separator"></span>  
                         <span>{{ current_user.account_number or 'N/A' }}</span>
                     </div>
                     <div class="soa-upload-meta">

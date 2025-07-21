@@ -6,51 +6,71 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Corona Telecom</title>
 
+  <!-- Fonts & Icons -->
   <link href="https://fonts.googleapis.com/css2?family=Titillium+Web&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-  {% if config['ENV_MODE'] == 'production' %}
+  {% if config.get('ENV_MODE', 'development') == 'production' %}
+
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.purged.css') }}">
   {% else %}
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
   {% endif %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/dark-mode.css') }}">
 </head>
 
 <body>
-
-  {% if current_user.is_authenticated and session.get('user_type') in ['admin', 'cx'] %}
-  <button id="sidebarToggle" class="toggle-btn">☰</button>
+  {% if current_user.is_authenticated and session.get('user_type') == 'admin' %}
   <div class="sidebar-overlay" id="sidebar-overlay"></div>
   {% endif %}
 
   <div class="main" id="main">
-
-    {# ✅ Include proper sidebar #}
     {% if current_user.is_authenticated and session.get('user_type') == 'admin' %}
     {% include 'partials/admin_sidebar.html' %}
     {% elif current_user.is_authenticated and session.get('user_type') == 'cx' %}
-    {% include 'partials/cx_sidebar.html' %}
+    {# No sidebar for CX #}
     {% endif %}
 
-    <div class="content-area">
-      {% if current_user.is_authenticated and session.get('user_type') == 'admin' %}
+    <div class="content-area 
+        {% if session.get('user_type') == 'cx' %}cx-padding
+        {% elif session.get('user_type') == 'admin' %}admin-padding
+        {% endif %}">
+
+      {% if current_user.is_authenticated %}
+      {% if session.get('user_type') == 'admin' %}
       <header class="admin-header">
-        <div class="admin-header-content">
-          <div class="admin-title-group">
-            <h1 class="admin-main-title">Corona Telecom Admin Panel</h1>
-            <p class="admin-subtitle">Monitor. Manage. Empower.</p>
+        <div class="admin-header-container">
+          <div class="admin-header-left">
+            <button id="sidebarToggle" class="toggle-btn" title="Toggle Sidebar">☰</button>
+            <div class="admin-title-group">
+              <h1 class="admin-main-title">Corona Telecom Admin Panel</h1>
+              <p class="admin-subtitle">Monitor. Manage. Empower.</p>
+            </div>
           </div>
-          <div class="admin-user-controls">
-            <img src="{{ url_for('static', filename='images/' + (current_user.avatar or 'admin.png')) }}"
-              alt="Admin Avatar" class="admin-avatar">
-            <div class="admin-user-info">
-              <span class="admin-name">{{ current_user.name or current_user.email }}</span>
-              <a href="{{ url_for('logout') }}" class="admin-logout-btn">Logout</a>
+          <div class="admin-header-right">
+            <button class="mode-toggle" title="Toggle Dark Mode">🌓</button>
+            <div class="admin-user-wrap">
+              <img src="{{ url_for('static', filename='images/' + (current_user.avatar or 'admin.png')) }}"
+                alt="Admin Avatar" class="admin-avatar">
+              <div class="admin-user-info">
+                <span class="admin-name">{{ current_user.name or current_user.email }}</span>
+                <a href="{{ url_for('logout') }}" class="admin-logout-btn">Logout</a>
+              </div>
             </div>
           </div>
         </div>
       </header>
+
+      {% elif session.get('user_type') == 'cx' %}
+      <header class="dashboard-header">
+        <div class="header-content">
+          <h1 class="main-title-bold">Welcome to Corona Telecom</h1>
+          <p class="subtitle-minimal">Empowering through connectivity.</p>
+        </div>
+      </header>
+      {% include 'partials/cx_nav.html' %}
+      {% endif %}
 
       {% elif is_admin_login %}
       <header class="admin-header admin-login">
@@ -63,28 +83,19 @@
       </header>
 
       {% else %}
-      <header class="{% if dashboard_header %}dashboard-header{% else %}compact-header{% endif %}">
-        {% if dashboard_header %}
-        <div class="header-content">
-          <h1 class="main-title-bold">Welcome to Corona Telecom</h1>
-          <p class="subtitle-minimal">Empowering through connectivity.</p>
-        </div>
-        {% else %}
+      <header class="compact-header">
         <img src="{{ url_for('static', filename='header.png') }}" alt="Corona Telecom Logo" class="header-image" />
-        {% endif %}
       </header>
       {% endif %}
 
       <main>
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
-        <div class="flash-container" style="position: fixed; top: 1rem; right: 1rem; z-index: 1000;">
+        <div class="flash-container">
           {% for category, message in messages %}
-          <div class="alert alert-{{ category }}"
-            style="position: relative; min-width: 250px; padding: 1rem 1.5rem; margin-bottom: 1rem; background-color: #FFEBEE; color: #C62828; border-left: 5px solid #FF325C; border-radius: 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+          <div class="alert alert-{{ category }}">
             {{ message }}
-            <span onclick="this.parentElement.style.display='none';"
-              style="position:absolute; top:5px; right:10px; cursor:pointer;">❌</span>
+            <span onclick="this.parentElement.style.display='none';" class="alert-close-btn">❌</span>
           </div>
           {% endfor %}
         </div>
@@ -92,16 +103,39 @@
         {% endwith %}
 
         {% block content %}{% endblock %}
-      </main>
+  </main>
+
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const flashContainer = document.querySelector('.flash-container');
+      if (!flashContainer) return;
+
+      const alerts = flashContainer.querySelectorAll('.alert');
+      if (!alerts.length) return;
+
+      setTimeout(() => {
+        alerts.forEach(alert => {
+          alert.classList.add('fade-out');
+          alert.addEventListener('transitionend', () => {
+            if (alert.parentElement) {
+              alert.parentElement.removeChild(alert);
+            }
+          });
+        });
+      }, 5000); // 5 seconds delay before fade out
+    });
+  </script>
     </div>
   </div>
 
+  <!-- ✅ Footer placed outside .main to avoid duplication -->
   <footer class="main-footer">
     <div class="footer-content">
       <div class="footer-section contact-info">
         <h3>Contact Corona Telecom</h3>
-        <p><i class="fab fa-facebook-square"></i> <a href="https://www.facebook.com/CoronaTelecom" target="_blank"
-            rel="noopener noreferrer">Corona Telecom</a></p>
+        <p><i class="fab fa-facebook-square"></i> <a href="https://www.facebook.com/CoronaTelecom"
+            target="_blank">Corona Telecom</a></p>
         <p><i class="fas fa-mobile-alt"></i> <a href="tel:+639123456789">+63 917 841 8711</a></p>
         <p><i class="fas fa-phone-alt"></i> <a href="tel:+63821234567">(02) 3439 2767</a></p>
       </div>
@@ -121,24 +155,21 @@
     </div>
   </footer>
 
+  <!-- Sidebar Script -->
   <script>
-     document.addEventListener('DOMContentLoaded', function () {
-        const sidebar = document.getElementById('sidebar'); // This will now correctly target the *single* sidebar
-        const toggleBtn = document.getElementById('sidebarToggle');
-        const overlay = document.getElementById('sidebar-overlay');
-        const mainContent = document.getElementById('main'); // Get the main content area
+    document.addEventListener('DOMContentLoaded', function () {
+      const sidebar = document.getElementById('sidebar');
+      const toggleBtn = document.getElementById('sidebarToggle');
+      const overlay = document.getElementById('sidebar-overlay');
+      const mainContent = document.getElementById('main');
 
-        if (!sidebar || !toggleBtn || !overlay) {
-          console.warn("Sidebar elements not found. Toggle functionality might not work.");
-          return;
-        }
-
+      if (sidebar && toggleBtn && overlay) {
         toggleBtn.addEventListener('click', function (e) {
-          e.stopPropagation(); // Prevent click from propagating to overlay/body
+          e.stopPropagation();
           sidebar.classList.toggle('active');
           overlay.classList.toggle('active');
-          document.body.classList.toggle('sidebar-open'); // Add class to body to prevent scroll
-          mainContent.classList.toggle('sidebar-open'); // Optional: add class to main content
+          document.body.classList.toggle('sidebar-open');
+          mainContent.classList.toggle('sidebar-open');
         });
 
         overlay.addEventListener('click', function () {
@@ -148,17 +179,66 @@
           mainContent.classList.remove('sidebar-open');
         });
 
-        // Close sidebar if window is resized to a larger size (e.g., desktop)
         window.addEventListener('resize', function () {
-          if (window.innerWidth > 768) { // Adjust breakpoint as needed
+          if (window.innerWidth > 768) {
             sidebar.classList.remove('active');
             overlay.classList.remove('active');
             document.body.classList.remove('sidebar-open');
             mainContent.classList.remove('sidebar-open');
           }
         });
-      });
-    
+      }
+    });
+  </script>
+
+  <!-- Dark Mode Toggle -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const toggleBtn = document.querySelector(".mode-toggle");
+
+      if (toggleBtn) {
+        toggleBtn.addEventListener("click", function () {
+          document.body.classList.toggle("dark-mode");
+          localStorage.setItem("dark-mode", document.body.classList.contains("dark-mode"));
+        });
+
+        const savedMode = localStorage.getItem("dark-mode");
+        if (savedMode === "true") {
+          document.body.classList.add("dark-mode");
+        }
+      }
+    });
+  </script>
+
+  <!-- CX Nav Behavior -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const cxNavRow = document.querySelector('.cx-nav-row');
+      let lastScrollTop = 0;
+
+      if (!cxNavRow) return;
+
+      function handleScroll() {
+        const currentScrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        const navHeight = cxNavRow.offsetHeight;
+
+        if (currentScrollTop > lastScrollTop && currentScrollTop > navHeight) {
+          cxNavRow.classList.add('scrolled-down', 'scrolled');
+        } else if (currentScrollTop < lastScrollTop || currentScrollTop <= navHeight) {
+          cxNavRow.classList.remove('scrolled-down');
+          if (currentScrollTop === 0) {
+            cxNavRow.classList.remove('scrolled');
+          } else {
+            cxNavRow.classList.add('scrolled');
+          }
+        }
+
+        lastScrollTop = currentScrollTop <= 0 ? 0 : currentScrollTop;
+      }
+
+      window.addEventListener('scroll', handleScroll);
+      handleScroll();
+    });
   </script>
 </body>
 

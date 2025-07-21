@@ -4,16 +4,20 @@
     <div class="login-card">
         <img src="{{ url_for('static', filename='logo.jpg') }}" alt="Company Logo" class="login-logo">
 
+        <!-- Login header -->
         <div id="login-header">
             <h2 class="login-title">Welcome Back!</h2>
             <p class="login-subtitle">Choose login type below.</p>
 
             <div class="toggle-buttons">
-            <button onclick="showCustomerForm()" class="auth-toggle-btn active" id="customer-tab">Customer Login</button>
-            <button onclick="showAdminForm()" class="auth-toggle-btn" id="admin-tab">Admin Login</button>
-        </div>
+                <button onclick="showCustomerForm()" class="auth-toggle-btn active" id="customer-tab">Customer
+                    Login</button>
+                <button onclick="showAdminForm()" class="auth-toggle-btn" id="admin-tab">Admin Login</button>
+            </div>
         </div>
 
+
+        <!-- CUSTOMER FORM -->
         <form id="customer-form" method="POST" action="{{ url_for('cx_login') }}">
             <div class="form-group">
                 <input type="email" name="email" placeholder="Customer Email" required>
@@ -22,62 +26,88 @@
                 <input type="password" name="password" placeholder="Password" required>
             </div>
             <button type="submit" class="login-btn">Login as Customer</button>
-            <p class="extra-link">Don't have an account? <a href="{{ url_for('cx_register') }}">Register Here</a></p>
+            <p class="extra-link">
+                Don't have an account? <a href="{{ url_for('cx_register') }}">Register Here</a>
+            </p>
+            <p class="extra-link termination-warning">
+                Account Terminated? <a href="#" onclick="toggleReactivationForm()">Request Reactivation</a>
+            </p>
         </form>
 
-        <form id="admin-form" method="POST" action="{{ url_for('admin_login') }}">
-    <div class="form-group">
-        <input type="hidden" name="email" placeholder="Admin Email" required value="admin@coronatel.ph">
-    </div>
-    <div class="form-group">
-        <input type="email" id="email" name="email" value="admin@coronatel.ph" disabled="">
-        <input type="password" name="password" placeholder="Password" required>
-    </div>
-    <button type="submit" class="login-btn secondary-btn">Login as Admin</button>
+        
 
-    <!-- Register link (visible only with admin form) -->
-        <a href="{{ url_for('register_admin') }}" class="register-btn tertiary-btn">Register as Admin</a>
-</form>
+    <!-- REACTIVATION FORM -->
+    <form id="reactivation-form" method="POST" action="{{ url_for('request_reactivation') }}" style="display: none;">
+        <h3>Request Account Reactivation</h3>
+    
+        <!-- Hidden field for cx_id (can be dynamically populated if user is logged in) -->
+        <input type="hidden" name="cx_id" value="{{ current_user.id if current_user.is_authenticated else '' }}">
+    
+        <div class="form-group">
+            <input type="email" name="email" placeholder="Enter your email" required>
+        </div>
+    
+        <div class="form-group">
+            <!-- Change name from 'reason' to 'message' -->
+            <textarea name="message" rows="3" placeholder="Reason for reactivation request" required></textarea>
+        </div>
+    
+        <button type="submit" class="login-btn">Submit Request</button>
+    
+        <p class="extra-link">
+            <a href="#" onclick="backToLogin()">← Back to Login</a>
+        </p>
+    </form>
 
+
+        <!-- ADMIN FORM -->
+        <form id="admin-form" method="POST" action="{{ url_for('admin_login') }}" style="display: none;">
+            <div class="form-group">
+                <input type="email" name="email" value="admin@coronatel.ph" disabled>
+            </div>
+            <div class="form-group">
+                <input type="password" name="password" placeholder="Password" required>
+            </div>
+            <button type="submit" class="login-btn secondary-btn">Login as Admin</button>
+            <a href="{{ url_for('register_admin') }}" class="register-btn tertiary-btn">Register as Admin</a>
+        </form>
+    </div>
 </div>
 
-
-
-
-<!-- Toggle Logic -->
+<!-- JS TOGGLE LOGIC -->
 <script>
-function showCustomerForm() {
-    document.getElementById('customer-form').style.display = 'block';
-    document.getElementById('admin-form').style.display = 'none';
-    document.getElementById('customer-tab').classList.add('active');
-    document.getElementById('admin-tab').classList.remove('active');
-}
-
-function showAdminForm() {
-    document.getElementById('customer-form').style.display = 'none';
-    document.getElementById('admin-form').style.display = 'block';
-    document.getElementById('admin-tab').classList.add('active');
-    document.getElementById('customer-tab').classList.remove('active');
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    // Show customer form by default
-    showCustomerForm();
-});
-</script>
-
-<script>
-    function showAdminLogin() {
-        document.getElementById("admin-login-form").style.display = "block";
-        document.getElementById("customer-login-form").style.display = "none";
+    function showCustomerForm() {
+        document.getElementById('customer-form').style.display = 'block';
+        document.getElementById('admin-form').style.display = 'none';
+        document.getElementById('reactivation-form').style.display = 'none';
+        document.getElementById('login-header').style.display = 'block';
+        document.getElementById('customer-tab').classList.add('active');
+        document.getElementById('admin-tab').classList.remove('active');
     }
 
-    function showCustomerLogin() {
-        document.getElementById("admin-login-form").style.display = "none";
-        document.getElementById("customer-login-form").style.display = "block";
+    function showAdminForm() {
+        document.getElementById('customer-form').style.display = 'none';
+        document.getElementById('admin-form').style.display = 'block';
+        document.getElementById('reactivation-form').style.display = 'none';
+        document.getElementById('login-header').style.display = 'block';
+        document.getElementById('admin-tab').classList.add('active');
+        document.getElementById('customer-tab').classList.remove('active');
     }
 
-    
-</script>
+    function toggleReactivationForm() {
+        document.getElementById('customer-form').style.display = 'none';
+        document.getElementById('admin-form').style.display = 'none';
+        document.getElementById('login-header').style.display = 'none';
+        document.getElementById('reactivation-form').style.display = 'block';
+        document.getElementById('reactivation-form').scrollIntoView({ behavior: 'smooth' });
+    }
 
+    function backToLogin() {
+        showCustomerForm();
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        showCustomerForm();
+    });
+</script>
 {% endblock %}

@@ -1,0 +1,214 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="admin-support-page">
+    <h2 class="support-title">Manage Support Tickets</h2>
+
+    <!-- FILTER OPTIONS -->
+    <div class="filter-bar">
+        <form method="GET" action="{{ url_for('admin_support') }}">
+            <select name="status" class="filter-select" onchange="this.form.submit()">
+                <option value="">All Status</option>
+                <option value="Pending" {% if request.args.get('status')=='Pending' %}selected{% endif %}>Pending
+                </option>
+                <option value="In Progress" {% if request.args.get('status')=='In Progress' %}selected{% endif %}>In
+                    Progress</option>
+                <option value="Resolved" {% if request.args.get('status')=='Resolved' %}selected{% endif %}>Resolved
+                </option>
+            </select>
+        </form>
+    </div>
+
+    <!-- TICKETS TABLE -->
+    <div class="table-container">
+        <table class="support-tickets-table">
+            <thead>
+                <tr>
+                    <th><input type="checkbox" id="select-all" title="Select All"></th>
+                    <th>Ticket ID</th>
+                    <th>Customer</th>
+                    <th>Account No.</th>
+                    <th>Type</th>
+                    <th>Issue/Request</th>
+                    <th>Submitted</th>
+                    <th>Status</th>
+                    <th>Team</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ticket in tickets %}
+                <tr>
+                    <td><input type="checkbox" class="select-ticket" value="{{ ticket.id }}"></td>
+                    <td>{{ ticket.id }}</td>
+                    <td><strong>{{ ticket.cx.name if ticket.cx else 'Unknown' }}</strong></td>
+                    <td>{{ ticket.cx.account_number if ticket.cx else 'N/A' }}</td>
+                    <td>{{ ticket.ticket_type | capitalize }}</td>
+                    <td>
+                        {% if ticket.ticket_type == 'repair' %}
+                        {{ ticket.issue_type or 'N/A' }}
+                        {% if ticket.issue_type == 'Others' and ticket.other_issue_detail %}
+                        <br><small>{{ ticket.other_issue_detail }}</small>
+                        {% endif %}
+                        {% elif ticket.ticket_type == 'account' %}
+                        {{ ticket.account_request or 'N/A' }}
+                        {% if ticket.account_request == 'Change Internet Plan' and ticket.new_plan %}
+                        <br><small>New Plan: {{ ticket.new_plan }}</small>
+                        {% endif %}
+                        {% else %}
+                        N/A
+                        {% endif %}
+                    </td>
+                    <td>{{ ticket.created_at.strftime('%Y-%m-%d') }}</td>
+                    <td>
+                        <form method="POST" action="{{ url_for('update_ticket_status', ticket_id=ticket.id) }}">
+                            <select name="status" class="status-select" onchange="this.form.submit()">
+                                {% set current_status = ticket.status %}
+                                {% if current_status not in ['Pending', 'In Progress', 'Resolved'] %}
+                                {% set current_status = 'Unknown' %}
+                                {% endif %}
+                                <option value="Pending" {% if current_status=='Pending' %}selected{% endif %}>Pending
+                                </option>
+                                <option value="In Progress" {% if current_status=='In Progress' %}selected{% endif %}>In
+                                    Progress</option>
+                                <option value="Resolved" {% if current_status=='Resolved' %}selected{% endif %}>Resolved
+                                </option>
+                            </select>
+                        </form>
+                    </td>
+                    <td>{{ ticket.request_service or 'N/A' }}</td>
+                    <td>
+                        <button class="btn-view" onclick="showTicketDetail('{{ ticket.id }}')">View</button>
+
+                        <!-- DELETE -->
+                        <form id="delete-form-{{ ticket.id }}" method="POST"
+                            action="{{ url_for('delete_ticket', ticket_id=ticket.id) }}" style="display:none;"></form>
+                        <button type="button" class="btn-delete"
+                            onclick="confirmDelete('{{ ticket.id }}')">Delete</button>
+
+                        {% if current_user.role == 'admin' %}
+                        <form method="POST" action="{{ url_for('assign_admin_ticket', ticket_id=ticket.id) }}"
+                            style="display:inline;">
+                            <button type="submit" class="btn-action">Assign Me</button>
+                        </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="10" class="no-tickets">No tickets found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <button type="button" class="btn-delete-selected" onclick="confirmBulkDelete()">Delete Selected</button>
+
+        <!-- Hidden Form for Bulk Delete -->
+        <form id="bulk-delete-form" method="POST" action="{{ url_for('bulk_delete_tickets') }}" style="display: none;">
+        </form>
+    </div>
+
+    {% if ticket_detail %}
+    <!-- INLINE DETAIL VIEW -->
+    <div class="ticket-detail-popup">
+        <div class="detail-content">
+            <h3>Ticket #{{ ticket_detail.ticket_number }}</h3>
+            <p><strong>Customer:</strong> {{ ticket_detail.cx.name }} ({{ ticket_detail.cx.account_number }})</p>
+            <p><strong>Submitted:</strong> {{ ticket_detail.created_at.strftime('%B %d, %Y %I:%M %p') }}</p>
+            <p><strong>Status:</strong> {{ ticket_detail.status }}</p>
+            <p><strong>Type:</strong> {{ ticket_detail.ticket_type | capitalize }}</p>
+
+            {% if ticket_detail.ticket_type == 'repair' %}
+            <p><strong>Issue:</strong> {{ ticket_detail.issue_type }}</p>
+            {% if ticket_detail.issue_type == 'Others' %}
+            <p><strong>Other Detail:</strong> {{ ticket_detail.other_issue_detail }}</p>
+            {% endif %}
+            <p><strong>Team:</strong> {{ ticket_detail.request_service }}</p>
+            <p><strong>Note:</strong> {{ ticket_detail.repair_note or 'None' }}</p>
+            {% elif ticket_detail.ticket_type == 'account' %}
+            <p><strong>Request:</strong> {{ ticket_detail.account_request }}</p>
+            {% if ticket_detail.account_request == 'Change Internet Plan' %}
+            <p><strong>New Plan:</strong> {{ ticket_detail.new_plan }}</p>
+            {% endif %}
+            <p><strong>Note:</strong> {{ ticket_detail.account_note or 'None' }}</p>
+            {% endif %}
+
+            <button class="btn-close" onclick="closeTicketDetail()">Close</button>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- SweetAlert CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    function showTicketDetail(ticketId) {
+        const url = new URL(window.location.href);
+        url.searchParams.set('detail_id', ticketId);
+        window.location.href = url.toString();
+    }
+
+    function closeTicketDetail() {
+        const url = new URL(window.location.href);
+        url.searchParams.delete('detail_id');
+        window.location.href = url.toString();
+    }
+
+    function confirmDelete(ticketId) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'This will permanently delete the support ticket.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Yes, delete it!',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById(`delete-form-${ticketId}`).submit();
+            }
+        });
+    }
+
+    function confirmBulkDelete() {
+        const selected = document.querySelectorAll('.select-ticket:checked');
+        if (selected.length === 0) {
+            Swal.fire('No tickets selected', 'Please select tickets to delete.', 'info');
+            return;
+        }
+
+        Swal.fire({
+            title: 'Are you sure?',
+            text: `This will permanently delete ${selected.length} selected support ticket(s).`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Yes, delete them!',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const form = document.getElementById('bulk-delete-form');
+                form.innerHTML = ''; // clear any previous data
+                selected.forEach(cb => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'ticket_ids[]';
+                    input.value = cb.value;
+                    form.appendChild(input);
+                });
+                form.submit();
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        document.getElementById('select-all').addEventListener('change', function () {
+            const checked = this.checked;
+            document.querySelectorAll('.select-ticket').forEach(cb => cb.checked = checked);
+        });
+    });
+</script>
+{% endblock %}

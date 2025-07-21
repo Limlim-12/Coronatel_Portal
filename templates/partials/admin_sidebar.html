@@ -1,6 +1,4 @@
-
-
-<div class="sidebar collapsed" id="sidebar">
+<div class="sidebar" id="sidebar">
     <div class="sidebar-header">
         <img src="{{ url_for('static', filename='images/' + (current_user.avatar or 'admin.png')) }}" alt="Admin Avatar"
             class="sidebar-avatar">
@@ -19,18 +17,21 @@
             <li>
                 <a href="{{ url_for('admin_dashboard', tab='users') }}"
                     class="sidebar-link {% if active_tab == 'users' %}active{% endif %}">
-                    <i class="icon-users"></i><span>Manage Users</span>
+                    <i class="icon-users"></i><span>Manage Accounts</span>
                 </a>
             </li>
+        <li>
+            <a href="{{ url_for('admin_dashboard', tab='tickets') }}"
+                class="sidebar-link {% if active_tab == 'tickets' %}active{% endif %}">
+                <i class="icon-ticket"></i>
+                <span>Manage Tickets</span>
+            </a>
+        </li>
+
             <li>
                 <a href="{{ url_for('admin_dashboard', tab='billing') }}"
                     class="sidebar-link {% if active_tab == 'billing' %}active{% endif %}">
                     <i class="icon-billing"></i><span>Billing & Payment</span>
-                </a>
-            </li>
-            <li>
-                <a href="{{ url_for('logout') }}" class="sidebar-link logout-link">
-                    <i class="icon-logout"></i><span>Logout</span>
                 </a>
             </li>
         </ul>
