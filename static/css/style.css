@@ -1216,6 +1216,77 @@ body.sidebar-open {
       margin-top: auto; /* Mobile phones */
     }
   }
+
+  .horizontal-summary .summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.summary-item {
+  background-color: #f9f9f9;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  transition: background-color 0.3s ease;
+}
+
+.summary-item:hover {
+  background-color: #f0f0f0;
+}
+
+.summary-item .label {
+  font-weight: 600;
+  color: #333;
+  font-size: 0.9rem;
+}
+
+.summary-item .value {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #111;
+}
+
+.summary-subsection {
+  margin-top: 1.5rem;
+}
+
+.recent-login-list {
+  margin-top: 0.5rem;
+  padding-left: 1rem;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  list-style-type: disc;
+}
+
+/* 🔁 Mobile optimization */
+@media (max-width: 600px) {
+  .horizontal-summary .summary-grid {
+    grid-template-columns: 1fr; /* Stack items */
+    gap: 0.8rem;
+  }
+
+  .summary-item {
+    padding: 0.65rem 0.9rem;
+  }
+
+  .summary-item .label {
+    font-size: 0.85rem;
+  }
+
+  .summary-item .value {
+    font-size: 1.1rem;
+  }
+
+  .recent-login-list {
+    font-size: 0.85rem;
+  }
+}
+
   
 
 
@@ -5553,6 +5624,14 @@ form .action-btn {
    Flash & Alert Styles - Unified & Minimalist
    ======================================== */
 
+.flash {
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  color: #fff;
+}
+
 .flash-container {
     position: fixed;
     top: 1.25rem;
@@ -5792,11 +5871,14 @@ form .action-btn {
 .support-page {
   max-width: 900px;
   margin: 2rem auto;
-  padding: 1.5rem;
-  background: #ffffff;
-  border-radius: 18px;
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
+  padding: 2.5rem 1.5rem;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
   font-family: 'Segoe UI', sans-serif;
+  box-sizing: border-box;
+  min-height: 250px;
+  animation: fadeIn 0.4s ease-in-out;
 }
 
 /* Page Header */
@@ -5813,7 +5895,7 @@ form .action-btn {
 .support-page .toggle-options {
   display: flex;
   justify-content: center;
-  gap: 1rem;
+  gap: 1.2rem;
   margin-bottom: 2rem;
 }
 
@@ -5821,19 +5903,28 @@ form .action-btn {
   background-color: #1d4ed8;
   color: #fff;
   border: none;
-  padding: 0.6rem 1.4rem;
-  font-size: 0.95rem;
-  font-weight: 500;
+  padding: 0.7rem 1.6rem;
+  font-size: 1rem;
+  font-weight: 600;
   border-radius: 10px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  transition: background-color 0.3s ease;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  transition: background-color 0.3s, color 0.3s;
+  border-bottom: 3px solid transparent;
+  cursor: pointer;
+}
+
+.support-page .toggle-options button.active,
+.support-page .toggle-options button:focus {
+  background-color: #2563eb;
+  color: #fff;
+  border-bottom: 3px solid #047857;
 }
 
 .support-page .toggle-options button:hover {
   background-color: #2563eb;
 }
 
-/* Form Wrapper (shared) */
+/* Form Wrapper */
 .support-page form {
   display: flex;
   flex-direction: column;
@@ -5844,6 +5935,7 @@ form .action-btn {
 .support-page .form-group {
   display: flex;
   flex-direction: column;
+  margin-bottom: 1.2rem;
 }
 
 .support-page label {
@@ -5856,12 +5948,14 @@ form .action-btn {
 .support-page input[type="number"],
 .support-page select,
 .support-page textarea {
-  padding: 0.65rem 0.9rem;
+  padding: 0.7rem 1rem;
   border-radius: 8px;
   border: 1px solid #cbd5e1;
-  font-size: 0.95rem;
+  font-size: 1rem;
   background-color: #f9fafb;
-  transition: border-color 0.2s ease;
+  transition: border-color 0.2s, background-color 0.2s;
+  margin-top: 0.2rem;
+  box-sizing: border-box;
 }
 
 .support-page input:focus,
@@ -5874,23 +5968,10 @@ form .action-btn {
 
 /* Textarea Styling */
 .support-page textarea {
-    display: block;
-    margin: 5px auto;
-    width: 100%;
-    max-width: 100%;
-    resize: vertical;
-    min-height: 5px;
-    white-space: pre-wrap;
-    padding: 10px;
-    font-size: 14px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    background-color: #fdfdfd;
-    line-height: 1;
+  resize: vertical;
+  min-height: 60px;
+  line-height: 1.5;
 }
-
-
-
 
 /* Conditional Sections */
 .support-page #repair-form,
@@ -5902,53 +5983,77 @@ form .action-btn {
 }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: scale(0.97);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+  from { opacity: 0; transform: scale(0.97);}
+  to { opacity: 1; transform: scale(1);}
 }
 
 /* Submit Button */
 .support-page .submit-btn {
   background-color: #047857;
-  color: white;
-  font-size: 1rem;
+  color: #fff;
+  font-size: 1.05rem;
   font-weight: 600;
-  padding: 0.9rem;
+  padding: 1rem 2rem;
   border: none;
   border-radius: 10px;
   cursor: pointer;
-  box-shadow: 0 3px 6px rgba(4, 120, 87, 0.2);
-  transition: background-color 0.3s ease;
+  box-shadow: 0 3px 8px rgba(4,120,87,0.13);
+  transition: background-color 0.3s;
   margin-top: 1rem;
+  min-width: 180px;
 }
 
 .support-page .submit-btn:hover {
   background-color: #059669;
 }
 
-/* Responsive (Optional) */
-@media (max-width: 600px) {
+/* Flash Messages */
+.flash {
+  padding: 0.8rem 1.2rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  font-weight: 500;
+}
+.flash.success { background: #e8f5e9; color: #388e3c; }
+.flash.danger { background: #ffebee; color: #d32f2f; }
+.flash.warning { background: #fffde7; color: #fbc02d; }
+
+/* Utility classes */
+.mb-4 { margin-bottom: 1.5rem; }
+.mt-4 { margin-top: 1.5rem; }
+
+/* Responsive */
+@media (max-width: 767px) {
   .support-page {
     padding: 1rem;
+    border-radius: 0;
+    box-shadow: none;
+    min-height: auto;
   }
-
   .support-page .toggle-options {
     flex-direction: column;
     align-items: center;
+    gap: 0.7rem;
   }
-
   .support-page .toggle-options button {
     width: 100%;
     text-align: center;
+    font-size: 0.97em;
+    border-radius: 8px;
+    padding: 0.9rem;
+  }
+  .support-page .toggle-options button.active {
+    background-color: #047857;
+    color: #fff;
+    border-bottom: none;
+  }
+  .support-page form {
+    gap: 1rem;
   }
 }
 
-
+/* End Support Page Styles */
 
 /* ─────────────────────────────────────────────── */
 /* ADMIN SUPPORT PAGE - SCOPED            */

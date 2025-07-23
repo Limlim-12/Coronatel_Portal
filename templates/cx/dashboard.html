@@ -110,7 +110,13 @@
         <!-- Usage & Billing -->
         <div class="dashboard-card status-usage-card">
             <h2>Internet Status</h2>
-            <p><strong>Status:</strong> {{ current_user.internet_status or 'Unknown' }}</p>
+            <p><strong>Status:</strong>
+                {% if current_user.internet_status %}
+                {{ current_user.internet_status }}
+                {% else %}
+                <em>Not set</em>
+                {% endif %}
+            </p>
             <p><strong>Billing Cycle:</strong> 01/07/2025 - 31/07/2025</p>
             <p><strong>Due Date:</strong> 25/07/2025</p>
 

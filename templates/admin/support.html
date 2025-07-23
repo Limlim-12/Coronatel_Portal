@@ -62,35 +62,19 @@
                     <td>
                         <form method="POST" action="{{ url_for('update_ticket_status', ticket_id=ticket.id) }}">
                             <select name="status" class="status-select" onchange="this.form.submit()">
-                                {% set current_status = ticket.status %}
-                                {% if current_status not in ['Pending', 'In Progress', 'Resolved'] %}
-                                {% set current_status = 'Unknown' %}
-                                {% endif %}
-                                <option value="Pending" {% if current_status=='Pending' %}selected{% endif %}>Pending
+                                <option value="Pending" {% if ticket.status=='Pending' %}selected{% endif %}>Pending</option>
+                                <option value="In Progress" {% if ticket.status=='In Progress' %}selected{% endif %}>In Progress
                                 </option>
-                                <option value="In Progress" {% if current_status=='In Progress' %}selected{% endif %}>In
-                                    Progress</option>
-                                <option value="Resolved" {% if current_status=='Resolved' %}selected{% endif %}>Resolved
-                                </option>
+                                <option value="Resolved" {% if ticket.status=='Resolved' %}selected{% endif %}>Resolved</option>
                             </select>
                         </form>
                     </td>
                     <td>{{ ticket.request_service or 'N/A' }}</td>
                     <td>
                         <button class="btn-view" onclick="showTicketDetail('{{ ticket.id }}')">View</button>
-
-                        <!-- DELETE -->
                         <form id="delete-form-{{ ticket.id }}" method="POST"
                             action="{{ url_for('delete_ticket', ticket_id=ticket.id) }}" style="display:none;"></form>
-                        <button type="button" class="btn-delete"
-                            onclick="confirmDelete('{{ ticket.id }}')">Delete</button>
-
-                        {% if current_user.role == 'admin' %}
-                        <form method="POST" action="{{ url_for('assign_admin_ticket', ticket_id=ticket.id) }}"
-                            style="display:inline;">
-                            <button type="submit" class="btn-action">Assign Me</button>
-                        </form>
-                        {% endif %}
+                        <button type="button" class="btn-delete" onclick="confirmDelete('{{ ticket.id }}')">Delete</button>
                     </td>
                 </tr>
                 {% else %}
@@ -139,8 +123,6 @@
     {% endif %}
 </div>
 
-<!-- SweetAlert CDN -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
     function showTicketDetail(ticketId) {

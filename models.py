@@ -24,6 +24,7 @@ class Cx(db.Model, UserMixin):
     contact = db.Column(db.String(50))
     account_number = db.Column(db.String(50))
     internet_plan = db.Column(db.String(50))
+    internet_status = db.Column(db.String(20))
     is_verified = db.Column(db.Boolean, default=False)  # ✅ NEW
 
     # Personal info
@@ -223,3 +224,27 @@ class SupportTicket(db.Model):
     # Status tracking
     status = db.Column(db.String(20), default='Pending')
     created_at = db.Column(db.DateTime, default=now_manila)
+
+
+
+
+
+class Region(db.Model):
+    reg_code = db.Column(db.String(10), primary_key=True)
+    reg_desc = db.Column(db.String(100), nullable=False)
+
+class Province(db.Model):
+    prov_code = db.Column(db.String(10), primary_key=True)
+    prov_desc = db.Column(db.String(100), nullable=False)
+    reg_code = db.Column(db.String(10), db.ForeignKey('region.reg_code'), nullable=False)
+
+class CityMun(db.Model):
+    citymun_code = db.Column(db.String(10), primary_key=True)
+    citymun_desc = db.Column(db.String(100), nullable=False)
+    prov_code = db.Column(db.String(10), db.ForeignKey('province.prov_code'), nullable=False)
+
+class Barangay(db.Model):
+    brgy_code = db.Column(db.String(10), primary_key=True)
+    brgy_desc = db.Column(db.String(100), nullable=False)
+    citymun_code = db.Column(db.String(10), db.ForeignKey('city_mun.citymun_code'), nullable=False)
+

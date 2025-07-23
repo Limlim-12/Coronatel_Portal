@@ -65,21 +65,6 @@
         </div>
       </a>
 
-      <!-- System Summary -->
-      <div class="dashboard-card status-usage-card">
-        <h2>System Summary</h2>
-        <p><strong>Total Customers:</strong> {{ customers|length }}</p>
-        <p><strong>Active Requests:</strong> {{ completed_requests_count }}</p>
-        <p><strong>Open Tickets:</strong> <em>Coming soon</em></p>
-        <p><strong>Recent Logins:</strong></p>
-        <ul>
-          {% for log in recent_logins %}
-            <li>{{ log.cx.account_number }} - {{ log.cx.name }}</li>
-          {% endfor %}
-        </ul>
-        <p><strong>Logins Today:</strong> {{ login_count_today }}</p>
-      </div>
-
       <!-- Reactivation Requests -->
       <a href="{{ url_for('admin_dashboard', tab='users') }}" class="dashboard-card-link">
         <div class="dashboard-card notifications-card">
@@ -100,6 +85,82 @@
         </div>
       </a>
 
+      <!-- Support Tickets -->
+      <a href="{{ url_for('admin_dashboard', tab='tickets') }}" class="dashboard-card-link">
+        <div class="dashboard-card notifications-card">
+          <h2>Support Tickets</h2>
+          {% if support_tickets %}
+          <ul class="pending-request-list">
+            {% for ticket in support_tickets[:5] %}
+            <li class="pending-request-item">
+              <span class="type-label type-{{ ticket.ticket_type }}">{{ ticket.ticket_type | capitalize }}</span>
+              <div><strong>{{ ticket.cx.name if ticket.cx else 'Unknown' }}</strong> | {{ ticket.cx.account_number or 'N/A' }}
+              </div>
+              <div><strong>Status:</strong> {{ ticket.status or 'Pending' }}</div>
+              <div><strong>Submitted:</strong> {{ ticket.created_at.strftime('%b %d, %Y') }}</div>
+            </li>
+            {% endfor %}
+          </ul>
+          {% if support_tickets|length > 5 %}
+          <p style="font-size: 0.9rem; margin-top: 0.5rem;">More tickets pending…</p>
+          {% endif %}
+          {% else %}
+          <p>No support tickets at this time.</p>
+          {% endif %}
+        </div>
+      </a>
+
+
+
+
+  <!-- System Summary -->
+  <div class="dashboard-card horizontal-summary">
+    <h2>System Summary</h2>
+  
+    <div class="summary-grid">
+      <div class="summary-item">
+        <span class="label">Total Customers</span>
+        <span class="value">{{ customers|length }}</span>
+      </div>
+  
+      <div class="summary-item">
+        <span class="label">Active Requests</span>
+        <span class="value">{{ completed_requests_count }}</span>
+      </div>
+  
+      <div class="summary-item">
+        <span class="label">Open Tickets</span>
+        <span class="value">Coming soon</span>
+      </div>
+  
+      <div class="summary-item">
+        <span class="label">Logins Today</span>
+        <span class="value">{{ login_count_today }}</span>
+      </div>
+    </div>
+  
+  <div class="summary-subsection">
+    <h3 style="margin-top: 1.5rem; font-size: 1.1rem;">Recent Logins</h3>
+    <ul class="recent-login-list">
+      {% set seen_accounts = [] %}
+      {% set has_logins = false %}
+      {% for log in recent_logins %}
+      {% if log.cx and log.cx.account_number not in seen_accounts %}
+      {% set _ = seen_accounts.append(log.cx.account_number) %}
+      {% set has_logins = true %}
+      <li>{{ log.cx.account_number }} - {{ log.cx.name }}</li>
+      {% endif %}
+      {% endfor %}
+      {% if not has_logins %}
+      <li>No logins yet today.</li>
+      {% endif %}
+    </ul>
+  </div>
+
+  </div>
+
+
+  
       <!-- About Section -->
       <div class="dashboard-card about-us-container">
         <h2>ADMIN PANEL – CORONA TELECOM</h2>

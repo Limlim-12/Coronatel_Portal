@@ -12,7 +12,7 @@ from datetime import datetime, date
 from pytz import timezone
 from functools import wraps
 from extensions import db, login_manager, mail # Keep this import
-from mailer import send_payment_status_email , send_request_status_email, send_account_verification_email # Make sure this is imported at the top
+from mailer import send_payment_status_email , send_request_status_email, send_account_verification_email,  send_account_termination_email,  send_account_reactivation_email  # Make sure this is imported at the top
 import pytz
 import os
 import random
@@ -430,7 +430,9 @@ def logout():
     if isinstance(current_user, Cx):
         current_user.account_status = 'INACTIVE'
         db.session.commit()
+        
     logout_user()
+    session.clear()  # Clears any remaining session data
     flash("You have been logged out.", "info")
     return redirect(url_for('cx_login'))
 
@@ -464,7 +466,11 @@ def account_termination_request():
 @app.route('/cx/support')
 @login_required
 def cx_support():
-    return render_template('cx/support.html')
+    tickets = SupportTicket.query.filter_by(cx_id=current_user.id).order_by(SupportTicket.created_at.desc()).all()
+    # Render the dashboard with support tab active to keep base layout and CSS intact
+    return render_template('cx/dashboard.html', active_tab='support', tickets=tickets)
+
+
 
 
 
@@ -607,8 +613,9 @@ def admin_dashboard():
         return render_template('admin/account_tab.html', **context)
 
     elif tab == 'tickets':
+        # Pass as 'tickets' for compatibility with admin/support.html
         context.update({
-            'support_tickets': SupportTicket.query.order_by(SupportTicket.created_at.desc()).all()
+            'tickets': SupportTicket.query.order_by(SupportTicket.created_at.desc()).all()
         })
 
     template_map = {
@@ -894,8 +901,16 @@ def delete_account(cx_id):
     cx = Cx.query.get_or_404(cx_id)
     cx.account_status = 'TERMINATE'  # Use consistent TERMINATE label
     db.session.commit()
+
+    # ✅ Send termination email
+    try:
+        send_account_termination_email(cx.name, cx.email, cx.account_number)
+    except Exception as e:
+        flash(f"Terminated account but failed to send email: {e}", "warning")
+
     flash(f"Account for {cx.name} has been terminated.", "success")
     return redirect(url_for('admin_dashboard', tab='users'))
+
 
 @app.route('/admin/restore_account/<int:cx_id>', methods=['POST'])
 @login_required
@@ -913,8 +928,16 @@ def restore_account(cx_id):
         reactivation_request.resolved_at = datetime.now()
 
     db.session.commit()
+
+    # ✅ Send reactivation email
+    try:
+        send_account_reactivation_email(cx.name, cx.email, cx.account_number)
+    except Exception as e:
+        flash(f"Reactivated account but failed to send email: {e}", "warning")
+
     flash(f"Account for {cx.name} has been reactivated.", "success")
-    return redirect(url_for('admin_dashboard', tab='overview'))
+    return redirect(url_for('admin_dashboard', tab='users'))
+
 
 
 
@@ -972,10 +995,10 @@ def request_reactivation():
             flash('Invalid customer account.', 'danger')
             return redirect(url_for('cx_login'))
 
-    # 🔒 Prevent duplicate reactivation request by email
-    existing_email_request = ReactivationRequest.query.filter_by(email=email, status='PENDING').first()
+    # 🔒 Prevent duplicate reactivation request by email (check all statuses)
+    existing_email_request = ReactivationRequest.query.filter_by(email=email).first()
     if existing_email_request:
-        flash('A pending reactivation request already exists for this email.', 'warning')
+        flash('A reactivation request already exists for this email.', 'warning')
         return redirect(url_for('cx_login'))
 
     # 🔒 Optional: Prevent duplicate by cx_id
@@ -993,25 +1016,43 @@ def request_reactivation():
         requested_at=datetime.now(pytz.timezone('Asia/Manila'))
     )
     db.session.add(new_request)
-    db.session.commit()
+    try:
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        flash('An error occurred while submitting your request. Please try again.', 'danger')
+        return redirect(url_for('cx_login'))
 
     flash('Your request for reactivation has been submitted.', 'success')
     return redirect(url_for('cx_login'))
 
 
 
-def generate_ticket_number():
-    from random import randint
-    return f"CT-{randint(100, 999)}-{randint(100, 999)}"
 
 
 @app.route('/submit-support', methods=['POST'])
 @login_required
 def submit_support():
     from random import randint
+    import re
 
     def generate_ticket_number():
-        return f"CT-{randint(100, 999)}-{randint(100, 999)}"
+        last_ticket = SupportTicket.query.order_by(SupportTicket.id.desc()).first()
+        if last_ticket and last_ticket.ticket_number:
+            # Extract numeric part after "CT-"
+            match = re.match(r"CT-(\d{3})-(\d{3})", last_ticket.ticket_number)
+            if match:
+                part1 = int(match.group(1))
+                part2 = int(match.group(2))
+                # Combine parts into a single number
+                combined = part1 * 1000 + part2
+                combined += 1
+                # Split back into two parts
+                new_part1 = combined // 1000
+                new_part2 = combined % 1000
+                return f"CT-{new_part1:03d}-{new_part2:03d}"
+        # Default start
+        return "CT-000-000"
 
     ticket_number = generate_ticket_number()
 
@@ -1025,9 +1066,27 @@ def submit_support():
 
     # Common fields
     account_type = request.form.get('account_type')
-    contact_person = request.form.get('contact_person')
-    contact_number = request.form.get('contact_number')
-    service_address = request.form.get('service_address')
+
+    # Validate required fields based on ticket type
+    if ticket_type == 'repair':
+        contact_person = request.form.get('contact_person')
+        contact_number = request.form.get('contact_number')
+        service_address = request.form.get('service_address')
+        if not contact_person or not contact_number or not service_address:
+            flash("Please fill in all required fields for repair tickets.", "danger")
+            return redirect(url_for('cx_support'))
+    else:
+        contact_person = None
+        contact_number = None
+        service_address = None
+
+    if ticket_type == 'account':
+        account_request = request.form.get('account_request')
+        if not account_type or not account_request:
+            flash("Please fill in all required fields for account management tickets.", "danger")
+            return redirect(url_for('cx_support'))
+    else:
+        account_request = None
 
     # Repair-specific fields
     issue_type = request.form.get('issue_type') if ticket_type == 'repair' else None
@@ -1036,11 +1095,10 @@ def submit_support():
     repair_note = request.form.get('repair_note') if ticket_type == 'repair' else None
 
     # Account-specific fields
-    account_request = request.form.get('account_request') if ticket_type == 'account' else None
     new_plan = request.form.get('new_plan') if ticket_type == 'account' and account_request == 'Change Internet Plan' else None
     account_note = request.form.get('account_note') if ticket_type == 'account' else None
 
-    # Create the SupportTicket object
+    # Create the SupportTicket object with explicit status
     ticket = SupportTicket(
         ticket_number=ticket_number,
         cx_id=current_user.id,
@@ -1055,17 +1113,20 @@ def submit_support():
         repair_note=repair_note,
         account_request=account_request,
         new_plan=new_plan,
-        account_note=account_note
+        account_note=account_note,
+        status='pending'  # Use lowercase for consistency
     )
 
-    db.session.add(ticket)
-    db.session.commit()
+    try:
+        db.session.add(ticket)
+        db.session.commit()
+        flash(f"Support ticket submitted! Ticket No: {ticket_number}", "success")
+    except Exception as e:
+        db.session.rollback()  # Rollback in case of error
+        flash("An error occurred while submitting your ticket. Please try again.", "danger")
 
-    # Debug: flash ticket id after commit
-    # flash(f"Debug: Ticket created with ID {ticket.id}", "info")
-
-    flash(f"Support ticket submitted! Ticket No: {ticket_number}", "success")
     return redirect(url_for('cx_support'))
+
 
 
 
@@ -1081,36 +1142,20 @@ def admin_required(f):
 @login_required
 @admin_required
 def admin_support():
-    status = request.args.get('status')
-    detail_id = request.args.get('detail_id', type=int)
+    status_filter = request.args.get('status')
+    detail_id = request.args.get('detail_id')
+    query = SupportTicket.query
 
-    # Fetch ticket list
-    if status:
-        tickets = SupportTicket.query.filter_by(status=status).order_by(SupportTicket.created_at.desc()).all()
-    else:
-        tickets = SupportTicket.query.order_by(SupportTicket.created_at.desc()).all()
+    if status_filter and status_filter.strip():
+        query = query.filter(SupportTicket.status.ilike(f"%{status_filter.strip()}%"))
 
-    # Load selected ticket for popup detail view
+    tickets = query.order_by(SupportTicket.created_at.desc()).all()
     ticket_detail = None
     if detail_id:
-        ticket_detail = SupportTicket.query.get(detail_id)
-        if ticket_detail:
-            # force load cx if not already loaded
-            _ = ticket_detail.cx  
-
+        ticket_detail = SupportTicket.query.filter_by(id=detail_id).first()
+    print("Tickets found:", tickets)  # Debug: See what tickets are returned
     return render_template('admin/support.html', tickets=tickets, ticket_detail=ticket_detail)
-
-
-
-@app.route('/admin/support/<int:ticket_id>')
-@login_required
-@admin_required
-def view_ticket_detail(ticket_id):
-    # Since the user wants to integrate ticket detail inside admin/support.html,
-    # redirect to admin_support with detail_id query param instead of separate template
-    return redirect(url_for('admin_support', detail_id=ticket_id))
-
-
+   
 
 
 

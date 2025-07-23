@@ -170,3 +170,48 @@ billing@coronatel.com
     msg = Message(subject=subject, recipients=[email], body=body)
     mail.send(msg)
 
+
+def send_account_termination_email(name, email, account_number):
+    subject = "[Corona Telecom] Account Termination Notice"
+
+    body = f"""Hi {name},
+
+We regret to inform you that your Corona Telecom account has been terminated as of today.
+
+Account Number: {account_number}
+
+If you believe this was a mistake or you wish to discuss this matter further, please reach out to us immediately.
+
+We appreciate your past patronage and are here to assist should you decide to reactivate your services in the future.
+
+Best regards,  
+Account Management Team  
+billing@coronatel.com
+"""
+
+    msg = Message(subject=subject, recipients=[email], body=body)
+    mail.send(msg)
+
+
+def send_account_reactivation_email(name, email, account_number):
+    subject = "[Corona Telecom] Account Reactivated Successfully"
+
+    body = f"""Hi {name},
+
+Good news!
+
+Your Corona Telecom account has been reactivated. You may now resume access to your services and customer portal.
+
+Account Number: {account_number}
+
+If you encounter any issues or have questions regarding your account status, please don’t hesitate to contact us.
+
+Thank you for staying with Corona Telecom.
+
+Best regards,  
+Account Management Team  
+billing@coronatel.com
+"""
+
+    msg = Message(subject=subject, recipients=[email], body=body)
+    mail.send(msg)

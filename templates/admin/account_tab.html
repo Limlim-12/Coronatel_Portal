@@ -66,10 +66,12 @@
           <input id="account_number_{{ cx.id }}" type="text" name="account_number"
             value="{{ cx.account_number or '' }}" />
         </div>
+
         <div class="account-field">
           <label>Email</label>
           <input type="text" name="email" value="{{ cx.email or '' }}" />
         </div>
+
         <div class="account-field">
           <label>Internet Status</label>
           <select name="internet_status" aria-label="Internet status">
@@ -79,6 +81,7 @@
             </option>
           </select>
         </div>
+        
         <div class="account-field">
           <label>Plan</label>
           <input type="text" name="internet_plan" value="{{ cx.internet_plan or '' }}" />

@@ -1,3 +1,6 @@
+
+
+{% block content %}
 <div class="support-page">
     <h2>Submit a Support Ticket</h2>
 
@@ -15,22 +18,23 @@
     </div>
 
     <form method="POST" action="{{ url_for('submit_support') }}" onsubmit="return validateFormType();">
-        <input type="hidden" name="form_type" id="form_type" value="">
+        <input type="hidden" name="form_type" id="form_type" value="{{ request.form.get('form_type', '') }}">
 
         <!-- Common Fields -->
         <div class="form-group">
-            <label>Account Name</label>
-            <input type="text" name="account_name" value="{{ current_user.name }}" readonly>
+            <label for="account_name">Account Name</label>
+            <input type="text" name="account_name" id="account_name" value="{{ current_user.name }}" readonly>
         </div>
 
         <div class="form-group">
-            <label>Account Number</label>
-            <input type="text" name="account_number" value="{{ current_user.account_number }}" readonly>
+            <label for="account_number">Account Number</label>
+            <input type="text" name="account_number" id="account_number" value="{{ current_user.account_number }}"
+                readonly>
         </div>
 
         <div class="form-group">
-            <label>Account Type</label>
-            <select name="account_type" required>
+            <label for="account_type">Account Type</label>
+            <select name="account_type" id="account_type" required>
                 <option value="Residential">Residential</option>
                 <option value="Enterprise">Enterprise</option>
             </select>
@@ -39,24 +43,24 @@
         <!-- REPAIR SECTION -->
         <div id="repair-form" style="display: none;">
             <div class="form-group">
-                <label>Contact Person</label>
-                <input type="text" name="contact_person" required>
+                <label for="contact_person">Contact Person</label>
+                <input type="text" name="contact_person" id="contact_person">
             </div>
 
             <div class="form-group">
-                <label>Contact Number</label>
-                <input type="text" name="contact_number" value="{{ current_user.contact_number }}" required>
+                <label for="contact_number">Contact Number</label>
+                <input type="text" name="contact_number" id="contact_number" value="{{ current_user.contact_number }}">
             </div>
 
             <div class="form-group">
-                <label>Service Address</label>
+                <label for="service_address">Service Address</label>
                 <textarea name="service_address"
-                    required>{{ current_user.location_street or '' }} | {{ current_user.location_barangay or '' }} | {{ current_user.location_city or '' }} | {{ current_user.location_province or '' }} | {{ current_user.location_region or '' }} | {{ current_user.location_zip or '' }} | {{ current_user.location_country or '' }}</textarea>
+                    id="service_address">{{ current_user.location_street or '' }} | {{ current_user.location_barangay or '' }} | {{ current_user.location_city or '' }} | {{ current_user.location_province or '' }} | {{ current_user.location_region or '' }} | {{ current_user.location_zip or '' }} | {{ current_user.location_country or '' }}</textarea>
             </div>
 
             <div class="form-group">
-                <label>Issue Type</label>
-                <select name="issue_type" id="issue_type" onchange="toggleOtherIssue()" required>
+                <label for="issue_type">Issue Type</label>
+                <select name="issue_type" id="issue_type" onchange="toggleOtherIssue()">
                     <option value="">Select</option>
                     <option value="No Internet Connection">No Internet Connection</option>
                     <option value="Slow Internet Connection">Slow Internet Connection</option>
@@ -69,13 +73,13 @@
             </div>
 
             <div class="form-group" id="other-issue-box" style="display: none;">
-                <label>Other Issue</label>
-                <input type="text" name="other_issue_detail">
+                <label for="other_issue_detail">Other Issue</label>
+                <input type="text" name="other_issue_detail" id="other_issue_detail">
             </div>
 
             <div class="form-group">
-                <label>Request Services</label>
-                <select name="request_service" required>
+                <label for="request_service">Request Services</label>
+                <select name="request_service" id="request_service">
                     <option value="Technical Team">Technical Team</option>
                     <option value="Network Team">Network Team</option>
                     <option value="Billing Team">Billing Team</option>
@@ -83,16 +87,16 @@
             </div>
 
             <div class="form-group">
-                <label>Leave a Note</label>
-                <textarea name="repair_note"></textarea>
+                <label for="repair_note">Leave a Note</label>
+                <textarea name="repair_note" id="repair_note"></textarea>
             </div>
         </div>
 
         <!-- ACCOUNT MANAGEMENT SECTION -->
         <div id="account-form" style="display: none;">
             <div class="form-group">
-                <label>Account Request</label>
-                <select name="account_request" id="account_request" onchange="togglePlanOptions()" required>
+                <label for="account_request">Account Request</label>
+                <select name="account_request" id="account_request" onchange="togglePlanOptions()">
                     <option value="">Select</option>
                     <option value="Change Internet Plan">Change Internet Plan</option>
                     <option value="Line Transfer">Line Transfer</option>
@@ -102,8 +106,8 @@
             </div>
 
             <div class="form-group" id="plan-options" style="display: none;">
-                <label>Choose New Internet Plan</label>
-                <select name="new_plan">
+                <label for="new_plan">Choose New Internet Plan</label>
+                <select name="new_plan" id="new_plan">
                     <option value="">Select Plan</option>
                     <option value="Basic Plan">Basic Plan</option>
                     <option value="Premium Plan">Premium Plan</option>
@@ -112,8 +116,8 @@
             </div>
 
             <div class="form-group">
-                <label>Leave a Note</label>
-                <textarea name="account_note"></textarea>
+                <label for="account_note">Leave a Note</label>
+                <textarea name="account_note" id="account_note"></textarea>
             </div>
         </div>
 
@@ -121,18 +125,17 @@
     </form>
 </div>
 
+
 <script>
- function showForm(type) {
+    function showForm(type) {
         document.getElementById('form_type').value = type;
 
         const repairForm = document.getElementById('repair-form');
         const accountForm = document.getElementById('account-form');
 
-        // Toggle visibility
         repairForm.style.display = (type === 'repair') ? 'block' : 'none';
         accountForm.style.display = (type === 'account') ? 'block' : 'none';
 
-        // Enable required fields for the selected form only
         const toggleRequired = (form, enable) => {
             Array.from(form.querySelectorAll('[required]')).forEach(input => {
                 if (enable) {
@@ -146,7 +149,6 @@
         toggleRequired(repairForm, type === 'repair');
         toggleRequired(accountForm, type === 'account');
     }
-
 
     function toggleOtherIssue() {
         const issue = document.getElementById('issue_type').value;
@@ -168,10 +170,23 @@
     }
 
     window.addEventListener('DOMContentLoaded', () => {
-        const type = document.getElementById('form_type').value;
-        if (type) showForm(type);
+        let formType = "{{ request.form.get('form_type', '') }}";
+        if (formType !== 'repair' && formType !== 'account') {
+            formType = 'repair'; // default to repair form if none selected
+        }
+        showForm(formType);
         toggleOtherIssue();
         togglePlanOptions();
+
+        // Add active class toggle to buttons
+        const buttons = document.querySelectorAll('.toggle-options button');
+        buttons.forEach(button => {
+            button.classList.remove('active');
+            if (button.getAttribute('onclick').includes(formType)) {
+                button.classList.add('active');
+            }
+        });
     });
 </script>
 
+{% endblock %}
